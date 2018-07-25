@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "FlatListDemo",
-    "description": "This project is really great.",
-    "slug": "FlatListDemo",
+    "name": "HiEfficiency",
+    "description": "An app that makes measuring Process Efficiency easy",
+    "slug": "HiEfficieny",
     "privacy": "public",
     "sdkVersion": "28.0.0",
     "platforms": ["ios", "android"],
