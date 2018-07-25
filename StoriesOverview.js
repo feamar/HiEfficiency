@@ -16,15 +16,23 @@ import {
 import firebase from 'firebase';
 import 'firebase/firestore';
 
+
+  function getStories() {
+    var firebaseConfig = require('./firebase.config.json');
+    !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+    store = firebase.firestore();
+    store.settings({timestampsInSnapshots: true});
+    return store.collection('stories');
+  }
+
+
 export default class StoriesOverview extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      basic: true,
       listViewData: [],
       isReady: false,
-      isOpen: false
     };
   }
   
@@ -35,7 +43,7 @@ export default class StoriesOverview extends React.Component {
   
   registerDatabaseListener() {
     var _this = this;
-    this.unregisterDatabaseListener = this.stories.onSnapshot(function(querySnapshot) {
+    this.unregisterDatabaseListener = getStories().onSnapshot(function(querySnapshot) {
     	var i;
 	    const newData = [..._this.state.listViewData];
     	for (i = 0; i < querySnapshot.docChanges().length; i++) { 
@@ -55,11 +63,6 @@ export default class StoriesOverview extends React.Component {
   }
 
   componentDidMount() {
-	var firebaseConfig = require('./firebase.config.json');
-    !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-    store = firebase.firestore();
-    store.settings({timestampsInSnapshots: true});
-    this.stories = store.collection('stories');
 	this.registerDatabaseListener();
     this.loadFonts();
   }
@@ -81,12 +84,12 @@ export default class StoriesOverview extends React.Component {
 
   // For deleting and adding rows to the database
   deleteRow(data) {
-    this.stories.doc(data.id).delete();
+    getStories().doc(data.id).delete();
   }
 
   addRow(newStoryName) {
 	  if (newStoryName !== undefined) {
-		  this.stories.add({
+		  getStories().add({
 			  name: newStoryName,
 		  });
 	  } else {
