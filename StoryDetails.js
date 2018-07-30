@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppLoading, Font } from 'expo';
-import { FlatList, ListView, StyleSheet, View } from 'react-native';
+import { Modal, FlatList, ListView, StyleSheet, View } from 'react-native';
 import {
 	  Button,
 	  Container,
@@ -28,6 +28,8 @@ export default class StoryDetails extends React.Component {
 	  super(props);
 	  this.story = props.navigation.getParam('story');
   	this.state = {
+			   modalVisible: false,
+				 modalItemSelected: -1,
 		     started: this.story.data().startedOn !== undefined,
 		     startedOn: this.story.data().startedOn !== undefined ? this.story.data().startedOn.seconds : undefined,
 		     finished: this.story.data().finishedOn !== undefined,
@@ -35,6 +37,10 @@ export default class StoryDetails extends React.Component {
 		     interruptions: this.story.data().interruptions !== undefined ? this.story.data().interruptions : [],
 				 interruptionCategories: this.story.data().interruptionCategories !== undefined ? this.story.data().interruptionCategories : [],
 		   };
+  }
+
+  setModalVisible(visible) {
+    this.setState({modalVisible: visible});
   }
 
   componentDidMount() {
@@ -141,7 +147,7 @@ export default class StoryDetails extends React.Component {
       case 'other':
         return 'hand';
       default:
-        return 'question';
+        return 'help';
     }
 	}
 
@@ -172,88 +178,122 @@ export default class StoryDetails extends React.Component {
   }
 
   render() {
-	let interruptionList;
-	if (this.state.interruptions.length !== 0) {
-		// Add all the finished interruptions in reverse order
-		_keyExtractor = (item, index) => index + ' ' + item.seconds;
-		interruptionList =
-        	<FlatList
-        	  data={this.convertInterruptionTimesToIntervals()}
-		 	  extraData={this.state}
-		      keyExtractor={_keyExtractor}
-        	  renderItem={({item}) =>
-							<View style={styles.interruptionItem}>
-								<Icon active style={item.iconColor} name={item.iconName} />
-								<Text>&nbsp;&nbsp;At&nbsp;{item.interruptStart},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
-							</View>
-						}
-        	/>;
-	}
+		let interruptionList;
+		if (this.state.interruptions.length !== 0) {
+			// Add all the finished interruptions in reverse order
+			_keyExtractor = (item, index) => index + ' ' + item.seconds;
+			interruptionList =
+	      <FlatList
+	        	  data={this.convertInterruptionTimesToIntervals()}
+			 	  extraData={this.state}
+			      keyExtractor={_keyExtractor}
+	        	  renderItem={({item, index}) =>
+								<View style={styles.interruptionItem}>
+									<Button iconLeft transparent onPress = {() => {
+										this.setState({modalItemSelected: index});
+										this.setModalVisible(true);
+									}}>
+									  <Icon active style={item.iconColor} name={item.iconName} />
+									</Button>
+									<Text>&nbsp;&nbsp;At&nbsp;{item.interruptStart},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
+								</View>
+							}
+	        	/>;
+		}
 
-	let element;
-	if (!this.state.started) {
-		element =
-		   <Button onPress={this.addStartedOn}>
-		     <Text>Start story</Text>
-		   </Button>;
-	} else if (!this.state.finished) {
-		if (this.state.interruptions.length % 2 == 0) {
+		let element;
+		if (!this.state.started) {
 			element =
-				 <View>
-					<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
-					{interruptionList}
-					<View style={styles.buttonContainer}>
-					   <Button style={{backgroundColor: 'purple'}} onPress={() => this.addInterrupt('meeting')}>
-							 <Icon active name="chatbubbles" />
-							 <Text>Meeting</Text>
-					   </Button>
-						 <Button style={{backgroundColor: 'orange'}} onPress={() => this.addInterrupt('waiting')}>
-							 <Icon active name="people" />
-							 <Text>Waiting on others</Text>
-					   </Button>
-						 <Button style={{backgroundColor: 'blue'}} onPress={() => this.addInterrupt('other')}>
-							 <Icon active name="hand" />
-							 <Text>Other</Text>
-					   </Button>
-					   <Button style={styles.finishButton} onPress={this.addFinishedOn}>
-							 <Icon active name="checkmark" />
-							 <Text>Finish story</Text>
-					   </Button>
-					</View>
-				 </View>;
+			   <Button onPress={this.addStartedOn}>
+			     <Text>Start story</Text>
+			   </Button>;
+		} else if (!this.state.finished) {
+			if (this.state.interruptions.length % 2 == 0) {
+				element =
+					 <View>
+						<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
+						{interruptionList}
+						<View style={styles.buttonContainer}>
+						   <Button style={{backgroundColor: 'purple'}} onPress={() => this.addInterrupt('meeting')}>
+								 <Icon active name="chatbubbles" />
+								 <Text>Meeting</Text>
+						   </Button>
+							 <Button style={{backgroundColor: 'orange'}} onPress={() => this.addInterrupt('waiting')}>
+								 <Icon active name="people" />
+								 <Text>Waiting on others</Text>
+						   </Button>
+							 <Button style={{backgroundColor: 'blue'}} onPress={() => this.addInterrupt('other')}>
+								 <Icon active name="hand" />
+								 <Text>Other</Text>
+						   </Button>
+						   <Button style={styles.finishButton} onPress={this.addFinishedOn}>
+								 <Icon active name="checkmark" />
+								 <Text>Finish story</Text>
+						   </Button>
+						</View>
+					 </View>;
+			} else {
+				element =
+					 <View>
+					   <Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
+						{interruptionList}
+						<View style={styles.buttonContainer}>
+						   <Button onPress={() => this.addInterrupt(undefined)}>
+								 <Icon active name="refresh" />
+								 <Text>Resume Progress</Text>
+						   </Button>
+						   <Button style={styles.finishButton} onPress={this.finishInterruptedStory}>
+								 <Icon active name="checkmark" />
+								 <Text>Finish story</Text>
+						   </Button>
+						</View>
+					 </View>;
+			}
 		} else {
 			element =
-				 <View>
-				   <Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
-					{interruptionList}
-					<View style={styles.buttonContainer}>
-					   <Button onPress={() => this.addInterrupt(undefined)}>
-							 <Icon active name="refresh" />
-							 <Text>Resume Progress</Text>
-					   </Button>
-					   <Button style={styles.finishButton} onPress={this.finishInterruptedStory}>
-							 <Icon active name="checkmark" />
-							 <Text>Finish story</Text>
-					   </Button>
-					</View>
-				 </View>;
+		    <View>
+			  <Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
+			  <Text>Finished on {this.dateAsString(this.state.finishedOn)}</Text>
+			  <Text>Total time: {this.secondsDifferenceAsString(this.state.startedOn, this.state.finishedOn)}</Text>
+			  <Text>The times that the team was interrupted were:</Text>
+			  {interruptionList}
+			</View>
 		}
-	} else {
-		element =
-	    <View>
-		  <Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
-		  <Text>Finished on {this.dateAsString(this.state.finishedOn)}</Text>
-		  <Text>Total time: {this.secondsDifferenceAsString(this.state.startedOn, this.state.finishedOn)}</Text>
-		  <Text>The times that the team was interrupted were:</Text>
-		  {interruptionList}
-		</View>
-	}
 
-	return (
-		<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-			{element}
-		</View>
-    );
+		return (
+			<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+				<Modal
+					animationType="slide"
+					transparent={true}
+					visible={this.state.modalVisible}
+					onRequestClose={() => alert('Requested close for modal')}
+				>
+					<View style={{
+						flex: 1,
+						flexDirection: 'column',
+					  justifyContent: 'center',
+					  alignItems: 'center'
+					}}>
+					  <View style={{
+					    width: 300,
+					    height: 300,
+							backgroundColor: '#ffffff80'
+						}}>
+							<Button onPress = { () => {
+								this.setState({modalItemSelected: -1});
+								this.setModalVisible(false);
+							}}>
+								<Text>Close</Text>
+						  </Button>
+							<Text>{'Selected item: ' + this.state.modalItemSelected}</Text>
+							<Text>{this.state.modalItemSelected !== -1 ? new Date(this.state.interruptions[this.state.modalItemSelected*2].seconds*1000).toLocaleTimeString() : ''}</Text>
+							<Text>{this.state.modalItemSelected !== -1 ? new Date(this.state.interruptions[this.state.modalItemSelected*2+1].seconds*1000).toLocaleTimeString() : ''}</Text>
+						</View>
+					</View>
+				</Modal>
+				{element}
+			</View>
+	  );
   }
 }
 
