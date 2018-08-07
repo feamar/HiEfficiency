@@ -189,13 +189,10 @@ export default class StoryDetails extends React.Component {
 	  if (this.state.interruptions.length % 2 == 1) {
 		  var current = this.state.interruptions[this.state.interruptions.length - 1].seconds;
 		  result.push({
-<<<<<<< HEAD
 				currentInterrupt: 'Currently interrupted, started at ' + new Date(current*1000).toDateString().slice(4),
-=======
 				displayText: new Date(current*1000).toLocaleTimeString() + ' got interrupted ',
 				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
 				iconName: this.iconName(this.state.interruptionCategories[i/2])
->>>>>>> 1bed8cd1d15e10fab08d4b871e58ff8d9641c621
 			});
 	  }
 	  return result;
@@ -208,12 +205,11 @@ export default class StoryDetails extends React.Component {
 			_keyExtractor = (item, index) => index + ' ' + item.seconds;
 			interruptionList =
 	      <FlatList
-      	  data={this.convertInterruptionTimesToIntervals().reverse()}
+      	  data={this.convertInterruptionTimesToIntervals()}
 			 	  extraData={this.state}
 		      keyExtractor={_keyExtractor}
       	  renderItem={({item, index}) =>
 								<View style={styles.interruptionItem}>
-<<<<<<< HEAD
 									<View style={styles.interruptionSubitem}>
 										<View style={styles.interruptionIconAndText}>
 										  <Icon active style={item.iconColor} name={item.iconName} />
@@ -227,15 +223,6 @@ export default class StoryDetails extends React.Component {
 										</Button>
 									</View>
 									<Text style={styles.productiveTimeText}>Produced for {item.productiveTime}</Text>
-=======
-									<Button iconLeft transparent onPress = {() => {
-										this.setState({modalItemSelected: index});
-										this.setModalVisible(true);
-									}}>
-									  <Icon active style={item.iconColor} name={item.iconName} />
-									</Button>
-									<Text>&nbsp;&nbsp;At&nbsp;{item.displayText == undefined ? item.interruptStart : item.displayText},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
->>>>>>> 1bed8cd1d15e10fab08d4b871e58ff8d9641c621
 								</View>
 							}
 	        	/>;
