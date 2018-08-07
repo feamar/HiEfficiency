@@ -4,14 +4,14 @@ import { Modal, FlatList, ListView, StyleSheet, View } from 'react-native';
 import {
 	  Button,
 	  Container,
+		Content,
 	  Header,
 		Icon,
-	  Content,
+		Input,
+		Item,
 	  List,
 	  ListItem,
 	  Text,
-	  Input,
-	  Item,
 	} from 'native-base';
 import Timestamp from 'react-timestamp';
 
@@ -159,19 +159,23 @@ export default class StoryDetails extends React.Component {
 	  for (i = 0; i + 1 < this.state.interruptions.length; i += 2) {
 		  first = this.state.interruptions[i].seconds;
 		  second = this.state.interruptions[i+1].seconds;
+			if (i==0) {
+				previous = this.state.startedOn;
+			} else {
+				previous = this.state.interruptions[i-1].seconds;
+			}
 		  result.push({
 				interruptTime: this.secondsDifferenceAsString(first, second),
 				interruptStart: new Date(first*1000).toLocaleTimeString(),
 				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
-				iconName: this.iconName(this.state.interruptionCategories[i/2])
+				iconName: this.iconName(this.state.interruptionCategories[i/2]),
+				productiveTime: this.secondsDifferenceAsString(previous, first)
 			});
 	  }
 	  if (this.state.interruptions.length % 2 == 1) {
 		  var current = this.state.interruptions[this.state.interruptions.length - 1].seconds;
 		  result.push({
-				displayText: 'Currently interrupted, started at ' + new Date(current*1000).toDateString().slice(4),
-				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
-				iconName: this.iconName(this.state.interruptionCategories[i/2])
+				currentInterrupt: 'Currently interrupted, started at ' + new Date(current*1000).toDateString().slice(4),
 			});
 	  }
 	  return result;
@@ -184,18 +188,24 @@ export default class StoryDetails extends React.Component {
 			_keyExtractor = (item, index) => index + ' ' + item.seconds;
 			interruptionList =
 	      <FlatList
-	        	  data={this.convertInterruptionTimesToIntervals()}
+      	  data={this.convertInterruptionTimesToIntervals().reverse()}
 			 	  extraData={this.state}
-			      keyExtractor={_keyExtractor}
-	        	  renderItem={({item, index}) =>
+		      keyExtractor={_keyExtractor}
+      	  renderItem={({item, index}) =>
 								<View style={styles.interruptionItem}>
-									<Button iconLeft transparent onPress = {() => {
-										this.setState({modalItemSelected: index});
-										this.setModalVisible(true);
-									}}>
-									  <Icon active style={item.iconColor} name={item.iconName} />
-									</Button>
-									<Text>&nbsp;&nbsp;At&nbsp;{item.interruptStart},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
+									<View style={styles.interruptionSubitem}>
+										<View style={styles.interruptionIconAndText}>
+										  <Icon active style={item.iconColor} name={item.iconName} />
+											<Text>&nbsp;&nbsp;At&nbsp;{item.interruptStart},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
+										</View>
+										<Button iconLeft transparent onPress = {() => {
+											this.setState({modalItemSelected: index});
+											this.setModalVisible(true);
+										}}>
+										  <Icon active name='more' />
+										</Button>
+									</View>
+									<Text style={styles.productiveTimeText}>Produced for {item.productiveTime}</Text>
 								</View>
 							}
 	        	/>;
@@ -211,23 +221,26 @@ export default class StoryDetails extends React.Component {
 			if (this.state.interruptions.length % 2 == 0) {
 				element =
 					 <View>
-						<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
 						{interruptionList}
+						<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
+							<Icon active name='power' />
+							<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
+						</View>
 						<View style={styles.buttonContainer}>
 						   <Button style={{backgroundColor: 'purple'}} onPress={() => this.addInterrupt('meeting')}>
-								 <Icon active name="chatbubbles" />
+								 <Icon active style={styles.buttonIcon} name="chatbubbles" />
 								 <Text>Meeting</Text>
 						   </Button>
 							 <Button style={{backgroundColor: 'orange'}} onPress={() => this.addInterrupt('waiting')}>
-								 <Icon active name="people" />
+								 <Icon active style={styles.buttonIcon} name="people" />
 								 <Text>Waiting on others</Text>
 						   </Button>
 							 <Button style={{backgroundColor: 'blue'}} onPress={() => this.addInterrupt('other')}>
-								 <Icon active name="hand" />
+								 <Icon active style={styles.buttonIcon} name="hand" />
 								 <Text>Other</Text>
 						   </Button>
 						   <Button style={styles.finishButton} onPress={this.addFinishedOn}>
-								 <Icon active name="checkmark" />
+								 <Icon active style={styles.buttonIcon} name="checkmark" />
 								 <Text>Finish story</Text>
 						   </Button>
 						</View>
@@ -235,15 +248,18 @@ export default class StoryDetails extends React.Component {
 			} else {
 				element =
 					 <View>
-					   <Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
 						{interruptionList}
+						<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
+							<Icon active name='power' />
+							<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
+						</View>
 						<View style={styles.buttonContainer}>
 						   <Button onPress={() => this.addInterrupt(undefined)}>
-								 <Icon active name="refresh" />
+								 <Icon active style={styles.buttonIcon} name="refresh" />
 								 <Text>Resume Progress</Text>
 						   </Button>
 						   <Button style={styles.finishButton} onPress={this.finishInterruptedStory}>
-								 <Icon active name="checkmark" />
+								 <Icon active style={styles.buttonIcon} name="checkmark" />
 								 <Text>Finish story</Text>
 						   </Button>
 						</View>
@@ -311,7 +327,27 @@ const styles = StyleSheet.create({
 		backgroundColor: 'green',
 	},
 	interruptionItem: {
+		flexDirection: 'column',
+		paddingHorizontal: 5,
+	},
+	interruptionSubitem: {
 		flexDirection: 'row',
-		padding: 5,
-	}
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	interruptionIconAndText: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+	},
+	productiveTimeText: {
+		color: '#0005',
+		marginLeft: 15,
+		borderLeftWidth: 2,
+		paddingLeft: 5,
+		borderColor: '#0005',
+	},
+	buttonIcon: {
+		color: 'white',
+	},
 });
