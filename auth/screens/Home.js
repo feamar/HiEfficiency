@@ -33,7 +33,7 @@ export default class Home extends React.Component {
 
   addTeam = (teamDocument) => {
     currentTeams = this.state.teams;
-    currentTeams.push(teamDocument.data());
+    currentTeams.push(teamDocument);
     this.setState({teams: currentTeams});
   }
 
@@ -57,20 +57,25 @@ export default class Home extends React.Component {
     });
   }
 
+  getStoriesUnderTeam(teamDocument) {
+    let stories = teamDocument.ref.collection('stories');
+    stories.add({name: 'Nieuw team'});
+    return stories;
+  }
+
   render() {
-    console.log(this.state.teams);
     return (
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingVertical: 20 }}>
-          {this.state.teams.map(({ name }) => (
-            <Card title={`CARD ${name}`}>
+          {this.state.teams.map((teamDocument) => (
+            <Card title={`CARD ${teamDocument.data().name}`} key={teamDocument.id}>
               <Text style={{ marginBottom: 10 }}>
-                Team {name}.
+                Team {teamDocument.data().name}.
               </Text>
               <Button
               title="VIEW NOW"
                 backgroundColor="#03A9F4"
-                // onPress={() => Linking.openURL(url)}
+                onPress={() => this.getStoriesUnderTeam(teamDocument)}
               />
             </Card>
           ))}
