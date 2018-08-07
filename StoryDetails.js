@@ -183,7 +183,7 @@ export default class StoryDetails extends React.Component {
 			}
 		  result.push({
 				interruptTime: this.secondsDifferenceAsString(first, second),
-				interruptStart: new Date(first*1000).toLocaleTimeString(),
+				interruptStart: new Date(first*1000).toLocaleTimeString().substring(0,5),
 				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
 				iconName: this.iconName(this.state.interruptionCategories[i/2]),
 				productiveTime: this.secondsDifferenceAsString(previous, first)
@@ -193,7 +193,7 @@ export default class StoryDetails extends React.Component {
 		  var current = this.state.interruptions[this.state.interruptions.length - 1].seconds;
 		  result.push({
 				currentInterrupt: 'Currently interrupted, started at ' + new Date(current*1000).toDateString().slice(4),
-				displayText: new Date(current*1000).toLocaleTimeString() + ' got interrupted ',
+				displayText: new Date(current*1000).toLocaleTimeString().substring(0,5) + ' got interrupted ',
 				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
 				iconName: this.iconName(this.state.interruptionCategories[i/2])
 			});
@@ -209,7 +209,7 @@ export default class StoryDetails extends React.Component {
 	}
 
   render() {
-		let interruptionList = <InterruptionList data={this.convertInterruptionTimesToIntervals()} extraData={this.state} keyExtractor={(item, index) => index + ' ' + item.seconds} editFnc={this.editInterruption} />;
+		let interruptionList = <InterruptionList data={this.convertInterruptionTimesToIntervals().reverse()} extraData={this.state} keyExtractor={(item, index) => index + ' ' + item.seconds} editFnc={this.editInterruption} />;
 
 		let element;
 		if (!this.state.started) {
@@ -277,7 +277,7 @@ export default class StoryDetails extends React.Component {
 		}
 
 		return (
-			<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+			<View style={styles.container}>
 				<EditInterruptionModal
    				parent={this}
 					modalVisible={this.state.modalVisible}

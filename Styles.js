@@ -38,4 +38,29 @@ export const styles = StyleSheet.create({
 	buttonIcon: {
 		color: 'white',
 	},
+  modalSurroundings: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#00000033',
+  },
+  modalContainer: {
+    width: 300,
+    height: 300,
+    backgroundColor: '#ffffffff',
+    padding: 5,
+    justifyContent: 'flex-start',
+  },
+  modalHeader: {
+    backgroundColor: 'red',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  datetimeEditButton: {
+    flex: .8,
+    paddingVertical: 2,
+    borderColor: 'grey',
+    borderBottomWidth: 1,
+    marginHorizontal: 5,
+  },
 });
