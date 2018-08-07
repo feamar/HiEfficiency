@@ -15,6 +15,7 @@ export default class Auth extends React.Component {
   }
 
   componentDidMount() {
+    console.ignoredYellowBox = ['Setting a timer'];
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         // User is signed in.
