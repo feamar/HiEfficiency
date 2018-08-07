@@ -1,26 +1,8 @@
 import React from "react";
 import { View } from "react-native";
 import { Card, Button, Text } from "react-native-elements";
-import { signOut } from "../auth";
-import firebase from 'firebase';
-import 'firebase/firestore';
-import 'firebase/auth';
-
-function getUsers() {
-  var firebaseConfig = require('./../../firebase.config.json');
-  !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-  store = firebase.firestore();
-  store.settings({timestampsInSnapshots: true});
-  return store.collection('users');
-}
-
-function getTeams() {
-  var firebaseConfig = require('./../../firebase.config.json');
-  !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-  store = firebase.firestore();
-  store.settings({timestampsInSnapshots: true});
-  return store.collection('teams');
-}
+import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../../FirebaseAdapter";
+import { signOutAndRedirect } from './Home';
 
 export default class Profile extends React.Component {
   constructor(props) {
@@ -32,29 +14,25 @@ export default class Profile extends React.Component {
     }
   }
 
-  componentDidMount() {
-    _this = this;
-    console.ignoredYellowBox = ['Setting a timer'];
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        getUsers().doc(user.uid).get().then(function(doc) {
-            if (doc.exists) {
-                // Map teams identifiers to documents
-                _this.setState({name: doc.data().name, initials: doc.data().initials, teams: doc.data().teams});
-            } else {
-                console.log("Signed up user does not have a profile for user id: " + user.id);
-            }
-        }).catch(function(error) {
-            console.log("Error getting user profile:", error);
-        });
-      } else {
-        signOut().then(() => this.props.navigation.navigate("SignedOut"));
-      }
+  displayUserProfileData = (user) => {
+    let _this = this;
+    getUsers().doc(user.uid).get().then(function(doc) {
+        if (doc.exists) {
+            // Map teams identifiers to documents
+            _this.setState({name: doc.data().name, initials: doc.data().initials, teams: doc.data().teams});
+        } else {
+            console.log("Signed up user does not have a profile for user id: " + user.id);
+        }
+    }).catch(function(error) {
+        console.log("Error getting user profile:", error);
     });
   }
 
-  render() {
+  componentDidMount() {
+    hookIntoUserSignin(this.displayUserProfileData, signOutAndRedirect);
+  }
 
+  render() {
     return (
       <View style={{ paddingVertical: 20 }}>
         <Card title={this.state.name}>

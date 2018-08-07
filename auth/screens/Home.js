@@ -1,25 +1,10 @@
 import React from "react";
 import { ScrollView, Text, Linking, View } from "react-native";
 import { Card, Button } from "react-native-elements";
+import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../../FirebaseAdapter';
 
-import firebase from 'firebase';
-import 'firebase/firestore';
-import 'firebase/auth';
-
-function getUsers() {
-  var firebaseConfig = require('./../../firebase.config.json');
-  !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-  store = firebase.firestore();
-  store.settings({timestampsInSnapshots: true});
-  return store.collection('users');
-}
-
-function getTeams() {
-  var firebaseConfig = require('./../../firebase.config.json');
-  !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-  store = firebase.firestore();
-  store.settings({timestampsInSnapshots: true});
-  return store.collection('teams');
+export const signOutAndRedirect = () => {
+  signOut().then(() => this.props.navigation.navigate("SignedOut"));
 }
 
 export default class Home extends React.Component {
@@ -37,23 +22,16 @@ export default class Home extends React.Component {
     this.setState({teams: currentTeams});
   }
 
-  componentDidMount() {
+  getTeamsForUser = (user) => {
     let _this = this;
-    console.ignoredYellowBox = ['Setting a timer'];
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        getUsers().doc(user.uid).get().then(function(doc) {
-            if (doc.exists) {
-                doc.data().teams.map((teamIdentifier) => getTeams().doc(teamIdentifier).get().then(_this.addTeam));
-            } else {
-                console.log("Signed up user does not have a profile for user id: " + user.id);
-            }
-        }).catch(function(error) {
-            console.log("Error getting user profile:", error);
-        });
-      } else {
-        signOut().then(() => this.props.navigation.navigate("SignedOut"));
-      }
+    getUsers().doc(user.uid).get().then(function(doc) {
+        if (doc.exists) {
+            doc.data().teams.map((teamIdentifier) => getTeams().doc(teamIdentifier).get().then(_this.addTeam));
+        } else {
+            console.log("Signed up user does not have a profile for user id: " + user.id);
+        }
+    }).catch(function(error) {
+        console.log("Error getting user profile:", error);
     });
   }
 
@@ -61,6 +39,10 @@ export default class Home extends React.Component {
     let stories = teamDocument.ref.collection('stories');
     stories.add({name: 'Nieuw team'});
     return stories;
+  }
+
+  componentDidMount() {
+    hookIntoUserSignin(this.getTeamsForUser, signOutAndRedirect);
   }
 
   render() {

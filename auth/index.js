@@ -1,8 +1,8 @@
 import React from "react";
 import { createRootNavigator } from "./router";
-import { isSignedIn } from "./auth";
 import firebase from 'firebase';
 import 'firebase/auth';
+import { hookIntoUserSignin } from './../FirebaseAdapter'
 
 export default class Auth extends React.Component {
   constructor(props) {
@@ -15,16 +15,8 @@ export default class Auth extends React.Component {
   }
 
   componentDidMount() {
-    console.ignoredYellowBox = ['Setting a timer'];
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        this.setState({ signedIn: true, checkedSignIn: true });
-      } else {
-        // No user is signed in.
-        this.setState({ signedIn: false, checkedSignIn: true });
-      }
-    });
+    hookIntoUserSignin(() => this.setState({ signedIn: true, checkedSignIn: true }),
+                       () => this.setState({ signedIn: false, checkedSignIn: true }));
   }
 
   render() {

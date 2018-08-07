@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { AppLoading, Font } from 'expo';
 import { ListView, View } from 'react-native';
 import {
   Button,
@@ -13,18 +12,7 @@ import {
   Input,
   Item,
 } from 'native-base';
-import firebase from 'firebase';
-import 'firebase/firestore';
-
-
-  function getStories() {
-    var firebaseConfig = require('./firebase.config.json');
-    !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-    store = firebase.firestore();
-    store.settings({timestampsInSnapshots: true});
-    return store.collection('stories');
-  }
-
+import { getStories } from './FirebaseAdapter';
 
 export default class StoriesOverview extends React.Component {
   constructor(props) {
@@ -32,21 +20,20 @@ export default class StoriesOverview extends React.Component {
 
     this.state = {
       listViewData: [],
-      isReady: false,
     };
   }
-  
+
   static navigationOptions = {
 	title: 'Stories',
 	headerTitleStyle: {flex: 1}
   };
-  
+
   registerDatabaseListener() {
     var _this = this;
     this.unregisterDatabaseListener = getStories().onSnapshot(function(querySnapshot) {
     	var i;
 	    const newData = [..._this.state.listViewData];
-    	for (i = 0; i < querySnapshot.docChanges().length; i++) { 
+    	for (i = 0; i < querySnapshot.docChanges().length; i++) {
         	var dcs = querySnapshot.docChanges()[i];
         	if (dcs.type == 'added') {
         	    newData.splice(dcs.newIndex, 0, dcs.doc);
@@ -63,23 +50,11 @@ export default class StoriesOverview extends React.Component {
   }
 
   componentDidMount() {
-	this.registerDatabaseListener();
-    this.loadFonts();
+	  this.registerDatabaseListener();
   }
-  
+
   componentWillUnmount() {
 	  this.unregisterDatabaseListener();
-  }
-  
-  // For basic functionality, we need to load some resources 
-  async loadFonts() {
-    await Font.loadAsync({
-      FontAwesome: require('@expo/vector-icons/fonts/FontAwesome.ttf'),
-      Roboto: require('native-base/Fonts/Roboto.ttf'),
-      Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
-      Ionicons: require('@expo/vector-icons/fonts/Ionicons.ttf'),
-    });
-    this.setState({ isReady: true });
   }
 
   // For deleting and adding rows to the database
@@ -96,12 +71,8 @@ export default class StoriesOverview extends React.Component {
 		  alert('You cannot add a story without giving it a name');
 	  }
   }
-  
-  render() {
-    if (!this.state.isReady) {
-      return <AppLoading />;
-    }
 
+  render() {
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     return (
       <Container>
@@ -124,7 +95,7 @@ export default class StoriesOverview extends React.Component {
               <ListItem onPress = {_ => this.props.navigation.navigate('Details', {
               	  story: doc,
               })}>
-	            <Text> {doc.data().name} </Text>
+	             <Text> {doc.data().name} </Text>
               </ListItem>
             )}
             renderLeftHiddenRow={(doc, secId, rowId, rowMap) => (

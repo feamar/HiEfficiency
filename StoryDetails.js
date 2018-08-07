@@ -15,6 +15,8 @@ import {
 	} from 'native-base';
 import Timestamp from 'react-timestamp';
 import EditInterruptionModal from './EditInterruptionModal';
+import { InterruptionList } from './InterruptionList';
+import { styles } from './Styles';
 
 export default class StoryDetails extends React.Component {
 
@@ -27,6 +29,7 @@ export default class StoryDetails extends React.Component {
 
   constructor(props) {
 	  super(props);
+		this.editInterruption = this.editInterruption.bind(this);
 	  this.story = props.navigation.getParam('story');
   	this.state = {
 			   modalVisible: false,
@@ -198,35 +201,15 @@ export default class StoryDetails extends React.Component {
 	  return result;
   }
 
-  render() {
-		let interruptionList;
-		if (this.state.interruptions.length !== 0) {
-			// Add all the finished interruptions in reverse order
-			_keyExtractor = (item, index) => index + ' ' + item.seconds;
-			interruptionList =
-	      <FlatList
-      	  data={this.convertInterruptionTimesToIntervals()}
-			 	  extraData={this.state}
-		      keyExtractor={_keyExtractor}
-      	  renderItem={({item, index}) =>
-								<View style={styles.interruptionItem}>
-									<View style={styles.interruptionSubitem}>
-										<View style={styles.interruptionIconAndText}>
-										  <Icon active style={item.iconColor} name={item.iconName} />
-											<Text>&nbsp;&nbsp;At&nbsp;{item.interruptStart},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
-										</View>
-										<Button iconLeft transparent onPress = {() => {
-											this.setState({modalItemSelected: index});
-											this.setModalVisible(true);
-										}}>
-										  <Icon active name='more' />
-										</Button>
-									</View>
-									<Text style={styles.productiveTimeText}>Produced for {item.productiveTime}</Text>
-								</View>
-							}
-	        	/>;
+  editInterruption = (index) => {
+		return () => {
+			this.setState({modalItemSelected: index});
+			this.setModalVisible(true);
 		}
+	}
+
+  render() {
+		let interruptionList = <InterruptionList data={this.convertInterruptionTimesToIntervals()} extraData={this.state} keyExtractor={(item, index) => index + ' ' + item.seconds} editFnc={this.editInterruption} />;
 
 		let element;
 		if (!this.state.started) {
@@ -305,42 +288,3 @@ export default class StoryDetails extends React.Component {
 	  );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 15,
-    backgroundColor: '#fff',
-  },
-  buttonContainer: {
-		flexDirection: 'column',
-		justifyContent: 'flex-end',
-	},
-	finishButton: {
-		backgroundColor: 'green',
-	},
-	interruptionItem: {
-		flexDirection: 'column',
-		paddingHorizontal: 5,
-	},
-	interruptionSubitem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	interruptionIconAndText: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'flex-start',
-	},
-	productiveTimeText: {
-		color: '#0005',
-		marginLeft: 15,
-		borderLeftWidth: 2,
-		paddingLeft: 5,
-		borderColor: '#0005',
-	},
-	buttonIcon: {
-		color: 'white',
-	},
-});

@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { Card, Button, FormLabel, FormInput } from "react-native-elements";
-import { signUpWithEmailAndPassword } from "../auth";
+import { signUpWithEmailAndPassword } from "../../FirebaseAdapter";
 
 export default class SignUp extends React.Component {
   constructor() {
