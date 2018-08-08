@@ -17,6 +17,7 @@ import Timestamp from 'react-timestamp';
 import EditInterruptionModal from './EditInterruptionModal';
 import { InterruptionList } from './InterruptionList';
 import { styles } from './Styles';
+import { InterruptionButton, Meeting, WaitingForOthers, Other } from './InterruptionType';
 
 export default class StoryDetails extends React.Component {
 
@@ -30,6 +31,7 @@ export default class StoryDetails extends React.Component {
   constructor(props) {
 	  super(props);
 		this.editInterruption = this.editInterruption.bind(this);
+		this.addInterrupt = this.addInterrupt.bind(this);
 	  this.story = props.navigation.getParam('story');
   	this.state = {
 			   modalVisible: false,
@@ -227,18 +229,9 @@ export default class StoryDetails extends React.Component {
 							<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
 						</View>
 						<View style={styles.buttonContainer}>
-						   <Button style={{backgroundColor: 'purple'}} onPress={() => this.addInterrupt('meeting')}>
-								 <Icon active style={styles.buttonIcon} name="chatbubbles" />
-								 <Text>Meeting</Text>
-						   </Button>
-							 <Button style={{backgroundColor: 'orange'}} onPress={() => this.addInterrupt('waiting')}>
-								 <Icon active style={styles.buttonIcon} name="people" />
-								 <Text>Waiting on others</Text>
-						   </Button>
-							 <Button style={{backgroundColor: 'blue'}} onPress={() => this.addInterrupt('other')}>
-								 <Icon active style={styles.buttonIcon} name="hand" />
-								 <Text>Other</Text>
-						   </Button>
+						   <InterruptionButton type={Meeting} onPress={this.addInterrupt} />
+							 <InterruptionButton type={WaitingForOthers} onPress={this.addInterrupt} />
+							 <InterruptionButton type={Other} onPress={this.addInterrupt} />
 						   <Button style={styles.finishButton} onPress={this.addFinishedOn}>
 								 <Icon active style={styles.buttonIcon} name="checkmark" />
 								 <Text>Finish story</Text>
