@@ -100,11 +100,6 @@ export default class StoryDetails extends React.Component {
 	  return result;
   }
 
-  dateAsString(seconds) {
-	  var asDate = new Date(seconds*1000);
-	  return asDate.toDateString() + ' ' + asDate.toLocaleTimeString();
-  }
-
   addInterrupt = (category) => {
 	  let newInterrupts = this.state.interruptions
 	  newInterrupts.push(new Date());
@@ -224,45 +219,33 @@ export default class StoryDetails extends React.Component {
 				element =
 					 <View>
 						{interruptionList}
-						<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
-							<Icon active name='power' />
-							<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
-						</View>
+						<StartedOn start={this.state.startedOn} />
 						<View style={styles.buttonContainer}>
 						   <InterruptionButton type={Meeting} onPress={this.addInterrupt} />
 							 <InterruptionButton type={WaitingForOthers} onPress={this.addInterrupt} />
 							 <InterruptionButton type={Other} onPress={this.addInterrupt} />
-						   <Button style={styles.finishButton} onPress={this.addFinishedOn}>
-								 <Icon active style={styles.buttonIcon} name="checkmark" />
-								 <Text>Finish story</Text>
-						   </Button>
+							 <FinishButton onPress={this.addFinishedOn} />
 						</View>
 					 </View>;
 			} else {
 				element =
 					 <View>
 						{interruptionList}
-						<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
-							<Icon active name='power' />
-							<Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
-						</View>
+						<StartedOn start={this.state.startedOn} />
 						<View style={styles.buttonContainer}>
 						   <Button onPress={() => this.addInterrupt(undefined)}>
 								 <Icon active style={styles.buttonIcon} name="refresh" />
 								 <Text>Resume Progress</Text>
 						   </Button>
-						   <Button style={styles.finishButton} onPress={this.finishInterruptedStory}>
-								 <Icon active style={styles.buttonIcon} name="checkmark" />
-								 <Text>Finish story</Text>
-						   </Button>
+							 <FinishButton onPress={this.finishInterruptedStory} />
 						</View>
 					 </View>;
 			}
 		} else {
 			element =
 		    <View>
-			  <Text>Started on {this.dateAsString(this.state.startedOn)}</Text>
-			  <Text>Finished on {this.dateAsString(this.state.finishedOn)}</Text>
+			  <Text>Started on {dateAsString(this.state.startedOn)}</Text>
+			  <Text>Finished on {dateAsString(this.state.finishedOn)}</Text>
 			  <Text>Total time: {this.secondsDifferenceAsString(this.state.startedOn, this.state.finishedOn)}</Text>
 			  <Text>The times that the team was interrupted were:</Text>
 			  {interruptionList}
@@ -280,4 +263,22 @@ export default class StoryDetails extends React.Component {
 			</View>
 	  );
   }
+}
+
+const StartedOn = (props) => {
+	<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
+		<Icon active name='power' />
+		<Text>Started on {dateAsString(props.start)}</Text>
+	</View>
+}
+
+const FinishButton = (props) => {
+	<Button style={styles.finishButton} onPress={props.onPress}>
+		<Icon active style={styles.buttonIcon} name="checkmark" />
+		<Text>Finish story</Text>
+	</Button>
+
+const dateAsString = (seconds) => {
+  var asDate = new Date(seconds*1000);
+  return asDate.toDateString() + ' ' + asDate.toLocaleTimeString();
 }
