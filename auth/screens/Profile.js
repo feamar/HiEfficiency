@@ -2,16 +2,20 @@ import React from "react";
 import { View } from "react-native";
 import { Card, Button, Text } from "react-native-elements";
 import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../../FirebaseAdapter";
-import { signOutAndRedirect } from './Home';
 
 export default class Profile extends React.Component {
   constructor(props) {
     super(props);
+    this.signOutAndRedirect = this.signOutAndRedirect.bind(this);
     this.state = {
       name: undefined,
       initials: undefined,
       teams: []
     }
+  }
+
+  signOutAndRedirect = () => {
+    signOut().then(() => this.props.navigation.navigate("SignedOut"));
   }
 
   displayUserProfileData = (user) => {
@@ -29,7 +33,7 @@ export default class Profile extends React.Component {
   }
 
   componentDidMount() {
-    hookIntoUserSignin(this.displayUserProfileData, signOutAndRedirect);
+    hookIntoUserSignin(this.displayUserProfileData, this.signOutAndRedirect);
   }
 
   render() {
