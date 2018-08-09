@@ -13,6 +13,7 @@ import {
   Item,
 } from 'native-base';
 import { getStories } from './FirebaseAdapter';
+import { styles } from './Styles';
 
 export default class StoriesOverview extends React.Component {
   constructor(props) {
@@ -79,7 +80,7 @@ export default class StoriesOverview extends React.Component {
         <Header style={{height: 0}} />
         <Content>
           <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-            <Button success iconLeft onPress={_ => this.props.navigation.navigate('NewStory', {
+            <Button style={styles.storiesButton} iconLeft onPress={_ => this.props.navigation.navigate('NewStory', {
             	onSubmit: this.addRow,
             	mode: 'New',
             })}>
@@ -92,7 +93,7 @@ export default class StoriesOverview extends React.Component {
             rightOpenValue={-75}
             dataSource={ds.cloneWithRows(this.state.listViewData)}
             renderRow={doc => (
-              <ListItem onPress = {_ => this.props.navigation.navigate('Details', {
+              <ListItem style={[styles.storyOverviewItem, doc.data().finishedOn !== undefined ? styles.storyOpen : styles.storyFinished]} onPress = {_ => this.props.navigation.navigate('Details', {
               	  story: doc,
               })}>
 	             <Text> {doc.data().name} </Text>
