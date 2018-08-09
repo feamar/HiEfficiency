@@ -115,11 +115,24 @@ export default class StoryDetails extends React.Component {
   }
 
   updateInterruptionAtIndex(indexOfChangedInterrupt, newInterruptionDateTime) {
-		let newInterrupts = this.state.interruptions
+		let newInterrupts = this.state.interruptions;
 		newInterrupts.splice(indexOfChangedInterrupt, 1, newInterruptionDateTime);
 
 		this.props.navigation.getParam('story').ref.update({
 				interruptions: newInterrupts,
+		});
+	}
+
+  deleteInterruptionAtIndex(indexOfChangedInterrupt) {
+		let newInterrupts = this.state.interruptions;
+		newInterrupts.splice(indexOfChangedInterrupt, indexOfChangedInterrupt == this.state.interruptions.length - 1 ? 1 : 2);
+
+		let newInterruptCategories = this.state.interruptionCategories;
+		newInterruptCategories.splice(indexOfChangedInterrupt/2, 1);
+
+		this.props.navigation.getParam('story').ref.update({
+				interruptions: newInterrupts,
+				interruptionCategories: newInterruptCategories
 		});
 	}
 

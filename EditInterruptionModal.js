@@ -15,11 +15,10 @@ import {
 	} from 'native-base';
 import Timestamp from 'react-timestamp';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-
 import { styles } from './Styles';
 
 const combine = (time, date) => {
-	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHour(), time.getMinute(), time.getSecond());
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
 }
 
 const asTime = (date) => {
@@ -58,7 +57,7 @@ export default class EditInterruptionModal extends React.Component {
   }
 
 	date = (index) => {
-		return index < 0 ? new Date() : new Date(this.props.interruptions[index].seconds*1000);
+		return index < 0 || index >= this.props.interruptions.length ? new Date() : new Date(this.props.interruptions[index].seconds*1000);
 	}
 
 	overwriteStartTime = (date) => {
@@ -95,9 +94,16 @@ export default class EditInterruptionModal extends React.Component {
 	 	});
 	}
 
+	delete = () => {
+		this.props.parent.deleteInterruptionAtIndex(this.props.modalItemSelected*2);
+		this.close();
+	}
+
 	persist = () => {
-		// this.props.parent.updateInterruptionAtIndex(this.props.modalItemSelected*2, combine(this.state.interruptionStartTime(), this.state.interruptionStartDate()));
-		// this.props.parent.updateInterruptionAtIndex(this.props.modalItemSelected*2+1, combine(this.state.interruptionEndTime(), this.state.interruptionEndDate()));
+		this.props.parent.updateInterruptionAtIndex(this.props.modalItemSelected*2, combine(this.state.startTime(), this.state.startDate()));
+		if (this.props.modalItemSelected*2+1 < this.props.interruptions.length) {
+			this.props.parent.updateInterruptionAtIndex(this.props.modalItemSelected*2+1, combine(this.state.endTime(), this.state.endDate()));
+		}
 		this.close();
 	}
 
@@ -126,7 +132,7 @@ export default class EditInterruptionModal extends React.Component {
 		            <Icon active name='close' style={{color: 'white'}} />
 		          </Button>
 							<Text>{this.props.interruptionCategory}</Text>
-							<Button transparent onPress = { () => {alert('This will ones be deleting your interruption');}}>
+							<Button transparent onPress = { this.delete }>
 		            <Icon active name='trash' style={{color: 'white', paddingRight: 10,}} />
 		          </Button>
 						</View>
@@ -141,7 +147,7 @@ export default class EditInterruptionModal extends React.Component {
 							</Button>
 						</View>
 						<View style = {{paddingVertical: 5, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
-							<Text style={{width: 60,}}>Start</Text>
+							<Text style={{width: 60,}}>Finish</Text>
 							<Button transparent style={styles.datetimeEditButton} onPress={() => this.showDateTimePicker(this.state.endTime(), this.overwriteEndTime, 'time')}>
 								<Text style={{color: 'black',}} >{asTime(this.state.endTime())}</Text>
 							</Button>
