@@ -266,17 +266,22 @@ export default class StoryDetails extends React.Component {
 }
 
 const StartedOn = (props) => {
-	<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
-		<Icon active name='power' />
-		<Text>Started on {dateAsString(props.start)}</Text>
-	</View>
+	return (
+		<View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
+			<Icon active name='power' />
+			<Text>Started on {dateAsString(props.start)}</Text>
+		</View>
+	);
 }
 
 const FinishButton = (props) => {
-	<Button style={styles.finishButton} onPress={props.onPress}>
-		<Icon active style={styles.buttonIcon} name="checkmark" />
-		<Text>Finish story</Text>
-	</Button>
+	return (
+		<Button style={styles.finishButton} onPress={props.onPress}>
+			<Icon active style={styles.buttonIcon} name="checkmark" />
+			<Text>Finish story</Text>
+		</Button>
+	);
+}
 
 const dateAsString = (seconds) => {
   var asDate = new Date(seconds*1000);

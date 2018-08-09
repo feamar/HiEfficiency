@@ -18,23 +18,98 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 
 import { styles } from './Styles';
 
+const combine = (time, date) => {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHour(), time.getMinute(), time.getSecond());
+}
+
+const asTime = (date) => {
+	return date.toLocaleTimeString().substring(0,5);
+}
+
+const asDate = (date) => {
+	return date.toDateString().slice(4, 10);
+}
+
 export default class EditInterruptionModal extends React.Component {
   constructor(props) {
     super(props);
+		this.showDateTimePicker = this.showDateTimePicker.bind(this);
+		this.hideDateTimePicker = this.hideDateTimePicker.bind(this);
+		this.persist = this.persist.bind(this);
+		this.close = this.close.bind(this);
+		this.date = this.date.bind(this);
+
+		this.overwriteStartTime = this.overwriteStartTime.bind(this);
+		this.overwriteStartDate = this.overwriteStartDate.bind(this);
+		this.overwriteEndTime = this.overwriteEndTime.bind(this);
+		this.overwriteEndDate = this.overwriteEndDate.bind(this);
+
     this.state = {
-      isDateTimePickerVisible: false,
-      interruptionDateUnderEditIndex: -1
+      dateTimePickerVisible: false,
+			dateTimePickerMode: undefined,
+			dateTimePickerDate: new Date(),
+			dateTimePickerOnConfirm: (date) => {},
+
+			startTime: () => this.date(this.props.modalItemSelected*2),
+			startDate: () => this.date(this.props.modalItemSelected*2),
+			endTime: () => this.date(this.props.modalItemSelected*2+1),
+			endDate: () => this.date(this.props.modalItemSelected*2+1),
     }
   }
 
-  _showDateTimePicker = (dateUnderEdit) => this.setState({ isDateTimePickerVisible: true, interruptionDateUnderEditIndex: dateUnderEdit });
+	date = (index) => {
+		return index < 0 ? new Date() : new Date(this.props.interruptions[index].seconds*1000);
+	}
 
-  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false, interruptionDateUnderEditIndex: -1 });
+	overwriteStartTime = (date) => {
+		this.setState({startTime: () => date});
+	}
 
-  _handleDatePicked = (date) => {
-    this.props.parent.updateInterruptionAtIndex(this.state.interruptionDateUnderEditIndex, date);
-    this._hideDateTimePicker();
-  };
+	overwriteStartDate = (date) => {
+		this.setState({startDate: () => date});
+	}
+
+	overwriteEndTime = (date) => {
+		this.setState({endTime: () => date});
+	}
+
+	overwriteEndDate = (date) => {
+		this.setState({endDate: () => date});
+	}
+
+	showDateTimePicker = (dateToEdit, onConfirm, mode) => {
+		this.setState({
+			dateTimePickerVisible: true,
+			dateTimePickerMode: mode,
+			dateTimePickerDate: dateToEdit,
+			dateTimePickerOnConfirm: (date) => { onConfirm(date), this.hideDateTimePicker() },
+		});
+	}
+
+  hideDateTimePicker = () => {
+		this.setState({
+			dateTimePickerVisible: false,
+			dateTimePickerMode: undefined,
+			dateTimePickerDate: new Date(),
+			dateTimePickerOnConfirm: (date) => {},
+	 	});
+	}
+
+	persist = () => {
+		// this.props.parent.updateInterruptionAtIndex(this.props.modalItemSelected*2, combine(this.state.interruptionStartTime(), this.state.interruptionStartDate()));
+		// this.props.parent.updateInterruptionAtIndex(this.props.modalItemSelected*2+1, combine(this.state.interruptionEndTime(), this.state.interruptionEndDate()));
+		this.close();
+	}
+
+	close = () => {
+		this.setState({
+			startTime: () => this.date(this.props.modalItemSelected*2),
+			startDate: () => this.date(this.props.modalItemSelected*2),
+			endTime: () => this.date(this.props.modalItemSelected*2+1),
+			endDate: () => this.date(this.props.modalItemSelected*2+1),
+		});
+		this.props.parent.closeModal();
+	}
 
   render() {
 		return (
@@ -47,52 +122,49 @@ export default class EditInterruptionModal extends React.Component {
 				<View style={styles.modalSurroundings}>
 	        <View style={styles.modalContainer}>
 						<View style={styles.modalHeader}>
-		          <Button transparent onPress = { () => {
-		            this.props.parent.closeModal();
-		          }}>
+		          <Button transparent onPress = { this.close }>
 		            <Icon active name='close' style={{color: 'white'}} />
 		          </Button>
 							<Text>{this.props.interruptionCategory}</Text>
-							<Button transparent onPress = { () => {
-		            Alert.alert('This will ones be deleting your interruption');
-		          }}>
+							<Button transparent onPress = { () => {alert('This will ones be deleting your interruption');}}>
 		            <Icon active name='trash' style={{color: 'white', paddingRight: 10,}} />
 		          </Button>
 						</View>
 	          <Text>{'Selected item: ' + this.props.modalItemSelected}</Text>
-	          <View style = {{paddingVertical: 5, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
+						<View style = {{paddingVertical: 5, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
 							<Text style={{width: 60,}}>Start</Text>
-							<Button transparent style={styles.datetimeEditButton} onPress={() => this._showDateTimePicker(this.props.modalItemSelected*2)}>
-								<Text style={{color: 'black',}} >{this.props.modalItemSelected !== -1 ? new Date(this.props.interruptions[this.props.modalItemSelected*2].seconds*1000).toLocaleTimeString().substring(0,5) : ''}</Text>
-	            </Button>
-							<Button transparent style={styles.datetimeEditButton} onPress={() => this._showDateTimePicker(this.props.modalItemSelected*2)}>
-								<Text style={{color: 'black',}} >{this.props.modalItemSelected !== -1 ? new Date(this.props.interruptions[this.props.modalItemSelected*2].seconds*1000).toDateString().slice(4).substring(0,6) : ''}</Text>
-	            </Button>
-	          </View>
-	          <View style = {{alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
-							<Text style={{width: 60,}}>Finish</Text>
-							<Button transparent style={styles.datetimeEditButton} onPress={() => this._showDateTimePicker(this.props.modalItemSelected*2 + 1)}>
-								<Text style={{color: 'black',}} >{this.props.modalItemSelected !== -1 ? new Date(this.props.interruptions[this.props.modalItemSelected*2+1].seconds*1000).toLocaleTimeString().substring(0,5) : ''}</Text>
-	            </Button>
-							<Button transparent style={styles.datetimeEditButton} onPress={() => this._showDateTimePicker(this.props.modalItemSelected*2 + 1)}>
-								<Text style={{color: 'black',}} >{this.props.modalItemSelected !== -1 ? new Date(this.props.interruptions[this.props.modalItemSelected*2 + 1].seconds*1000).toDateString().slice(4).substring(0,6) : ''}</Text>
-	            </Button>
-	          </View>
+							<Button transparent style={styles.datetimeEditButton} onPress={() => this.showDateTimePicker(this.state.startTime(), this.overwriteStartTime, 'time')}>
+								<Text style={{color: 'black',}} >{asTime(this.state.startTime())}</Text>
+							</Button>
+							<Button transparent style={styles.datetimeEditButton} onPress={() => this.showDateTimePicker(this.state.startDate(), this.overwriteStartDate, 'date')}>
+								<Text style={{color: 'black',}} >{asDate(this.state.startDate())}</Text>
+							</Button>
+						</View>
+						<View style = {{paddingVertical: 5, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row'}}>
+							<Text style={{width: 60,}}>Start</Text>
+							<Button transparent style={styles.datetimeEditButton} onPress={() => this.showDateTimePicker(this.state.endTime(), this.overwriteEndTime, 'time')}>
+								<Text style={{color: 'black',}} >{asTime(this.state.endTime())}</Text>
+							</Button>
+							<Button transparent style={styles.datetimeEditButton} onPress={() => this.showDateTimePicker(this.state.endDate(), this.overwriteEndDate, 'date')}>
+								<Text style={{color: 'black',}} >{asDate(this.state.endDate())}</Text>
+							</Button>
+						</View>
 						<View style={{flex:1, flexDirection: 'row', justifyContent: 'flex-end',}}>
-							<Button transparent>
+							<Button transparent onPress = { this.close }>
 								<Text style={{color: 'red',}}>Cancel</Text>
 							</Button>
-							<Button transparent>
+							<Button transparent onPress={ this.persist }>
 								<Text style={{color: 'green',}}>Save</Text>
 							</Button>
 						</View>
 	        </View>
 				</View>
         <DateTimePicker
-          mode = 'datetime'
-          isVisible = {this.state.isDateTimePickerVisible}
-          onConfirm = {this._handleDatePicked}
-          onCancel = {this._hideDateTimePicker}
+          mode = {this.state.dateTimePickerMode}
+					date = {this.state.dateTimePickerDate}
+          isVisible = {this.state.dateTimePickerVisible}
+          onConfirm = {this.state.dateTimePickerOnConfirm}
+          onCancel = {this.hideDateTimePicker}
         />
       </Modal>
     );
