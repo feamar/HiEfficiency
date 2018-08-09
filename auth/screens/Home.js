@@ -3,17 +3,18 @@ import { ScrollView, Text, Linking, View } from "react-native";
 import { Card, Button } from "react-native-elements";
 import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../../FirebaseAdapter';
 
-export const signOutAndRedirect = () => {
-  signOut().then(() => this.props.navigation.navigate("SignedOut"));
-}
-
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
     this.addTeam = this.addTeam.bind(this);
+    this.signOutAndRedirect = this.signOutAndRedirect.bind(this);
     this.state = {
       teams: [],
-    }
+  }
+}
+
+  signOutAndRedirect = () => {
+    signOut().then(() => this.props.navigation.navigate("SignedOut"));
   }
 
   addTeam = (teamDocument) => {
@@ -42,7 +43,7 @@ export default class Home extends React.Component {
   }
 
   componentDidMount() {
-    hookIntoUserSignin(this.getTeamsForUser, signOutAndRedirect);
+    hookIntoUserSignin(this.getTeamsForUser, this.signOutAndRedirect);
   }
 
   render() {

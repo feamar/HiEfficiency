@@ -38,8 +38,16 @@ export const signOut = () => {
   return firebase.auth().signOut();
 }
 
+export const createUserUnderUsers = (uid, displayName) => {
+  console.log('Adding user: ' + displayName + ' with uid: ' + uid);
+  getUsers().doc(uid).set({
+    name: displayName,
+  });
+}
+
 export const signUpWithEmailAndPassword = (email, password) => {
   return firebase.auth().createUserWithEmailAndPassword(email, password).then((userCredential) => {
+      createUserUnderUsers(userCredential.user.uid, email);
       userCredential.user.sendEmailVerification();
       signInWithEmailAndPassword(email, password);
   }).catch(function(error) {
