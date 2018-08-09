@@ -14,7 +14,6 @@ const RootStack = createStackNavigator(
   {
 	  Home: StoriesOverview,
 	  Details: StoryDetails,
-	  NewStory: NewStory,
 	  Auth: Auth
   },
   {

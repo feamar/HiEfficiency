@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Modal, View } from 'react-native';
 import {
 	  Button,
 	  Container,
@@ -15,25 +15,31 @@ import {
 import { styles } from './Styles';
 
 export default class NewStoryModal extends React.Component {
+  constructor(props) {
+    super(props);
+	}
 
-  static navigationOptions = ({ navigation }) => {
-	return {
-		title: navigation.getParam('mode', 'New') + ' story',
-		headerTitleStyle: {flex: 1}
-    }
-  }
+	close = () => {
+		this.props.parent.closeModal();
+	}
+
+	create = () => {
+		this.props.parent.addRow(this.storyName);
+		this.close();
+	}
+
+	edit = () => {
+		this.close();
+	}
 
   render() {
     let updateBtn;
     let textField;
-    if (this.props.navigation.getParam('mode', 'New') == 'New') {
+    if (this.props.mode == 'new') {
         updateBtn =
-    	  <Button success iconLeft onPress={() => {
-    	  	this.props.navigation.goBack(),
-    	  	this.props.navigation.getParam('onSubmit')(this.storyName)}}>
-	        <Icon name='add' />
-	        <Text>Create</Text>
-	      </Button>;
+				<Button transparent onPress={ this.create }>
+					<Text style={{color: 'green',}}>Create</Text>
+				</Button>;
 	    textField =
 	      <Input
             placeholder="The name of the new story"
@@ -42,19 +48,17 @@ export default class NewStoryModal extends React.Component {
 
     } else {
     	if (this.storyName == undefined) {
-	    	this.storyName = this.props.navigation.getParam('story').data().name;
+	    	this.storyName = this.props.story.data().name;
     	}
     	updateBtn =
-      	  <Button success iconLeft onPress={() => {
-      		  this.props.navigation.goBack();
-      		  this.props.navigation.getParam('story').ref.update({
+					<Button transparent onPress={() => {
+      		  this.props.story.ref.update({
       			  name: this.storyName
       		  }); } }>
-	        <Icon name='create' />
-	        <Text>Change</Text>
-	      </Button>;
+						<Text style={{color: 'green',}}>Change</Text>
+	      	</Button>;
 	    textField =
-	      <Input placeholder = {this.props.navigation.getParam('story').data().name}
+	      <Input placeholder = {this.props.story == undefined ? '' : this.props.story.data().name}
             onChangeText={text => this.storyName = text}
 	      />
     }
@@ -62,17 +66,31 @@ export default class NewStoryModal extends React.Component {
 
 
     return (
-      <View style={styles.container}>
-	      <Item regular>
-	        {textField}
-	      </Item>
-	      <View style={styles.buttonContainer}>
-	          <Button style={styles.buttonDefault} success onPress={() => { this.props.navigation.goBack() } }>
-	            <Text>Cancel</Text>
-	          </Button>
-	          {updateBtn}
-	      </View>
-	  	</View>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={this.props.modalVisible}
+				onRequestClose={() => alert('Requested close for modal')}
+			>
+				<View style={styles.modalSurroundings}>
+					<View style={styles.modalContainer}>
+						<View style={styles.modalHeader}>
+							<Button transparent onPress = { this.close }>
+								<Icon active name='close' style={{color: 'white'}} />
+							</Button>
+						</View>
+			      <Item regular>
+			        {textField}
+			      </Item>
+						<View style={{flex:1, flexDirection: 'row', justifyContent: 'flex-end',}}>
+							<Button transparent onPress = { this.close }>
+								<Text style={{color: 'red',}}>Cancel</Text>
+							</Button>
+							{updateBtn}
+						</View>
+			  	</View>
+				</View>
+			</Modal>
     );
   }
 }

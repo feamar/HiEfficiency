@@ -14,6 +14,7 @@ import {
 } from 'native-base';
 import { getStories } from './FirebaseAdapter';
 import { styles } from './Styles';
+import NewStoryModal from './NewStory';
 
 export default class StoriesOverview extends React.Component {
   constructor(props) {
@@ -21,6 +22,9 @@ export default class StoriesOverview extends React.Component {
 
     this.state = {
       listViewData: [],
+      modalItemSelected: undefined,
+      modalVisible: false,
+      mode: 'new',
     };
   }
 
@@ -28,6 +32,24 @@ export default class StoriesOverview extends React.Component {
 	title: 'Stories',
 	headerTitleStyle: {flex: 1}
   };
+
+  closeModal() {
+		this.setState({modalVisible: false, modalItemSelected: undefined});
+	}
+
+  setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+
+  editStory = (story, mode) => {
+		return () => {
+      this.setState({
+        modalItemSelected: story,
+        mode: mode,
+      });
+			this.setModalVisible(true);
+		}
+	}
 
   registerDatabaseListener() {
     var _this = this;
@@ -80,10 +102,7 @@ export default class StoriesOverview extends React.Component {
         <Header style={{height: 0}} />
         <Content>
           <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-            <Button style={styles.storiesButton} iconLeft onPress={_ => this.props.navigation.navigate('NewStory', {
-            	onSubmit: this.addRow,
-            	mode: 'New',
-            })}>
+            <Button style={styles.storiesButton} onPress={this.editStory(undefined, 'new')}>
               <Icon name="add" />
               <Text>New story</Text>
             </Button>
@@ -102,11 +121,7 @@ export default class StoriesOverview extends React.Component {
             renderLeftHiddenRow={(doc, secId, rowId, rowMap) => (
               <Button full onPress={_ => {
             	  rowMap[`${secId}${rowId}`].props.closeRow();
-            	  this.props.navigation.navigate('NewStory', {
-                	onSubmit: this.addRow,
-                  	story: doc,
-                  	mode: 'Edit',
-                  })}}>
+            	  this.editStory(doc, 'edit')()}}>
                 <Icon active name="create" />
               </Button>
             )}
@@ -118,6 +133,11 @@ export default class StoriesOverview extends React.Component {
               </Button>
             )}
           />
+          <NewStoryModal
+     				parent={this}
+  					modalVisible={this.state.modalVisible}
+            story={this.state.modalItemSelected}
+  					mode={this.state.mode} />
         </Content>
       </Container>
     );
