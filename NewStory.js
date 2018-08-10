@@ -29,6 +29,7 @@ export default class NewStoryModal extends React.Component {
 	}
 
 	edit = () => {
+		this.props.story.ref.update({name: this.storyName});
 		this.close();
 	}
 
@@ -51,10 +52,7 @@ export default class NewStoryModal extends React.Component {
 	    	this.storyName = this.props.story.data().name;
     	}
     	updateBtn =
-					<Button transparent onPress={() => {
-      		  this.props.story.ref.update({
-      			  name: this.storyName
-      		  }); } }>
+					<Button transparent onPress={ this.edit }>
 						<Text style={{color: 'green',}}>Change</Text>
 	      	</Button>;
 	    textField =
