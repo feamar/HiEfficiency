@@ -2,12 +2,7 @@ import React from 'react';
 import { Modal, View } from 'react-native';
 import {
 	  Button,
-	  Container,
-	  Header,
-	  Content,
 	  Icon,
-	  List,
-	  ListItem,
 	  Text,
 	  Input,
 	  Item,
