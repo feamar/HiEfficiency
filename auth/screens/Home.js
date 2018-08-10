@@ -13,7 +13,7 @@ import {
   Input,
   Item,
 } from 'native-base';
-import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../../FirebaseAdapter';
+import { getRootCollection, getStories, getUsers, getTeams, hookIntoUserSignin, signOut } from '../../FirebaseAdapter';
 import { Team } from '../../Team';
 
 export default class Home extends React.Component {
@@ -47,12 +47,6 @@ export default class Home extends React.Component {
     }).catch(function(error) {
         console.log("Error getting user profile:", error);
     });
-  }
-
-  getStoriesUnderTeam(teamDocument) {
-    let stories = teamDocument.ref.collection('stories');
-    stories.add({name: 'Nieuw team'});
-    return stories;
   }
 
   componentDidMount() {
@@ -152,7 +146,7 @@ export default class Home extends React.Component {
               <View style={{ flexDirection: 'row', justifyContent:'space-between' }}>
                 <Button
                   backgroundColor="#03A9F4"
-                  onPress={() => this.getStoriesUnderTeam(teamDocument)}
+                  onPress={() => this.props.navigation.navigate('Overview', {teamId: teamDocument.id})}
                 >
                   <Text>Go to storyboard</Text>
                 </Button>

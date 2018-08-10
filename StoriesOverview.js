@@ -19,18 +19,19 @@ import NewStoryModal from './NewStory';
 export default class StoriesOverview extends React.Component {
   constructor(props) {
     super(props);
-
+    console.log('TeamId: ' + props.navigation.getParam('teamId'));
     this.state = {
       listViewData: [],
       modalItemSelected: undefined,
       modalVisible: false,
       mode: 'new',
+      teamId: props.navigation.getParam('teamId')
     };
   }
 
   static navigationOptions = {
-	title: 'Stories',
-	headerTitleStyle: {flex: 1}
+  	title: 'Stories',
+  	headerTitleStyle: {flex: 1}
   };
 
   closeModal() {
@@ -53,7 +54,7 @@ export default class StoriesOverview extends React.Component {
 
   registerDatabaseListener() {
     var _this = this;
-    this.unregisterDatabaseListener = getStories().onSnapshot(function(querySnapshot) {
+    this.unregisterDatabaseListener = getStories(this.state.teamId).onSnapshot(function(querySnapshot) {
     	var i;
 	    const newData = [..._this.state.listViewData];
     	for (i = 0; i < querySnapshot.docChanges().length; i++) {
@@ -82,12 +83,12 @@ export default class StoriesOverview extends React.Component {
 
   // For deleting and adding rows to the database
   deleteRow(data) {
-    getStories().doc(data.id).delete();
+    getStories(this.state.teamId).doc(data.id).delete();
   }
 
   addRow(newStoryName) {
 	  if (newStoryName !== undefined) {
-		  getStories().add({
+		  getStories(this.state.teamId).add({
 			  name: newStoryName,
 		  });
 	  } else {

@@ -24,8 +24,8 @@ export const getTeams = () => {
   return getRootCollection('teams');
 }
 
-export const getStories = () => {
-  return getRootCollection('stories');
+export const getStories = (teamId) => {
+  return getTeams().doc(teamId).collection('stories');
 }
 
 export const getRootCollection = (name) => {
