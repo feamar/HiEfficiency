@@ -42,6 +42,7 @@ export const createUserUnderUsers = (uid, displayName) => {
   console.log('Adding user: ' + displayName + ' with uid: ' + uid);
   getUsers().doc(uid).set({
     name: displayName,
+    teams: [],
   });
 }
 
