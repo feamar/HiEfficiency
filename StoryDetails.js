@@ -149,7 +149,7 @@ export default class StoryDetails extends React.Component {
   }
 
   finishInterruptedStory = () => {
-	  this.addInterruption();
+	  this.addInterrupt(undefined);
 	  this.addFinishedOn();
   }
 
