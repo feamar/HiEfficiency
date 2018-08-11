@@ -103,7 +103,7 @@ export default class StoriesOverview extends React.Component {
         <Header style={{height: 0}} />
         <Content>
           <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-            <Button style={styles.storiesButton} onPress={this.editStory(undefined, 'new')}>
+            <Button style={styles.stories} onPress={this.editStory(undefined, 'new')}>
               <Icon name="add" />
               <Text>New story</Text>
             </Button>
@@ -111,7 +111,7 @@ export default class StoriesOverview extends React.Component {
           <List
             leftOpenValue={75}
             rightOpenValue={-75}
-            dataSource={ds.cloneWithRows(this.state.listViewData)}
+            dataSource={ds.cloneWithRows(this.state.listViewData.filter(function(item){return item.data().finishedOn == undefined}))}
             renderRow={doc => (
               <ListItem style={[styles.storyOverviewItem, doc.data().finishedOn !== undefined ? styles.storyOpen : styles.storyFinished]} onPress = {_ => this.props.navigation.navigate('Details', {
               	  story: doc,

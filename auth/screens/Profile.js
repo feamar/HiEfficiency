@@ -3,6 +3,8 @@ import { View } from "react-native";
 import { Card, Button, Text } from "react-native-elements";
 import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../../FirebaseAdapter";
 
+import { styles } from '../../Styles';
+
 export default class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -55,7 +57,7 @@ export default class Profile extends React.Component {
             <Text style={{ color: "white", fontSize: 28 }}>{this.state.initials}</Text>
           </View>
           <Button
-            backgroundColor="#03A9F4"
+            style={styles.profile}
             title="SIGN OUT"
             onPress={() => signOut().then(() => this.props.navigation.navigate("SignedOut"))}
           />

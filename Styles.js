@@ -15,8 +15,14 @@ export const styles = StyleSheet.create({
     paddingTop: 15,
     backgroundColor: 'white',
   },
-  text: {
+  textDark: {
     color: colors.jet,
+  },
+  profile: {
+    backgroundColor: colors.darkSlateGrey,
+  },
+  stories: {
+    backgroundColor: colors.myrtleGreen,
   },
   /*------------------ Story overview ------------------*/
   storyOverviewItem: {
@@ -32,7 +38,11 @@ export const styles = StyleSheet.create({
     borderColor: colors.myrtleGreenTint,
   },
   /*------------------ Interruption list ------------------*/
-	interruptionItem: {
+  interruptionList: {
+    marginHorizontal: 10,
+    justifyContent: 'flex-start',
+  },
+  interruptionItem: {
 		flexDirection: 'column',
 		paddingHorizontal: 5,
 	},
@@ -55,20 +65,22 @@ export const styles = StyleSheet.create({
 	},
   /*------------------ Buttons ------------------*/
   buttonContainer: {
-		flexDirection: 'column',
-		justifyContent: 'flex-end',
+		flexDirection: 'row',
+		justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 2,
 	},
-	finishButton: {
-		backgroundColor: 'green',
-	},
+  moreButton: {
+    paddingHorizontal: 8,
+    color: colors.myrtleGreen,
+  },
 	buttonIcon: {
 		color: 'white',
 	},
-  storiesButton: {
+  finishButton: {
+    alignSelf: 'flex-end',
     backgroundColor: colors.myrtleGreen,
-  },
-  profileButton: {
-    backgroundColor: colors.darkSlateGrey,
+    marginBottom: 5,
   },
   /*------------------ Modal ------------------*/
   modalSurroundings: {
@@ -82,10 +94,9 @@ export const styles = StyleSheet.create({
     height: 300,
     backgroundColor: 'white',
     padding: 5,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
   },
   modalHeader: {
-    backgroundColor: colors.darkSlateGrey,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

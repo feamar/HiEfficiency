@@ -67,7 +67,7 @@ export default class NewStoryModal extends React.Component {
 			>
 				<View style={styles.modalSurroundings}>
 					<View style={styles.modalContainer}>
-						<View style={styles.modalHeader}>
+						<View style={[styles.modalHeader, styles.stories]}>
 							<Button transparent onPress = { this.close }>
 								<Icon active name='close' style={{color: 'white'}} />
 							</Button>
@@ -75,7 +75,7 @@ export default class NewStoryModal extends React.Component {
 			      <Item regular>
 			        {textField}
 			      </Item>
-						<View style={{flex:1, flexDirection: 'row', justifyContent: 'flex-end',}}>
+						<View style={{flexDirection: 'row', justifyContent: 'flex-end',}}>
 							<Button transparent onPress = { this.close }>
 								<Text style={{color: 'red',}}>Cancel</Text>
 							</Button>

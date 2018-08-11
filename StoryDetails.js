@@ -230,29 +230,31 @@ export default class StoryDetails extends React.Component {
 		} else if (!this.state.finished) {
 			if (this.state.interruptions.length % 2 == 0) {
 				element =
-					 <View>
+					 <View style={styles.container}>
+					 	<FinishButton onPress={this.addFinishedOn} />
 						{interruptionList}
 						<StartedOn start={this.state.startedOn} />
 						<View style={styles.buttonContainer}>
 						   <InterruptionButton type={Meeting} onPress={this.addInterrupt} />
 							 <InterruptionButton type={WaitingForOthers} onPress={this.addInterrupt} />
 							 <InterruptionButton type={Other} onPress={this.addInterrupt} />
-							 <FinishButton onPress={this.addFinishedOn} />
 						</View>
 					 </View>;
 			} else {
 				element =
-					 <View>
-						{interruptionList}
-						<StartedOn start={this.state.startedOn} />
+					 <View style={styles.container}>
+					 	<FinishButton onPress={this.finishInterruptedStory} />
+					 	<View style={styles.interruptionList}>
+							{interruptionList}
+							<StartedOn start={this.state.startedOn} />
+						</View>
 						<View style={styles.buttonContainer}>
 						   <Button onPress={() => this.addInterrupt(undefined)}>
 								 <Icon active style={styles.buttonIcon} name="refresh" />
 								 <Text>Resume Progress</Text>
 						   </Button>
-							 <FinishButton onPress={this.finishInterruptedStory} />
-						</View>
-					 </View>;
+						 </View>
+						</View>;
 			}
 		} else {
 			element =
