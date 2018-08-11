@@ -5,9 +5,6 @@ import NewStory from './NewStory';
 import StoriesOverview from './StoriesOverview';
 import StoryDetails from './StoryDetails';
 import { createRootNavigator } from './auth/router';
-import firebase from 'firebase';
-import 'firebase/firestore';
-import 'firebase/auth';
 import { initFirebase, hookIntoUserSignin } from './FirebaseAdapter';
 
 export default class App extends React.Component {

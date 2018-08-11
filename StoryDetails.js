@@ -18,6 +18,7 @@ import EditInterruptionModal from './EditInterruptionModal';
 import { InterruptionList } from './InterruptionList';
 import { styles } from './Styles';
 import { InterruptionButton, Meeting, WaitingForOthers, Other } from './InterruptionType';
+import { toInterruptionType } from './InterruptionType';
 
 export default class StoryDetails extends React.Component {
 
@@ -153,31 +154,6 @@ export default class StoryDetails extends React.Component {
 	  this.addFinishedOn();
   }
 
-	iconColor = (interruptionCategory) => {
-		switch (interruptionCategory) {
-      case 'meeting':
-        return {color: 'purple',};
-			case 'waiting':
-        return {color: 'orange',};
-      case 'other':
-        return {color: 'blue',};
-      default:
-        return {color: 'black',};
-    }
-	}
-	iconName = (interruptionCategory) => {
-		switch (interruptionCategory) {
-      case 'meeting':
-        return 'chatbubbles';
-			case 'waiting':
-        return 'people';
-      case 'other':
-        return 'hand';
-      default:
-        return 'help';
-    }
-	}
-
   convertInterruptionTimesToIntervals() {
 	  var result = [];
 	  var i;
@@ -192,20 +168,18 @@ export default class StoryDetails extends React.Component {
 				previous = this.state.interruptions[i-1].seconds;
 			}
 		  result.push({
+				interruptionType: toInterruptionType(this.state.interruptionCategories[i/2]),
 				interruptTime: this.secondsDifferenceAsString(first, second),
 				interruptStart: new Date(first*1000).toLocaleTimeString().substring(0,5),
-				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
-				iconName: this.iconName(this.state.interruptionCategories[i/2]),
 				productiveTime: this.secondsDifferenceAsString(previous, first)
 			});
 	  }
 	  if (this.state.interruptions.length % 2 == 1) {
 		  var current = this.state.interruptions[this.state.interruptions.length - 1].seconds;
 		  result.push({
+				interruptionType: toInterruptionType(this.state.interruptionCategories[i/2]),
 				currentInterrupt: 'Currently interrupted, started at ' + new Date(current*1000).toDateString().slice(4),
 				displayText: new Date(current*1000).toLocaleTimeString().substring(0,5) + ' got interrupted ',
-				iconColor: this.iconColor(this.state.interruptionCategories[i/2]),
-				iconName: this.iconName(this.state.interruptionCategories[i/2])
 			});
 	  }
 	  return result;
