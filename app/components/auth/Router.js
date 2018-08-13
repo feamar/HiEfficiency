@@ -5,7 +5,6 @@ import {
   createMaterialTopTabNavigator,
   createSwitchNavigator
 } from "react-navigation";
-import { FontAwesome } from "react-native-vector-icons";
 
 import SignUp from "./screens/SignUp";
 import SignIn from "./screens/SignIn";
@@ -45,7 +44,7 @@ export const SignedIn = createMaterialTopTabNavigator(
       navigationOptions: {
         tabBarLabel: "Home",
         tabBarIcon: ({ tintColor }) => (
-          <FontAwesome name="home" size={30} color={tintColor} />
+          <Icon name="home" size={30} color={tintColor} />
         )
       }
     },
@@ -54,7 +53,7 @@ export const SignedIn = createMaterialTopTabNavigator(
       navigationOptions: {
         tabBarLabel: "Profile",
         tabBarIcon: ({ tintColor }) => (
-          <FontAwesome name="user" size={30} color={tintColor} />
+          <Icon name="user" size={30} color={tintColor} />
         )
       }
     }

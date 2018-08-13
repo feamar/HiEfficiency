@@ -6,15 +6,14 @@ import {
   Container,
   Header,
   Content,
-  Icon,
   List,
   ListItem,
   Text,
   Input,
   Item,
 } from 'native-base';
-import { getRootCollection, getStories, getUsers, getTeams, hookIntoUserSignin, signOut } from '../../FirebaseAdapter';
-import { Team } from '../../Team';
+import { getRootCollection, getStories, getUsers, getTeams, hookIntoUserSignin, signOut } from '../../firebase/FirebaseAdapter';
+import { Team } from '../../teams/Team';
 
 export default class Home extends React.Component {
   constructor(props) {

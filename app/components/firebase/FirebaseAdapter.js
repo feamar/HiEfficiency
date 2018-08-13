@@ -1,16 +1,19 @@
-import firebase from 'firebase';
-import 'firebase/firestore';
-import 'firebase/auth';
+import firebase from 'react-native-firebase';
+
 
 export const initFirebase = () => {
-  var firebaseConfig = require('./firebase.config.json');
-  !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+  //This is no longer necessary in Firebase RN.
+  //var firebaseConfig = require('./firebase.config.json');
+  //!firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
 }
 
 export const getFireStore = () => {
-  initFirebase();
+  //initFirebase();
   store = firebase.firestore();
   store.settings({timestampsInSnapshots: true});
+
+
+  
   return store;
 }
 
@@ -19,7 +22,7 @@ export const getFireStore = () => {
 export const getUsers = () => {
   return getRootCollection('users');
 }
-
+      
 export const getTeams = () => {
   return getRootCollection('teams');
 }

@@ -1,4 +1,4 @@
-package com.HiEfficiency;
+package com.hiefficiency.app;
 
 import com.facebook.react.ReactActivity;
 

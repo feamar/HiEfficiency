@@ -1,9 +1,9 @@
 import React from "react";
 import { View } from "react-native";
 import { Card, Button, Text } from "react-native-elements";
-import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../../FirebaseAdapter";
+import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../../firebase/FirebaseAdapter";
 
-import { styles } from '../../Styles';
+import { styles } from "../../../styles/Styles";
 
 export default class Profile extends React.Component {
   constructor(props) {

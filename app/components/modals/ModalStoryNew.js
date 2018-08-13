@@ -7,9 +7,9 @@ import {
 	  Input,
 	  Item,
 	} from 'native-base';
-import { styles } from './Styles';
+import { styles } from '../../styles/Styles';
 
-export default class NewStoryModal extends React.Component {
+export default class ModalStoryNew extends React.Component {
   constructor(props) {
     super(props);
 	}
