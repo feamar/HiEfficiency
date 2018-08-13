@@ -46,6 +46,5 @@ export const toInterruptionType = (type) => {
       result = interruptionType;
     }
   });
-  console.log(JSON.stringify(result));
   return result;
 }

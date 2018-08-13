@@ -1,4 +1,4 @@
 import { AppRegistry } from "react-native";
-import FlatListDemo from "./FlatListDemo";
+import HiEfficiency from "./HiEfficiency";
 
-AppRegistry.registerComponent("FlatListDemo", () => FlatListDemo);
+AppRegistry.registerComponent("HiEfficiency", () => HiEfficiency);
