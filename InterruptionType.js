@@ -8,17 +8,6 @@ export const InterruptionButton = (props) => {
   </Button>);
 }
 
-const interruptionTypes = [Meeting, WaitingForOthers, Other];
-
-export const toInterruptionType = (type) => {
-  interruptionTypes.forEach((interruptionType) => {
-    if (interruptionType.dbId == type) {
-      return interruptionType;
-    }
-  });
-  return None;
-}
-
 export const Meeting = {
   dbId: 'meeting',
   iconColor: 'purple',
@@ -46,4 +35,17 @@ export const Other = {
 export const None = {
   iconColor: 'black',
   iconName: 'help'
+}
+
+export const interruptionTypes = [Meeting, WaitingForOthers, Other];
+
+export const toInterruptionType = (type) => {
+  let result = None;
+  interruptionTypes.forEach((interruptionType) => {
+    if (interruptionType.dbId == type) {
+      result = interruptionType;
+    }
+  });
+  console.log(JSON.stringify(result));
+  return result;
 }

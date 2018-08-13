@@ -11,8 +11,8 @@ export function InterruptionList(props) {
     renderItem={({item, index}) =>
           <View style={styles.interruptionItem}>
             <View style={styles.interruptionSubitem}>
-              <View style={styles.interruptionIconAndText}>
-                <Icon active style={item.interruptionType.iconColor} name={item.interruptionType.iconName} />
+                <Icon active style={{color: item.interruptionType.iconColor}} name={item.interruptionType.iconName} />
+                <View style={styles.interruptionIconAndText}>
                 <Text>&nbsp;&nbsp;At&nbsp;{item.interruptStart},&nbsp;lasted&nbsp;<Text style={{fontWeight: 'bold'}}>{item.interruptTime}</Text></Text>
               </View>
               <Button iconLeft transparent onPress = {props.editFnc(index)}>
