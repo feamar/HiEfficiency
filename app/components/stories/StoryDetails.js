@@ -58,6 +58,9 @@ export default class StoryDetails extends React.Component {
         let _this = this;
         this.story.ref.onSnapshot(function (doc) {
             let data = doc.data();
+            if(data == undefined)
+            {   return;}
+            
             _this.setState({ 
                 started: data.startedOn !== undefined,
                 startedOn: data.startedOn ,
