@@ -21,7 +21,7 @@ import InterruptionButton from '../interruptions/InterruptionButton';
 export default class StoryDetails extends React.Component {
 
     static navigationOptions = ({ navigation }) => {
-        return {
+        return {  
             title: 'Details for story: ' + navigation.getParam('story').data().name,
             headerTitleStyle: { flex: 1 }
         }

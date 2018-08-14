@@ -35,7 +35,12 @@ export default class Profile extends React.Component {
   }
 
   componentDidMount() {
-    hookIntoUserSignin(this.displayUserProfileData, this.signOutAndRedirect);
+    this.signInUnsubscriber = hookIntoUserSignin(this.displayUserProfileData, this.signOutAndRedirect);
+  }
+
+  componentWillUnmount() {
+    if(this.signInUnsubscriber)
+    { this.signInUnsubscriber();}
   }
 
   render() {

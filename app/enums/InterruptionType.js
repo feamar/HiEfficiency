@@ -29,11 +29,9 @@ export default class InterruptionType
   
     static fromDatabaseId = (dbId) => 
     {
-        console.log(JSON.stringify(InterruptionType.Values));
         for(i = 0 ; i < InterruptionType.Values.length ; i ++)
         {
             let current = InterruptionType.Values[i];
-            console.log("Current inerruption type: " + JSON.stringify(current));
             if(current.dbId == dbId)
             {   return current;}
         }

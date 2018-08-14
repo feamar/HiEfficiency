@@ -49,7 +49,13 @@ export default class Home extends React.Component {
   }
 
   componentDidMount() {
-    hookIntoUserSignin(this.getTeamsForUser, this.signOutAndRedirect);
+    this.signInUnsubscriber = hookIntoUserSignin(this.getTeamsForUser, this.signOutAndRedirect);
+  }
+
+  componentWillUnmount()
+  {
+    if(this.signInUnsubscriber)
+    { this.signInUnsubscriber();}
   }
 
   snapshotUser = (userDocument) => {

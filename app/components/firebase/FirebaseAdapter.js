@@ -10,10 +10,10 @@ export const initFirebase = () => {
 export const getFireStore = () => {
   //initFirebase();
   store = firebase.firestore();
-  store.settings({timestampsInSnapshots: true});
+  store.settings({ timestampsInSnapshots: true });
 
 
-  
+
   return store;
 }
 
@@ -22,7 +22,7 @@ export const getFireStore = () => {
 export const getUsers = () => {
   return getRootCollection('users');
 }
-      
+
 export const getTeams = () => {
   return getRootCollection('teams');
 }
@@ -51,24 +51,24 @@ export const createUserUnderUsers = (uid, displayName) => {
 
 export const signUpWithEmailAndPassword = (email, password) => {
   return firebase.auth().createUserWithEmailAndPassword(email, password).then((userCredential) => {
-      createUserUnderUsers(userCredential.user.uid, email);
-      userCredential.user.sendEmailVerification();
-      signInWithEmailAndPassword(email, password);
-  }).catch(function(error) {
+    createUserUnderUsers(userCredential.user.uid, email);
+    userCredential.user.sendEmailVerification();
+    signInWithEmailAndPassword(email, password);
+  }).catch(function (error) {
     alert(error.code + ': ' + error.message)
   });
 }
 
 export const signInWithEmailAndPassword = (email, password) => {
-  return firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-      alert(error.code + ': ' + error.message)
-    });
+  return firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password).catch(function (error) {
+    alert(error.code + ': ' + error.message)
+  });
 }
 
 // Hooks for interacting with firebase
 
 export const hookIntoUserSignin = (userSignedInSuccesfullyCallback, userNotSignedInCallback) => {
-  firebase.auth().onAuthStateChanged((user) => {
+  return firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       userSignedInSuccesfullyCallback(user);
     } else {
