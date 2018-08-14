@@ -53,7 +53,6 @@ export const styles = StyleSheet.create({
 	},
 	interruptionIconAndText: {
 		flexDirection: 'row',
-		alignItems: 'center',
 		justifyContent: 'flex-start',
 	},
 	productiveTimeText: {

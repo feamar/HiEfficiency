@@ -17,11 +17,13 @@ import ListInterruption from '../lists/ListInterruption';
 import { styles } from '../../styles/Styles';
 import InterruptionType from '../../enums/InterruptionType';
 import InterruptionButton from '../interruptions/InterruptionButton';
+import UtilityTime from '../../utilities/UtilityTime';
+import CardInterruptionsOnDay, { InterruptionItem}  from '../cards/CardInterruptionsOnDay';
 
 export default class StoryDetails extends React.Component {
 
     static navigationOptions = ({ navigation }) => {
-        return {  
+        return {
             title: 'Details for story: ' + navigation.getParam('story').data().name,
             headerTitleStyle: { flex: 1 }
         }
@@ -32,6 +34,7 @@ export default class StoryDetails extends React.Component {
         this.editInterruption = this.editInterruption.bind(this);
         this.addInterrupt = this.addInterrupt.bind(this);
         this.story = props.navigation.getParam('story');
+        //console.log("The story: " + JSON.stringify(JSON.decycle(this.story)));
         this.state = {
             modalVisible: false,
             modalItemSelected: -1,
@@ -55,19 +58,21 @@ export default class StoryDetails extends React.Component {
     componentDidMount() {
         let _this = this;
         this.story.ref.onSnapshot(function (doc) {
-            _this.setState({
-                started: doc.data().startedOn !== undefined,
-                startedOn: doc.data().startedOn !== undefined ? doc.data().startedOn.seconds : undefined,
-                finished: doc.data().finishedOn !== undefined,
-                finishedOn: doc.data().finishedOn !== undefined ? doc.data().finishedOn.seconds : undefined,
-                interruptions: doc.data().interruptions !== undefined ? doc.data().interruptions : [],
-                interruptionCategories: doc.data().interruptionCategories !== undefined ? doc.data().interruptionCategories : [],
+            let data = doc.data();
+            _this.setState({ 
+                started: data.startedOn !== undefined,
+                startedOn: data.startedOn ,
+                finished: data.finishedOn !== undefined,
+                finishedOn: data.finishedOn,
+                interruptions: data.interruptions !== undefined ? data.interruptions : [],
+                interruptionCategories: data.interruptionCategories !== undefined ? data.interruptionCategories : []
             })
         });
+
     }
 
     secondsDifferenceAsString(start, finish) {
-        difference = finish - start;
+        difference = finish - start; 
         seconds = difference % 60;
         difference -= seconds;
         difference /= 60;
@@ -152,35 +157,50 @@ export default class StoryDetails extends React.Component {
         this.addFinishedOn();
     }
 
-    convertInterruptionTimesToIntervals() {
+    convertInterruptionTimesToIntervals() 
+    {
         var result = [];
         var i;
-        var first;
-        var second;
-        for (i = 0; i + 1 < this.state.interruptions.length; i += 2) {
-            first = this.state.interruptions[i].seconds;
-            second = this.state.interruptions[i + 1].seconds;
-            if (i == 0) {
-                previous = this.state.startedOn;
-            } else {
-                previous = this.state.interruptions[i - 1].seconds;
-            }
+        var start;
+        var end;
+
+        for (i = 0; i + 1 < this.state.interruptions.length; i += 2) 
+        {
+            start = this.state.interruptions[i];
+            end = this.state.interruptions[i + 1];
+
+            if (i == 0) 
+            {   previous = this.state.startedOn;} 
+            else 
+            {   previous = this.state.interruptions[i - 1];}
+
+            //console.log(JSON.stringify("The start: " + start + " and the end: " + end + "."));
+            //console.log(JSON.stringify(JSON.decycle(this.state)));
+
+            result.push(
+                { 
+                    interruptionType: InterruptionType.fromDatabaseId(this.state.interruptionCategories[i / 2]),
+                    title: "At " + UtilityTime.dateToString(start) + " on " + UtilityTime.millisecondsSinceEpochToTimeOfDay(start) + ", lasted " + UtilityTime.millisecondsToHHMMSS(end - start),
+                    subtitle: "Productive for: " + this.secondsDifferenceAsString(previous, start)
+                }
+            );  
+        }
+
+        if (this.state.interruptions.length % 2 == 1)  
+        {
+            console.log("length: " + this.state.interruptions.length  + " modulus: " + this.state.interruptions.length % 2);
+            var start = this.state.interruptions[this.state.interruptions.length - 1]; 
+            var now = new Date();
+            var difference = now - start;
+
             result.push({
                 interruptionType: InterruptionType.fromDatabaseId(this.state.interruptionCategories[i / 2]),
-                interruptTime: this.secondsDifferenceAsString(first, second),
-                interruptStart: new Date(first * 1000).toLocaleTimeString().substring(0, 5),
-                productiveTime: this.secondsDifferenceAsString(previous, first)
+                title: 'Currently interrupted, started on ' + UtilityTime.millisecondsSinceEpochToTimeOfDay(start),
+                subtitle: "Interruption in progress for " + UtilityTime.millisecondsToHHMMSS(difference)
             });
-        }
-        if (this.state.interruptions.length % 2 == 1) {
-            var current = this.state.interruptions[this.state.interruptions.length - 1].seconds;
-            result.push({
-                interruptionType: InterruptionType.fromDatabaseId(this.state.interruptionCategories[i / 2]),
-                currentInterrupt: 'Currently interrupted, started at ' + new Date(current * 1000).toDateString().slice(4),
-                displayText: new Date(current * 1000).toLocaleTimeString().substring(0, 5) + ' got interrupted ',
-            });
-        }
-        return result;
+        }  
+  
+        return result;  
     }
 
     editInterruption = (index) => {
@@ -190,18 +210,23 @@ export default class StoryDetails extends React.Component {
         }
     }
 
+
     render() {
+        console.log("The state: " + JSON.stringify(JSON.decycle(this.state)));
+
         let interruptionList = <ListInterruption data={this.convertInterruptionTimesToIntervals().reverse()} extraData={this.state} keyExtractor={(item, index) => index + ' ' + item.seconds} editFnc={this.editInterruption} />;
+
 
         let element;
         if (!this.state.started) {
-            element =
+            element =  
                 <Button onPress={this.addStartedOn}>
                     <Text>Start story</Text>
                 </Button>;
-        } else if (!this.state.finished) {
+        }
+        else if (!this.state.finished) {
             if (this.state.interruptions.length % 2 == 0) {
-                element =
+                element =   
                     <View style={styles.container}>
                         <FinishButton onPress={this.addFinishedOn} />
                         {interruptionList}
@@ -212,7 +237,8 @@ export default class StoryDetails extends React.Component {
                             <InterruptionButton type={InterruptionType.Other} onPress={this.addInterrupt} />
                         </View>
                     </View>;
-            } else {
+            } 
+            else {
                 element =
                     <View style={styles.container}>
                         <FinishButton onPress={this.finishInterruptedStory} />
@@ -228,12 +254,13 @@ export default class StoryDetails extends React.Component {
                         </View>
                     </View>;
             }
-        } else {
+        } 
+        else {
             element =
                 <View>
-                    <Text>Started on {dateAsString(this.state.startedOn)}</Text>
-                    <Text>Finished on {dateAsString(this.state.finishedOn)}</Text>
-                    <Text>Total time: {this.secondsDifferenceAsString(this.state.startedOn, this.state.finishedOn)}</Text>
+                    <Text>Started on {this.state.startedOn.toLocaleString()}</Text>
+                    <Text>Finished on {this.state.finishedOn.toLocaleString()}</Text>
+                    <Text>Total time: {UtilityTime.millisecondsToHHMMSS(this.state.finishedOn - this.state.startedOn)}</Text>
                     <Text>The times that the team was interrupted were:</Text>
                     {interruptionList}
                 </View>
@@ -246,17 +273,18 @@ export default class StoryDetails extends React.Component {
                     modalVisible={this.state.modalVisible}
                     modalItemSelected={this.state.modalItemSelected}
                     interruptions={this.state.interruptions} />
-                {element}
-            </View>
+                {element}  
+            </View> 
         );
-    }
+    } 
 }
 
 const StartedOn = (props) => {
+    let date = new Date(props.start);
     return (
         <View style={{ flexDirection: 'row', marginRight: 5, alignItems: 'center' }}>
             <Icon active name='power' />
-            <Text>Started on {dateAsString(props.start)}</Text>
+            <Text>Started on {date.toLocaleDateString()} at {date.toLocaleTimeString()}</Text>    
         </View>
     );
 }
