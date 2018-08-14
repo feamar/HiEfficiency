@@ -18,7 +18,6 @@ import { styles } from '../../styles/Styles';
 import InterruptionType from '../../enums/InterruptionType';
 import InterruptionButton from '../interruptions/InterruptionButton';
 import UtilityTime from '../../utilities/UtilityTime';
-import CardInterruptionsOnDay, { InterruptionItem}  from '../cards/CardInterruptionsOnDay';
 
 export default class StoryDetails extends React.Component {
 
