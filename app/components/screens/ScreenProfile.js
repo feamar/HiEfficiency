@@ -1,11 +1,11 @@
 import React from "react";
 import { View } from "react-native";
 import { Card, Button, Text } from "react-native-elements";
-import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../../firebase/FirebaseAdapter";
+import { signOut, getUsers, getTeams, hookIntoUserSignin } from "../firebase/FirebaseAdapter";
 
-import { styles } from "../../../styles/Styles";
+import { styles } from "../../styles/Styles";
 
-export default class Profile extends React.Component {
+export default class ScreenProfile extends React.Component {
   constructor(props) {
     super(props);
     this.signOutAndRedirect = this.signOutAndRedirect.bind(this);

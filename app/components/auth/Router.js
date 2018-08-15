@@ -1,4 +1,4 @@
-import React from "react";
+/*import React from "react";
 import { Platform, StatusBar } from "react-native";
 import {
   createStackNavigator,
@@ -7,7 +7,7 @@ import {
 } from "react-navigation";
 
 import SignUp from "./screens/SignUp";
-import SignIn from "./screens/SignIn";
+import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Profile from "./screens/Profile";
 
@@ -24,16 +24,16 @@ export const SignedOut = createStackNavigator(
         headerStyle
       }
     },
-    SignIn: {
-      screen: SignIn,
+    Login: {
+      screen: Login,
       navigationOptions: {
-        title: "Sign In",
+        title: "Login",
         headerStyle
       }
     }
   },
   {
-    initialRouteName: 'SignIn'
+    initialRouteName: 'Login'
   }
 );
 
@@ -81,4 +81,4 @@ export const createRootNavigator = (signedIn = false) => {
       initialRouteName: signedIn ? "SignedIn" : "SignedOut"
     }
   );
-};
+};*/

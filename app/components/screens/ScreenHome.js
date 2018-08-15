@@ -12,10 +12,10 @@ import {
   Input,
   Item,
 } from 'native-base';
-import { getRootCollection, getStories, getUsers, getTeams, hookIntoUserSignin, signOut } from '../../firebase/FirebaseAdapter';
-import { Team } from '../../teams/Team';
+import { getRootCollection, getStories, getUsers, getTeams, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
+import { Team } from '../teams/Team';
 
-export default class Home extends React.Component {
+export default class ScreenHome extends React.Component {
   constructor(props) {
     super(props);
     this.addTeam = this.addTeam.bind(this);
