@@ -14,6 +14,7 @@ import {
 } from 'native-base';
 import { getRootCollection, getStories, getUsers, getTeams, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
 import { Team } from '../teams/Team';
+import { SCREEN_NAME_STORY_BOARD } from '../routing/Router';
 
 export default class ScreenHome extends React.Component {
   constructor(props) {
@@ -151,7 +152,9 @@ export default class ScreenHome extends React.Component {
               <View style={{ flexDirection: 'row', justifyContent:'space-between' }}>
                 <Button
                   backgroundColor="#03A9F4"
-                  onPress={() => this.props.navigation.navigate('Overview', {teamId: teamDocument.id})}
+                  onPress={() => {
+                    this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, {teamId: teamDocument.id})}
+                  }
                 >
                   <Text>Go to storyboard</Text>
                 </Button>
