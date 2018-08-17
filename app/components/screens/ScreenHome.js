@@ -66,7 +66,7 @@ export default class ScreenHome extends React.Component {
           _this.setState({user: doc, teams: []});
           doc.data().teams.map((teamIdentifier) => getTeams().doc(teamIdentifier).get().then(_this.addTeam));
       } else {
-          console.log("Signed up user does not have a profile for user id: " + user.id);
+          console.log("Signed up user does not have a profile for user id: " + userDocument.id);
       }
     });
   }
