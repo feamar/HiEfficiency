@@ -215,7 +215,7 @@ export default class StoryDetails extends React.Component {
                 <View>
                     <Text>Started on {this.state.startedOn.toLocaleString()}</Text>
                     <Text>Finished on {this.state.finishedOn.toLocaleString()}</Text>
-                    <Text>Total time: {UtilityTime.millisecondsToHHMMSS(this.state.finishedOn - this.state.startedOn)}</Text>
+                    <Text>Total time: {difference(this.state.finishedOn - this.state.startedOn)}</Text>
                     <Text>The times that the team was interrupted were:</Text>
                     {interruptionList}
                 </View>
