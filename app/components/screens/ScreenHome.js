@@ -85,10 +85,14 @@ export default class ScreenHome extends React.Component {
 
   addTeamToUser = (id) => {
     let teams = this.state.user.data().teams;
-    teams.push(id);
-    this.state.user.ref.update({
-        teams: teams
-    });
+    if (teams.indexOf(id) == -1) {
+      teams.push(id);
+      this.state.user.ref.update({
+          teams: teams
+      });
+    } else {
+      alert("Trying to join a team of which you are already a member");
+    }
   }
 
   createTeam = (teamName, teamCode) => {
@@ -109,14 +113,13 @@ export default class ScreenHome extends React.Component {
   }
 
   joinTeam = (teamName, teamCode) => {
-    let _this = this;
     let joined = false;
     let teamsFound = false;
     getTeams().where("name", "==", teamName).get().then((result) => {
         result.forEach((doc) => {
           teamsFound = true;
           if (doc.data().code == teamCode) {
-            _this.addTeamToUser(doc.id);
+            this.addTeamToUser(doc.id);
             joined = true;
           }
         })
