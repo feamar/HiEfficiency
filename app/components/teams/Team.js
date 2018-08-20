@@ -41,13 +41,13 @@ export class Team extends React.Component {
 			      <Item regular>
 							<Input
 			            placeholder="The name of the new team"
-			            onChangeText={text => this.teamName = text}
+			            onChangeText={text => this.teamName = text.trim()}
 				      />
 			      </Item>
 						<Item regular>
 							<Input
 			            placeholder="The security code for the new team (required to join)"
-			            onChangeText={text => this.teamCode = text}
+			            onChangeText={text => this.teamCode = text.trim()}
 				      />
 			      </Item>
 						<View style={{flex:1, flexDirection: 'row', justifyContent: 'flex-end',}}>

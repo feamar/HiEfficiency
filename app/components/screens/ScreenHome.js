@@ -26,9 +26,9 @@ export default class ScreenHome extends React.Component {
       teams: [],
       user: undefined,
       teamModalVisible: false,
-      modalConfirm: () => {},
+      modalConfirm: () => { },
+    }
   }
-}
 
   signOutAndRedirect = () => {
     signOut().then(() => this.props.navigation.navigate("SignedOut"));
@@ -37,15 +37,15 @@ export default class ScreenHome extends React.Component {
   addTeam = (teamDocument) => {
     currentTeams = this.state.teams;
     currentTeams.push(teamDocument);
-    this.setState({teams: currentTeams});
+    this.setState({ teams: currentTeams });
   }
 
   getTeamsForUser = (user) => {
     let _this = this;
-    getUsers().doc(user.uid).get().then(function(doc) {
+    getUsers().doc(user.uid).get().then(function (doc) {
       _this.snapshotUser(doc);
-    }).catch(function(error) {
-        console.log("Error getting user profile:", error);
+    }).catch(function (error) {
+      console.log("Error getting user profile:", error);
     });
   }
 
@@ -53,41 +53,42 @@ export default class ScreenHome extends React.Component {
     this.signInUnsubscriber = hookIntoUserSignin(this.getTeamsForUser, this.signOutAndRedirect);
   }
 
-  componentWillUnmount()
-  {
-    if(this.signInUnsubscriber)
-    { this.signInUnsubscriber();}
+  componentWillUnmount() {
+    if (this.signInUnsubscriber) { this.signInUnsubscriber(); }
+
+    if(this.onSnapshotUnsubscriber)
+    {   this.onSnapshotUnsubscriber();}
   }
 
   snapshotUser = (userDocument) => {
     let _this = this;
-    userDocument.ref.onSnapshot(function(doc) {
+    this.onSnapshotUnsubscriber = userDocument.ref.onSnapshot(function (doc) {
       if (doc.exists) {
-          _this.setState({user: doc, teams: []});
-          doc.data().teams.map((teamIdentifier) => getTeams().doc(teamIdentifier).get().then(_this.addTeam));
+        _this.setState({ user: doc, teams: [] });
+        doc.data().teams.map((teamIdentifier) => getTeams().doc(teamIdentifier).get().then(_this.addTeam));
       } else {
-          console.log("Signed up user does not have a profile for user id: " + userDocument.id);
+        console.log("Signed up user does not have a profile for user id: " + userDocument.id);
       }
     });
   }
 
   closeTeamModal = () => {
-    this.setState({teamModalVisible: false, modalConfirm: () => {}});
+    this.setState({ teamModalVisible: false, modalConfirm: () => { } });
   }
 
   showCreateTeam = () => {
-    this.setState({teamModalVisible: true, modalConfirm: this.createTeam});
+    this.setState({ teamModalVisible: true, modalConfirm: this.createTeam });
   }
 
   showJoinTeam = () => {
-    this.setState({teamModalVisible: true, modalConfirm: this.joinTeam});
+    this.setState({ teamModalVisible: true, modalConfirm: this.joinTeam });
   }
 
   addTeamToUser = (id) => {
     let teams = this.state.user.data().teams;
     teams.push(id);
     this.state.user.ref.update({
-        teams: teams
+      teams: teams
     });
   }
 
@@ -105,21 +106,21 @@ export default class ScreenHome extends React.Component {
     let joined = false;
     let teamsFound = false;
     getTeams().where("name", "==", teamName).get().then((result) => {
-        result.forEach((doc) => {
-          teamsFound = true;
-          if (doc.data().code == teamCode) {
-            _this.addTeamToUser(doc.id);
-            joined = true;
-          }
-        })
-        if (!teamsFound) {
-          alert('No team with name: ' + teamName + ' was found');
-        } else {
-          if (!joined) {
-            alert('A team with name: ' + teamName + ' was found, but code: ' + teamCode + ' was incorrect');
-          }
+      result.forEach((doc) => {
+        teamsFound = true;
+        if (doc.data().code == teamCode) {
+          _this.addTeamToUser(doc.id);
+          joined = true;
+        }
+      })
+      if (!teamsFound) {
+        alert('No team with name: ' + teamName + ' was found');
+      } else {
+        if (!joined) {
+          alert('A team with name: ' + teamName + ' was found, but code: ' + teamCode + ' was incorrect');
         }
       }
+    }
     );
   }
 
@@ -135,7 +136,7 @@ export default class ScreenHome extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', paddingTop: 20, paddingHorizontal: 15, justifyContent:'space-between' }}>
+        <View style={{ flexDirection: 'row', paddingTop: 20, paddingHorizontal: 15, justifyContent: 'space-between' }}>
           <Button onPress={this.showCreateTeam} >
             <Text>Create team</Text>
           </Button>
@@ -149,11 +150,12 @@ export default class ScreenHome extends React.Component {
               <Text style={{ marginBottom: 10 }}>
                 Team {teamDocument.data().name}.
               </Text>
-              <View style={{ flexDirection: 'row', justifyContent:'space-between' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Button
                   backgroundColor="#03A9F4"
                   onPress={() => {
-                    this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, {teamId: teamDocument.id})}
+                    this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, { teamId: teamDocument.id })
+                  }
                   }
                 >
                   <Text>Go to storyboard</Text>

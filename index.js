@@ -8,4 +8,7 @@ import {name as appName} from './app.json';
 import { YellowBox } from 'react-native';
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
+YellowBox.ignoreWarnings(["Warning: Failed prop type: The prop 'onCancel' is marked as required in 'CustomDatePickerAndroid', but its value is 'null'."]);
+
+
 AppRegistry.registerComponent(appName, () => App);

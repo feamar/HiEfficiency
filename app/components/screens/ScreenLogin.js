@@ -72,7 +72,9 @@ export default class ScreenLogin extends React.Component
 
   handleLogin = () => 
   {
-    signInWithEmailAndPassword(this.state.email, this.state.password);
+    this.setState({email: this.state.email.trim()}, () => {
+      signInWithEmailAndPassword(this.state.email, this.state.password);
+    });
   }
 
   handleRegister = () => 
@@ -91,7 +93,7 @@ export default class ScreenLogin extends React.Component
           </View> 
           <CardContent>  
             <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.handleInputChange("email")} />
-            <TextInput style={styles.input} type="password" id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
+            <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
             <Button style={styles.buttons.login} dark raised primary variant="contained" onPress={this.handleLogin}>Login</Button>
             <Button style={styles.buttons.register} flat primary onPress={this.handleRegister}>Register</Button>
           </CardContent>     

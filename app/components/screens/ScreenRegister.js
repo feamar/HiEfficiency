@@ -85,8 +85,11 @@ export default class ScreenRegister extends React.Component
       return;
     }
 
-    //State change will automatically navigate to HOME route if successful.
-    signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
+    this.setState({email: this.state.email.trim()}, () => {
+      //State change will automatically navigate to HOME route if successful.
+      signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
+    });
+
   }
 
   render() 
@@ -98,13 +101,13 @@ export default class ScreenRegister extends React.Component
         </View> 
         <CardContent>  
           <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.handleInputChange("email")} />
-          <TextInput style={styles.input} type="password" id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
-          <TextInput style={styles.input} type="password" id="confirmation" name="confirmation" label="Confirm Password" value={this.state.confirmation} onChangeText={this.handleInputChange("confirmation")} />
+          <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
+          <TextInput style={styles.input} secureTextEntry id="confirmation" name="confirmation" label="Confirm Password" value={this.state.confirmation} onChangeText={this.handleInputChange("confirmation")} />
           <Button style={styles.buttons.login} dark raised primary variant="contained" onPress={this.handleRegister}>Register</Button>
         </CardContent>    
       </Card> 
     </View>    
-
+ 
     /*return <View style={{ paddingVertical: 20 }}>
       <Card>
         <FormLabel>Email</FormLabel>

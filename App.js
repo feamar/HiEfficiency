@@ -2,7 +2,7 @@ import React from 'react';
 import { initFirebase, hookIntoUserSignin } from './app/components/firebase/FirebaseAdapter';
 
 import Theme from './app/styles/Theme';
-import { Provider as MaterialDesignProvider } from 'react-native-paper';
+import {Provider as MaterialDesignProvider} from 'react-native-paper';
 import Router from './app/components/routing/Router'
 
 export default class App extends React.Component {
@@ -13,10 +13,12 @@ export default class App extends React.Component {
       signedIn: false,
       checkedSignIn: false
     };
+
+    this.initializeCyclicJs();
   }
 
+
   componentDidMount() {
-    this.initializeCyclicJs();
     this.loadFonts();
     initFirebase();
     hookIntoUserSignin(() => this.setState({ signedIn: true, checkedSignIn: true }),
@@ -25,10 +27,12 @@ export default class App extends React.Component {
 
   render() {
     const { checkedSignIn, signedIn, fontsLoaded } = this.state;
+
     if (!checkedSignIn || !fontsLoaded) { return null; }
 
     const RouteStack = Router.createInitialStack(this.state.signedIn);
-    return (
+
+    return(
         <MaterialDesignProvider theme={Theme}>
           <RouteStack />
         </MaterialDesignProvider>
@@ -37,18 +41,28 @@ export default class App extends React.Component {
 
   // For basic functionality, we need to load some resources
   async loadFonts() {
+
     this.setState({ fontsLoaded: true });
   }
 
+  
+
   initializeCyclicJs = () => {
     JSON.decycle = function decycle(object, replacer) {
+
       var objects = new WeakMap();
       return (function derez(value, path) {
+
+
         var old_path;
         var nu;
+
+
         if (replacer !== undefined) {
           value = replacer(value);
         }
+
+
         if (
           typeof value === "object"
           && value !== null
@@ -58,11 +72,16 @@ export default class App extends React.Component {
           && !(value instanceof RegExp)
           && !(value instanceof String)
         ) {
+
+
           old_path = objects.get(value);
           if (old_path !== undefined) {
             return { $ref: old_path };
           }
+
+
           objects.set(value, path);
+
 
           if (Array.isArray(value)) {
             nu = [];
@@ -70,6 +89,8 @@ export default class App extends React.Component {
               nu[i] = derez(element, path + "[" + i + "]");
             });
           } else {
+
+
             nu = {};
             Object.keys(value).forEach(function (name) {
               nu[name] = derez(

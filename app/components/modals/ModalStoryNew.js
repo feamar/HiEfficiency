@@ -52,9 +52,10 @@ export default class ModalStoryNew extends React.Component {
 	      	</Button>;
 	    textField =
 	      <Input placeholder = {this.props.story == undefined ? '' : this.props.story.data().name}
-            onChangeText={text => this.storyName = text}
+						onChangeText={text => this.storyName = text}
+						value={this.storyName}
 	      />
-    }
+    } 
 
 
 
