@@ -92,12 +92,20 @@ export default class ScreenHome extends React.Component {
   }
 
   createTeam = (teamName, teamCode) => {
-    getTeams().add({
-      name: teamName,
-      code: teamCode
-    }).then((teamDocumentReference) => {
-      this.addTeamToUser(teamDocumentReference.id);
-    });
+    getTeams().where("name", "==", teamName).where("code", "==", teamCode).get().then(
+      (querySnapshot) => {
+        if (querySnapshot.docs.length == 0) {
+          getTeams().add({
+            name: teamName,
+            code: teamCode
+          }).then((teamDocumentReference) => {
+            this.addTeamToUser(teamDocumentReference.id);
+          });
+        } else {
+          alert ("Cannot create team with name: " + teamName + ". It already exists with that code.")
+        }
+      }
+    )
   }
 
   joinTeam = (teamName, teamCode) => {
