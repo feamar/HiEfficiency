@@ -39,8 +39,9 @@ export default class ScreenProfile extends React.Component {
   }
 
   componentWillUnmount() {
-    if(this.signInUnsubscriber)
-    { this.signInUnsubscriber();}
+    if (this.signInUnsubscriber) {
+      this.signInUnsubscriber();
+    }
   }
 
   render() {

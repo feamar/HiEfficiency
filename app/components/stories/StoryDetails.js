@@ -17,7 +17,7 @@ import ListInterruption from '../lists/ListInterruption';
 import { styles } from '../../styles/Styles';
 import InterruptionType from '../../enums/InterruptionType';
 import InterruptionButton from '../interruptions/InterruptionButton';
-import UtilityTime from '../../utilities/UtilityTime';
+import { asDate, asTime, difference } from '../util/DateUtil';
 
 export default class StoryDetails extends React.Component {
 
@@ -70,39 +70,6 @@ export default class StoryDetails extends React.Component {
             })
         });
 
-    }
-
-    secondsDifferenceAsString(start, finish) {
-        difference = finish - start;
-        seconds = difference % 60;
-        difference -= seconds;
-        difference /= 60;
-        minutes = difference % 60;
-        difference -= minutes;
-        difference /= 60;
-        hours = difference % 24;
-        difference -= hours;
-        difference /= 24;
-        days = difference;
-
-        result = '';
-        if (days > 0) {
-            result += days + 'd';
-        }
-        if (hours > 0) {
-            if (result !== '') { result += ' ' }
-            result += hours + 'h';
-        }
-        if (minutes > 0) {
-            if (result !== '') { result += ' ' }
-            result += minutes + 'm';
-        }
-
-        if (result == '') {
-            result += ((seconds - (seconds % 1))) + 's';
-        }
-
-        return result;
     }
 
     addInterrupt = (category) => {
@@ -164,31 +131,31 @@ export default class StoryDetails extends React.Component {
         var i;
         var start;
         var end;
+        var previous = undefined;
 
         for (i = 0; i + 1 < this.state.interruptions.length; i += 2)
         {
           start = this.state.interruptions[i];
           end = this.state.interruptions[i + 1];
-          previous = i == 0 ? this.state.startedOn : this.state.interruptions[i - 1];
 
           result.push({
               interruptionType: InterruptionType.fromDatabaseId(this.state.interruptionCategories[i / 2]),
-              title: "At " + UtilityTime.dateToString(start) + " on " + UtilityTime.millisecondsSinceEpochToTimeOfDay(start) + ", lasted " + UtilityTime.millisecondsToHHMMSS(end - start),
-              subtitle: "Productive for: " + this.secondsDifferenceAsString(previous, start)
+              title: "At " + asDate(start) + " on " + asTime(start) + ", lasted " + difference(start, end),
+              subtitle: previous !== undefined ? "Productive for: " + difference(previous, start) : undefined
             }
           );
+
+          previous = end;
         }
 
         if (this.state.interruptions.length % 2 == 1)
         {
           var start = this.state.interruptions[this.state.interruptions.length - 1];
-          var now = new Date();
-          var difference = now - start;
 
           result.push({
             interruptionType: InterruptionType.fromDatabaseId(this.state.interruptionCategories[i / 2]),
-            title: 'Currently interrupted, started on ' + UtilityTime.millisecondsSinceEpochToTimeOfDay(start),
-            subtitle: "Interruption in progress for " + UtilityTime.millisecondsToHHMMSS(difference)
+            title: 'Currently interrupted, started on ' + asTime(start),
+            subtitle: "Interruption in progress for " + difference(start, new Date())
           });
         }
 
