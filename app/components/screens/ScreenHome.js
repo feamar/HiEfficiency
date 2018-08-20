@@ -86,26 +86,45 @@ export default class ScreenHome extends React.Component {
 
   addTeamToUser = (id) => {
     let teams = this.state.user.data().teams;
+<<<<<<< HEAD
     teams.push(id);
     this.state.user.ref.update({
       teams: teams
     });
+=======
+    if (teams.indexOf(id) == -1) {
+      teams.push(id);
+      this.state.user.ref.update({
+          teams: teams
+      });
+    } else {
+      alert("Trying to join a team of which you are already a member");
+    }
+>>>>>>> 237f46228e78e9d8d7e619a62a9d4673c6797260
   }
 
   createTeam = (teamName, teamCode) => {
-    getTeams().add({
-      name: teamName,
-      code: teamCode
-    }).then((teamDocumentReference) => {
-      this.addTeamToUser(teamDocumentReference.id);
-    });
+    getTeams().where("name", "==", teamName).where("code", "==", teamCode).get().then(
+      (querySnapshot) => {
+        if (querySnapshot.docs.length == 0) {
+          getTeams().add({
+            name: teamName,
+            code: teamCode
+          }).then((teamDocumentReference) => {
+            this.addTeamToUser(teamDocumentReference.id);
+          });
+        } else {
+          alert ("Cannot create team with name: " + teamName + ". It already exists with that code.")
+        }
+      }
+    )
   }
 
   joinTeam = (teamName, teamCode) => {
-    let _this = this;
     let joined = false;
     let teamsFound = false;
     getTeams().where("name", "==", teamName).get().then((result) => {
+<<<<<<< HEAD
       result.forEach((doc) => {
         teamsFound = true;
         if (doc.data().code == teamCode) {
@@ -118,6 +137,21 @@ export default class ScreenHome extends React.Component {
       } else {
         if (!joined) {
           alert('A team with name: ' + teamName + ' was found, but code: ' + teamCode + ' was incorrect');
+=======
+        result.forEach((doc) => {
+          teamsFound = true;
+          if (doc.data().code == teamCode) {
+            this.addTeamToUser(doc.id);
+            joined = true;
+          }
+        })
+        if (!teamsFound) {
+          alert('No team with name: ' + teamName + ' was found');
+        } else {
+          if (!joined) {
+            alert('A team with name: ' + teamName + ' was found, but code: ' + teamCode + ' was incorrect');
+          }
+>>>>>>> 237f46228e78e9d8d7e619a62a9d4673c6797260
         }
       }
     }

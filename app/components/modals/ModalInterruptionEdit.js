@@ -14,18 +14,12 @@ import {
 } from 'native-base';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { styles } from '../../styles/Styles';
+import { asTime, asDate } from '../util/DateUtil';
 
 const combine = (time, date) => {
 	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
 }
 
-const asTime = (date) => {
-	return date.toLocaleTimeString().substring(0, 5);
-}
-
-const asDate = (date) => {
-	return date.toDateString().slice(4, 10);
-}
 
 export default class ModalInterruptionEdit extends React.Component {
 	constructor(props) {
@@ -59,7 +53,7 @@ export default class ModalInterruptionEdit extends React.Component {
 
 		console.log("The input: " + index + " the interruption: " + this.props.interruptions[index] + " the result: " + result);
 
-		return result;  
+		return result;
 	}
 
 	overwriteStartTime = (date) => {
