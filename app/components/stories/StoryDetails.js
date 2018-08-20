@@ -204,11 +204,7 @@ export default class StoryDetails extends React.Component {
 
 
     render() {
-        console.log("The state: " + JSON.stringify(JSON.decycle(this.state)));
-
         let interruptionList = <ListInterruption data={this.convertInterruptionTimesToIntervals().reverse()} extraData={this.state} keyExtractor={(item, index) => index + ' ' + item.seconds} editFnc={this.editInterruption} />;
-
-
         let element;
         if (!this.state.started) {
             element =

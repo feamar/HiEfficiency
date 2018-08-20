@@ -17,7 +17,7 @@ export default class ListInterruption extends React.Component {
                             <View style={styles.interruptionIconAndText}>
                                 <Text>{item.title}<Text style={{ fontWeight: 'bold' }}>{item.interruptTime}</Text></Text>
                             </View>
-                            <Button iconLeft transparent onPress={this.props.editFnc(index)}>
+                            <Button iconLeft transparent onPress={this.props.editFnc(this.props.data.length - 1 - index)}>
                                 <Icon active style={styles.moreButton} name='more' />
                             </Button>
                         </View>
@@ -28,4 +28,4 @@ export default class ListInterruption extends React.Component {
         );
     }
 
-} 
+}
