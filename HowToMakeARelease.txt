@@ -1,0 +1,24 @@
+Naar google developer console
+Naar release beheer
+App releases
+Hi Efficiency alfa track => beheren
+Release maken
+
+Explorer
+Naar <appdir>/android/app/build.gradle
+In <android> <defaultConfig> moet versionCode met 1 omhoog 
+en versionName moet een minor, major of patch gebumped worden naar de volgende versie
+
+Cmd
+Naar <appdir>/android
+gradlew assembleRelease
+
+Explorer
+<appdir>/android/app/build/outputs/apk/release
+Sleep app-release.apk naar de developer console
+Versie een naam geven
+Release notes schrijven
+Opslaan
+Controleren
+Implementatie starten
+Bevestigen
