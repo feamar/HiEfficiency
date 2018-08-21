@@ -3,6 +3,7 @@ import { initFirebase, hookIntoUserSignin } from './app/components/firebase/Fire
 
 import Theme from './app/styles/Theme';
 import {Provider as MaterialDesignProvider} from 'react-native-paper';
+import { MenuProvider } from 'react-native-popup-menu';
 import Router from './app/components/routing/Router'
 
 export default class App extends React.Component {
@@ -34,7 +35,9 @@ export default class App extends React.Component {
 
     return(
         <MaterialDesignProvider theme={Theme}>
-          <RouteStack />
+          <MenuProvider>
+            <RouteStack />
+          </MenuProvider>
         </MaterialDesignProvider>
     );
   }

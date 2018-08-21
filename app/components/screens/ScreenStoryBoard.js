@@ -17,7 +17,7 @@ import { styles } from '../../styles/Styles';
 import ModalStoryNew from '../modals/ModalStoryNew';
 import { SCREEN_NAME_STORY_DETAILS, TAB_NAME_TEAM_OVERVIEW } from '../routing/Router';
 
-export default class StoryBoard extends React.Component {
+export default class ScreenStoryBoard extends React.Component {
   constructor(props) {
     super(props);
     console.log('TeamId: ' + props.navigation.getParam('teamId'));

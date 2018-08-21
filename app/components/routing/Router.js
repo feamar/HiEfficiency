@@ -13,10 +13,10 @@ import {Icon} from "react-native-elements";
 import { Platform, StatusBar } from "react-native";
 import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
-import ScreenHome from "../screens/ScreenHome";
+import ScreenTeams from "../screens/ScreenTeams";
 import ScreenProfile from "../screens/ScreenProfile";
-import StoryBoard from '../stories/StoryBoard';
-import StoryDetails from '../stories/StoryDetails';
+import ScreenStoryBoard from '../screens/ScreenStoryBoard';
+import ScreenStoryDetails from '../screens/ScreenStoryDetails';
 import Theme from '../../styles/Theme';
 
 export const STACK_NAME_AUTH = 'Auth';
@@ -116,17 +116,17 @@ export default class Router
     return createStackNavigator({
       [SCREEN_NAME_TEAMS]:
       {
-        screen: ScreenHome,
+        screen: ScreenTeams,
         navigationOptions: getNavigationOptions("Teams", getHamburgerIcon())
       },
       [SCREEN_NAME_STORY_BOARD]:
       {
-        screen: StoryBoard, 
+        screen: ScreenStoryBoard, 
         navigationOptions: getNavigationOptions("Storyboard", getBackIcon())
       },
       [SCREEN_NAME_STORY_DETAILS]:
       {
-        screen: StoryDetails,
+        screen: ScreenStoryDetails,
         navigationOptions: getNavigationOptions("Story Details", getBackIcon())
       }
     }, {

@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {View} from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import PropTypes from 'prop-types';
-
+import { Divider } from 'react-native-paper';
+  
 const styles = {
     root: {
         paddingLeft: 20,

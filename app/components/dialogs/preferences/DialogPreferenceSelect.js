@@ -59,7 +59,7 @@ export default class DialogMultiSelect extends Component {
         return (
             <View>
                 <AbstractPreferenceDialog ref={instance => this.base = instance} title={this.props.label} value={this.state.storageValue} {...this.props}>
-                    <View style={{margin: 25}}>
+                    <View style={{marginLeft: 25, marginRight: 25}}>
                         {this.state.options.map((item, index) => {
                             return this.getCheckboxFor(item, index)
                         })}

@@ -213,7 +213,6 @@ export default class DialogPreferenceWeekSchema extends Component {
                 </View>
                 <DateTimePicker datePickerModeAndroid="default" date={this.getInitialPickerTime(index, 0)} onCancel={this.onCancel(index, 0)} mode="time" isVisible={this.state.pickerVisibilities[index][0]} onConfirm={this.onTimeConfirmed(index, 0)} />
                 <DateTimePicker datePickerModeAndroid="default" date={this.getInitialPickerTime(index, 1)} onCancel={this.onCancel(index, 1)} mode="time" isVisible={this.state.pickerVisibilities[index][1]} onConfirm={this.onTimeConfirmed(index, 1)} />
-                <Divider style={{ marginTop: 5, marginBottom: 5 }} />
             </View>
         );
     }

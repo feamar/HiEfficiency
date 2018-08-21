@@ -3,6 +3,7 @@ import {View } from 'react-native';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paragraph, TextInput } from 'react-native-paper';
 import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from './AbstractPreferenceDialog';
+import PropTypes from 'prop-types';
 
 export default class DialogPreferenceText extends Component
 {
@@ -15,6 +16,11 @@ export default class DialogPreferenceText extends Component
             visible: this.props.visible,
             value: this.props.value
         }
+    }
+
+    setValue = (value) =>
+    {
+        this.setState({value: value});
     }
 
     handleValueChange = (text) =>
@@ -36,3 +42,9 @@ export default class DialogPreferenceText extends Component
         );
     }
 }  
+
+DialogPreferenceText.propTypes ={
+    visible: PropTypes.bool.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
+}

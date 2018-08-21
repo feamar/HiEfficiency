@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { Text } from 'react-native-paper';
 
 import Theme from '../../styles/Theme';
+import {Divider} from "react-native-paper";
 
 const styles = {
     root:
@@ -26,6 +27,7 @@ export default class PreferenceCategory extends Component {
             <View style={styles.root}>
                 <Text style={styles.title}>{this.props.title}</Text>
                 <View style={styles.wrapper}>{this.props.children}</View>
+                <Divider />
             </View>
         );
     }

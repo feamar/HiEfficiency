@@ -1,3 +1,31 @@
+/*import React, {Component} from "react";
+import {View} from "react-native";
+import PropTypes from "prop-types";
+
+
+export default class ScreenStoryDetails extends Component
+{
+    constructor(props)
+    {
+        super(props);
+
+        this.story = props.navigation.getParam("story");
+        this.state = {
+            
+        }
+    }
+    render()
+    {
+        return(
+
+        );
+    }
+}
+
+ScreenStoryDetails.propTypes = {
+
+}
+*/
 import React from 'react';
 import { View } from 'react-native';
 import {
@@ -19,7 +47,7 @@ import InterruptionType from '../../enums/InterruptionType';
 import InterruptionButton from '../interruptions/InterruptionButton';
 import { asDate, asTime, difference } from '../util/DateUtil';
 
-export default class StoryDetails extends React.Component {
+export default class ScreenStoryDetails extends React.Component {
 
     static navigationOptions = ({ navigation }) => {
         return {
