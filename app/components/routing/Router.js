@@ -9,7 +9,7 @@ import
 
 import {View} from "react-native";
 import {Icon} from "react-native-elements";
- 
+
 import { Platform, StatusBar } from "react-native";
 import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
@@ -51,7 +51,7 @@ export default class Router
         return createSwitchNavigator(
             {
                 [STACK_NAME_AUTH]: Router.createAuthStack(),
-                [STACK_NAME_HOME]: Router.createHomeStack() 
+                [STACK_NAME_HOME]: Router.createHomeStack()
             },
             {
                 initialRouteName: loggedIn ? STACK_NAME_HOME : STACK_NAME_AUTH
@@ -91,8 +91,8 @@ export default class Router
         {
           screen: Router.createProfileRouter(),
         }
-      }, 
-      { 
+      },
+      {
         initialRouteName: STACK_NAME_TEAMS
       }
     );
@@ -121,7 +121,7 @@ export default class Router
       },
       [SCREEN_NAME_STORY_BOARD]:
       {
-        screen: StoryBoard, 
+        screen: StoryBoard,
         navigationOptions: getNavigationOptions("Storyboard", getBackIcon())
       },
       [SCREEN_NAME_STORY_DETAILS]:
@@ -130,12 +130,12 @@ export default class Router
         navigationOptions: getNavigationOptions("Story Details", getBackIcon())
       }
     }, {
-      initialRouteName: SCREEN_NAME_TEAMS, 
+      initialRouteName: SCREEN_NAME_TEAMS,
       backBehavior: "initialRoute"
     });
   }
 }
- 
+
 
 const getHamburgerIcon = () => (navigation) =>
 {
@@ -143,20 +143,23 @@ const getHamburgerIcon = () => (navigation) =>
 }
 
 const getBackIcon = () => (navigation) =>
-{ 
+{
   return <View style={{paddingLeft: 15}}><Icon onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" /></View>
-} 
+}
 
 const getNavigationOptions = (title, action) =>
 {
     return  ({navigation}) => {
-        return {
-          title: title,
-          headerStyle: {backgroundColor: Theme.colors.primary},
-          headerTitleStyle: {color: "white"},
-          headerTintColor: "white",
-          headerLeft: action(navigation)
+      var headerLeft = null;
+      if (action) {
+        headerLeft = action(navigation);
       }
-    };    
+      return {
+        title: title,
+        headerStyle: {backgroundColor: Theme.colors.primary},
+        headerTitleStyle: {color: "white"},
+        headerTintColor: "white",
+        headerLeft: headerLeft
+      }
+    };
 }
- 
