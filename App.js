@@ -45,7 +45,7 @@ export default class App extends React.Component {
     this.setState({ fontsLoaded: true });
   }
 
-  
+
 
   initializeCyclicJs = () => {
     JSON.decycle = function decycle(object, replacer) {
