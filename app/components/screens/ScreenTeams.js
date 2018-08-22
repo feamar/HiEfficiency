@@ -7,14 +7,15 @@ import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogJoinTeam from "../dialogs/teams/DialogJoinTeam";
 import { FABGroup } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
+import { ACTION_LEAVE, ACTION_INSPECT, ACTION_RENAME } from "../lists/teams/ListItemTeam";
 
 export default class ScreenTeams extends Component
 {
-  constructor(props) 
+  constructor(props)
   {
     super(props)
 
-    this.state = 
+    this.state =
     {
       user: null,
       teams: [],
@@ -25,7 +26,7 @@ export default class ScreenTeams extends Component
     this.teamUnsubscribers = [];
   }
 
-  componentWillMount() 
+  componentWillMount()
   {
     var unsubscriber = hookIntoUserSignin(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
     this.unsubscribers.push(unsubscriber);
@@ -35,14 +36,14 @@ export default class ScreenTeams extends Component
 
     unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
     this.unsubscribers.push(unsubscriber);
-  } 
+  }
 
-  onUserUnavailableWhileMounting = () => 
+  onUserUnavailableWhileMounting = () =>
   {   signOut();}
 
-  onUserAvailableWhileMounting = (user) => 
+  onUserAvailableWhileMounting = (user) =>
   {
-    getUsers().doc(user.uid).get().then(doc => 
+    getUsers().doc(user.uid).get().then(doc =>
     {
       //Subscribe to updates on the user document.
       const unsubscriber = doc.ref.onSnapshot(this.onUserDocumentChanged);
@@ -51,7 +52,7 @@ export default class ScreenTeams extends Component
       //Call the first document change manually, to trigger team change subscriptions and insertion into the state.
       this.onUserDocumentChanged(doc);
     })
-    .catch(function (error) 
+    .catch(function (error)
     {
       console.log("Error getting user profile:", error);
     });
@@ -60,7 +61,7 @@ export default class ScreenTeams extends Component
   onUserDocumentChanged = (document) =>
   {
     console.log("onUserDocumentChanged(" + document + ")");
-    if (document.exists == false) 
+    if (document.exists == false)
     {
       console.log("Signed up user does not have a profile for user id: " + document.id);
       signOut();
@@ -73,11 +74,11 @@ export default class ScreenTeams extends Component
     this.teamUnsubscribers = [];
 
     //For each of the user's teams
-    document.data().teams.map((teamId) => 
-    { 
+    document.data().teams.map((teamId) =>
+    {
       console.log("TEAM ID: " + JSON.stringify(teamId)) ;
       //Fetch the team.
-      teamsCollection.doc(teamId).get().then((team) => 
+      teamsCollection.doc(teamId).get().then((team) =>
       {
         //Subscribe to the updates on the team document.
         const unsubscriber = team.ref.onSnapshot(this.onTeamDocumentChanged);
@@ -99,27 +100,27 @@ export default class ScreenTeams extends Component
     {   teams.splice(index, 1, team);}
     else
     {   teams.push(team);}
- 
-    this.setState({teams: teams});  
+
+    this.setState({teams: teams});
   }
 
 
-  componentWillUnmount() 
+  componentWillUnmount()
   {
-    for (var i = 0; i < this.unsubscribers.length; i++) 
+    for (var i = 0; i < this.unsubscribers.length; i++)
     {   this.unsubscribers[i]();}
 
     for(var i = 0 ; i < this.teamUnsubscribers.length; i++)
     {   this.teamUnsubscribers[i]();}
   }
 
-  onItemSelected = (item, index) => 
+  onItemSelected = (item, index) =>
   {   this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, { teamId: item.id });}
 
-  onContextMenuItemSelected = (item, index, action) => 
+  onContextMenuItemSelected = (item, index, action) =>
   {
     console.log("onContextMenuItemSelected(" + item + ", " + index + ", " + action + ")");
-    switch (action) 
+    switch (action)
     {
       case ACTION_LEAVE:
         var teams =  this.state.user.data().teams;
@@ -129,11 +130,11 @@ export default class ScreenTeams extends Component
           teams.splice(index, 1);
           this.state.user.ref.update({ teams: teams });
         }
-        
+
         break;
 
       case ACTION_RENAME:
-        if (this.dialogRename) 
+        if (this.dialogRename)
         {
           this.currentlyRenamingTeam = item;
           this.dialogRename.setValue(item.data().name);
@@ -144,31 +145,31 @@ export default class ScreenTeams extends Component
       case ACTION_INSPECT:
         this.onItemSelected(item, index);
         break;
-    } 
+    }
   }
- 
-  onRenameDialogSubmitted = (value) => 
+
+  onRenameDialogSubmitted = (value) =>
   {
     console.log("onRenameDialogSubmitted(" + value + ")");
     //Update the team name in the firstore database.
     this.currentlyRenamingTeam.ref.update({name: value});
   }
 
-  onJoinDialogSubmitted = (name, securityCode) => 
+  onJoinDialogSubmitted = (name, securityCode) =>
   {
     console.log("onJoinDialogSubmitted(" + name + ", " + securityCode + ")");
-    getTeams().where("name", "==", name).get().then(teams => 
+    getTeams().where("name", "==", name).get().then(teams =>
     {
       for(var i = 0 ; i < teams.docs.length ; i ++)
       {
         const team = teams.docs[i];
         if(team.data().code == securityCode)
         {
-          var userTeams = this.state.user.data().teams; 
+          var userTeams = this.state.user.data().teams;
           if(userTeams.indexOf(team.id) > -1)
           {   continue;}
 
-          userTeams.push(team.id); 
+          userTeams.push(team.id);
           this.state.user.ref.update({teams: userTeams});
 
           return;
@@ -182,21 +183,21 @@ export default class ScreenTeams extends Component
     });
   }
 
-  handleCreateNewTeam = () => 
+  handleCreateNewTeam = () =>
   {   }
- 
+
   render() {
-    return (  
-      <View> 
+    return (
+      <View>
         <ListTeams items={this.state.teams} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogPreferenceText ref={instance => this.dialogRename = instance} visible={false} label="Team Name" value="" onDialogSubmitted={this.onRenameDialogSubmitted} />
         <DialogJoinTeam ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
         {this.state.shouldFabGroupRender && <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
-      </View> 
+      </View>
     );
   }
 
-  getFabGroupActions = () => 
+  getFabGroupActions = () =>
   {
     var actions = [];
     actions.push({ icon: "add", label: "Create Team", onPress: this.handleCreateNewTeam })
@@ -205,15 +206,15 @@ export default class ScreenTeams extends Component
     return actions;
   }
 
-  getIndexOfTeamById = (teamIds, id) => 
+  getIndexOfTeamById = (teamIds, id) =>
   {
-    for (var i = 0; i < teamIds.length; i++) 
+    for (var i = 0; i < teamIds.length; i++)
     {
       const current = teamIds[i];
-      if (current == id) 
+      if (current == id)
       {   return i;}
     }
- 
+
     return -1;
   }
 }
