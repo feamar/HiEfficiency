@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 import { View } from "react-native";
 import ListTeams from "../lists/teams/ListTeams";
-import { ACTION_LEAVE, ACTION_RENAME, ACTION_INSPECT } from "../lists/teams/ListItemTeam";
-
-import { SCREEN_NAME_STORY_BOARD } from '../routing/Router';
-
+import {SCREEN_NAME_STORY_BOARD} from "../routing/Router";
 import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
 import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogJoinTeam from "../dialogs/teams/DialogJoinTeam";
 import { FABGroup } from "react-native-paper";
+import { NavigationEvents } from 'react-navigation';
 
 export default class ScreenTeams extends Component
 {
@@ -27,10 +25,17 @@ export default class ScreenTeams extends Component
     this.teamUnsubscribers = [];
   }
 
-  componentWillMount() {
-    const unsubscriber = hookIntoUserSignin(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
+  componentWillMount() 
+  {
+    var unsubscriber = hookIntoUserSignin(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
     this.unsubscribers.push(unsubscriber);
-  }
+
+    unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.setState({shouldFabGroupRender: true})});
+    this.unsubscribers.push(unsubscriber);
+
+    unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
+    this.unsubscribers.push(unsubscriber);
+  } 
 
   onUserUnavailableWhileMounting = () => 
   {   signOut();}
@@ -89,8 +94,6 @@ export default class ScreenTeams extends Component
     var teams = this.state.teams;
     const index = this.getIndexOfTeamById(this.state.teams.map(current => {return current.id}), team.id);
 
-    //console.log("onTeamDocumentChanged(" + JSON.stringify(JSON.decycle(team)) +")"); 
-     
     //Determine whether to replace or push the team.
     if(index > -1)
     {   teams.splice(index, 1, team);}
@@ -181,16 +184,15 @@ export default class ScreenTeams extends Component
 
   handleCreateNewTeam = () => 
   {   }
-
+ 
   render() {
-    console.log("RENDER");
-    return (
-      <View>
+    return (  
+      <View> 
         <ListTeams items={this.state.teams} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogPreferenceText ref={instance => this.dialogRename = instance} visible={false} label="Team Name" value="" onDialogSubmitted={this.onRenameDialogSubmitted} />
         <DialogJoinTeam ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
-        <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />
-      </View>
+        {this.state.shouldFabGroupRender && <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+      </View> 
     );
   }
 
