@@ -9,8 +9,11 @@ export const asDate = (date) => {
 }
 
 export const difference = (start, finish) => {
+	if (start == undefined || finish == undefined) {
+		return "";
+	}
 	var first = (start.constructor !== undefined && start.constructor.name == 'Date') ? start.getTime() / 1000 : start;
-	var second = (finish.constructor !== undefined && finish.constructor.name == 'Date') ? finish.getTime() / 1000 : start;
+	var second = (finish.constructor !== undefined && finish.constructor.name == 'Date') ? finish.getTime() / 1000 : finish;
 
   var difference = second - first;
   seconds = difference % 60;
