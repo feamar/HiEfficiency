@@ -13,7 +13,7 @@ export const ACTION_INSPECT = "inspect";
 
 const styles = {
     listItem:{ 
-        padding:20,
+        paddingLeft: 20,
         flexDirection: "row",
     },
     contentWrapper: {
@@ -30,6 +30,13 @@ const styles = {
     menuOptions:{
         optionWrapper:{
             padding:15,
+
+        }
+    }, 
+    menuTrigger:{ 
+        triggerWrapper:  
+        {
+            padding:20 
         }
     }
 }
@@ -42,11 +49,12 @@ export default class ListItemTeam extends Component
 
         this.state = {
             team: this.props.team,
+            teamName: this.props.team.data().name,
             index: this.props.index
         }
     }
 
-    onListItemSelected =() => () =>
+    onListItemSelected = () => () =>
     {
         if(this.props.onItemSelected)
         {   this.props.onItemSelected(this.state.team, this.state.index);}
@@ -64,6 +72,9 @@ export default class ListItemTeam extends Component
         {   this.props.onContextMenuItemSelected(this.state.team, this.state.index, action);}
     }
 
+    componentWillReceiveProps = (props) => 
+    {   this.setState({teamName: props.team.data().name});    }
+
     render()
     {
         return (
@@ -71,10 +82,10 @@ export default class ListItemTeam extends Component
                 <TouchableRipple onPress={this.onListItemSelected()}>
                     <View style={styles.listItem}>
                         <View style={styles.contentWrapper}>
-                            <Text style={styles.teamName}>{this.state.team.name}</Text>
+                            <Text style={styles.teamName}>{this.state.teamName}</Text>
                         </View>
                         <Menu ref={instance => this.state.menu = instance}>
-                            <MenuTrigger> 
+                            <MenuTrigger customStyles={styles.menuTrigger}> 
                                 <Icon style={styles.icon} size={30} name="more-vert" />
                             </MenuTrigger>
                             <MenuOptions customStyles={styles.menuOptions}>

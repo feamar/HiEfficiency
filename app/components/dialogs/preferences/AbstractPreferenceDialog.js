@@ -24,9 +24,7 @@ export default class AbstractPreferenceDialog extends Component
 
     handleOpen = () =>
     {
-        console.log("SETTING STATE!");
         this.setState({visible: true});   
-        console.log("DONE SETTING STATE!");
     }
 
     handleDismiss = () =>
@@ -39,7 +37,6 @@ export default class AbstractPreferenceDialog extends Component
 
     handleSave = () =>
     {
-        console.log("ABS VALUE: " + JSON.stringify(this.state.value));
         if(this.props.onDialogSubmitted)
         {   this.props.onDialogSubmitted(this.state.value);}
 
@@ -48,13 +45,11 @@ export default class AbstractPreferenceDialog extends Component
 
     handleValueChange = (value) =>
     {
-        console.log("HANDLE!: " + JSON.stringify(value));
         this.setState({value: value});
     }
  
     render()
     { 
-        console.log("RENDING ABSTRACT PREFERENCE DIALOG!");
         return(
             <View>
                 <Dialog visible={this.state.visible} onDismiss={this.handleDismiss}>
@@ -76,7 +71,7 @@ export default class AbstractPreferenceDialog extends Component
 
 AbstractPreferenceDialog.propTypes = {
     title: PropTypes.string.isRequired,
-    onDialogCanceled: PropTypes.func.isRequired,
+    onDialogCanceled: PropTypes.func,
     onDialogSubmitted: PropTypes.func.isRequired,
     visible: PropTypes.bool.isRequired,
     value: PropTypes.any.isRequired 

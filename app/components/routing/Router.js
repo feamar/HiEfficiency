@@ -18,6 +18,7 @@ import ScreenProfile from "../screens/ScreenProfile";
 import ScreenStoryBoard from '../screens/ScreenStoryBoard';
 import ScreenStoryDetails from '../screens/ScreenStoryDetails';
 import Theme from '../../styles/Theme';
+import CustomDrawer from './CustomDrawer';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -93,11 +94,12 @@ export default class Router
         }
       },
       {
-        initialRouteName: STACK_NAME_TEAMS
+        initialRouteName: STACK_NAME_TEAMS,
+        contentComponent: (props) => <CustomDrawer {...props} />
       }
     );
   }
-
+  
   static createProfileRouter = () =>
   {
     return createStackNavigator({
@@ -135,6 +137,8 @@ export default class Router
     });
   }
 }
+
+
 
 
 const getHamburgerIcon = () => (navigation) =>

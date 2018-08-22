@@ -18,7 +18,7 @@ export default class ListTeams extends Component
         return(
             <View>
                 {this.props.items.map((item, index) => {
-                    return <ListItemTeam key={index} team={item} index={index} onContextMenuItemSelected={this.props.onContextMenuItemSelected} onItemSelected={this.props.onItemSelected}/>
+                    return <ListItemTeam key={item.id} team={item} index={index} onContextMenuItemSelected={this.props.onContextMenuItemSelected} onItemSelected={this.props.onItemSelected}/>
                 })}
             </View>
         );

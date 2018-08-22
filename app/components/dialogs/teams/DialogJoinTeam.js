@@ -5,6 +5,13 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paragraph, T
 import Theme from '../../../styles/Theme';
 import PropTypes from 'prop-types';
 
+const styles ={
+    content:{
+        maxHeight: "75%"
+    }
+}
+
+
 export default class DialogJoinTeam extends Component
 {
     constructor(props)
@@ -21,18 +28,25 @@ export default class DialogJoinTeam extends Component
 
 
     handleOpen = () =>
-    {
-        this.setState({visible: true});
-    }
+    {   this.setState({visible: true});}
 
-    handleDismiss = () => {
+    handleClose = () =>
+    {   this.setState({visible: false});}
+
+    handleDismiss = () => 
+    {
         if(this.props.onDialogCanceled)
         {   this.props.onDialogCanceled();}
+
+        this.handleClose();
     }
 
-    handleSave = () => {
+    handleSave = () => 
+    {
         if(this.props.onDialogSubmitted)
         {   this.props.onDialogSubmitted(this.state.name, this.state.securityCode);}
+
+        this.handleClose();
     }
 
     render(){
