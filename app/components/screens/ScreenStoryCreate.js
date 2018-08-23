@@ -60,7 +60,8 @@ export default class ScreenStoryCreate extends Component
         for(var i = 0 ; i < this.unsubscribers.length ; i ++)
         {
             const unsubscriber = this.unsubscribers[i];
-            unsubscriber();
+            if(unsubscriber && unsubscriber instanceof Function)
+            {   unsubscriber();}
         }
     }
 
