@@ -1,110 +1,41 @@
 import React, {Component} from "react";
 import {View} from "react-native";
-import PropTypes from "prop-types";
-import Icon  from "react-native-vector-icons/MaterialIcons";
 import {Text, TouchableRipple} from "react-native-paper"
 import { Divider } from "react-native-paper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
+import AbstractListItem from "../AbstractListItem";
+import Theme from "../../../styles/Theme";
 
 
-export const ACTION_LEAVE = "leave";
-export const ACTION_RENAME = "rename";
-export const ACTION_INSPECT = "inspect";
+export const ACTION_LEAVE_TEAM = "leave";
+export const ACTION_RENAME_TEAM = "rename";
+export const ACTION_INSPECT_TEAM = "inspect";
+export const ACTION_DELETE_TEAM = "delete";
 
 const styles = {
-    listItem:{ 
-        paddingLeft: 20,
-        flexDirection: "row",
-    },
-    contentWrapper: {
-        flex: 1,
-        justifyContent: "center"
-    },
     teamName: {
+        paddingLeft: 20,
         fontWeight: "bold",
-        color: "#434343"
-    },  
-    icon: { 
-
-    },
-    menuOptions:{
-        optionWrapper:{
-            padding:15,
-
-        }
-    }, 
-    menuTrigger:{ 
-        triggerWrapper:  
-        {
-            padding:20 
-        }
+        color: Theme.colors.typography.title
     }
 }
  
-export default class ListItemTeam extends Component
+export default class ListItemTeam extends AbstractListItem
 {
     constructor(props)
     {
         super(props);
-
-        this.state = {
-            team: this.props.team,
-            teamName: this.props.team.data().name,
-            index: this.props.index
-        }
-    }
-
-    onListItemSelected = () => () =>
-    {
-        if(this.props.onItemSelected)
-        {   this.props.onItemSelected(this.state.team, this.state.index);}
-    }
-
-    onContextMenuPressed = () =>
-    {
-        if(this.state.menu)
-        {   this.state.menu.openMenu();}
-    }
-
-    onContextMenuItemSelected = (action) => () =>
-    {
-        if(this.props.onContextMenuItemSelected)
-        {   this.props.onContextMenuItemSelected(this.state.team, this.state.index, action);}
+        this.addContextMenuItem("Leave", ACTION_LEAVE_TEAM);
+        this.addContextMenuItem("Rename", ACTION_RENAME_TEAM);
+        this.addContextMenuItem("Inspect", ACTION_INSPECT_TEAM);
+        //this.addContextMenuItem("Delete", ACTION_DELETE_TEAM);
     }
 
     componentWillReceiveProps = (props) => 
-    {   this.setState({teamName: props.team.data().name});    }
+    {   this.setState({item: props.item, index: props.index});}
 
-    render()
+    getItemContent = () => 
     {
-        return (
-            <View>
-                <TouchableRipple onPress={this.onListItemSelected()}>
-                    <View style={styles.listItem}>
-                        <View style={styles.contentWrapper}>
-                            <Text style={styles.teamName}>{this.state.teamName}</Text>
-                        </View>
-                        <Menu ref={instance => this.state.menu = instance}>
-                            <MenuTrigger customStyles={styles.menuTrigger}> 
-                                <Icon style={styles.icon} size={30} name="more-vert" />
-                            </MenuTrigger>
-                            <MenuOptions customStyles={styles.menuOptions}>
-                                <MenuOption text="Leave" onSelect={this.onContextMenuItemSelected(ACTION_LEAVE)}></MenuOption>
-                                <MenuOption text="Rename" onSelect={this.onContextMenuItemSelected(ACTION_RENAME)}></MenuOption>
-                                <MenuOption text="Inspect" onSelect={this.onContextMenuItemSelected(ACTION_INSPECT)}></MenuOption>
-                            </MenuOptions>
-                        </Menu>
-                    </View>
-                </TouchableRipple>
-                <Divider /> 
-            </View>
-        );
+        return <Text style={styles.teamName}>{this.state.item.data().name}</Text>
     }
-}
-
-ListItemTeam.propTypes = {
-    team: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired,
-    onItemSelected: PropTypes.func.isRequired,
-    onContextMenuItemSelected: PropTypes.func.isRequired
 }

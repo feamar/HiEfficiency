@@ -4,47 +4,36 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paragraph, T
 import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from './AbstractPreferenceDialog';
 import PropTypes from 'prop-types';
+import {Text} from "react-native-paper";
 
-export default class DialogPreferenceText extends Component
+const styles = {
+    error:{
+        fontWeight: "bold",
+        color: "red",
+        opacity: 0.75
+    }
+}
+export default class DialogPreferenceText extends AbstractPreferenceDialog
 {
 
     constructor(props)
     {
         super(props);
-
-        this.state = {
-            visible: this.props.visible,
-            value: this.props.value
-        }
     }
 
-    setValue = (value) =>
+    getDialogContent = () => 
     {
-        this.setState({value: value});
-    }
-
-    handleValueChange = (text) =>
-    {
-        this.setState({value: text});
-        this.base.handleValueChange(text);
-    }
-
-    render() 
-    {
-        return( 
-            <View>
-                <AbstractPreferenceDialog ref={instance => this.base = instance} title={this.props.label} {...this.props} value={this.state.value}>
-                    <View style={{marginLeft: 25, marginRight: 25}}>
-                        <TextInput name="value" label={this.props.label} value={this.state.value} onChangeText={this.handleValueChange}/>
-                    </View>
-                </AbstractPreferenceDialog>
+        return (
+            <View style={{marginLeft: 25, marginRight: 25}}>
+                <TextInput name="value" label={this.props.label} value={this.state.storageValue} onChangeText={this.onValueChange} multiline={this.props.multiline} numberOfLines={this.props.numberOfLines} />
+                {this.state.error && <Text style={styles.error}>{this.state.error}</Text>}
             </View>
         );
     }
 }  
 
-DialogPreferenceText.propTypes ={
-    visible: PropTypes.bool.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired
+DialogPreferenceText.propTypes = {
+    label: PropTypes.string.isRequired,
+    multiline: PropTypes.bool,
+    numberOfLines: PropTypes.number
 }

@@ -8,7 +8,11 @@ const Theme = {
         primaryDark: "#E64A19",
         primaryLight: "#FF8A65",
         accent: "#FFC107",
-        selectedBackground: "#EFEFEF"
+        selectedBackground: "#EFEFEF",
+        typography:{
+            title: "#434343",
+            subtitle: "#A1A1A1"
+        }
     },
     opacities: {
         text:{

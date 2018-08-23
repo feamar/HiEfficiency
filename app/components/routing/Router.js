@@ -15,10 +15,11 @@ import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
 import ScreenTeams from "../screens/ScreenTeams";
 import ScreenProfile from "../screens/ScreenProfile";
-import ScreenStoryBoard from '../screens/ScreenStoryBoard';
+import ScreenStoryboard from '../screens/ScreenStoryboard';
 import ScreenStoryDetails from '../screens/ScreenStoryDetails';
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
+import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -31,6 +32,7 @@ export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 
 export const SCREEN_NAME_STORY_BOARD = 'StoryBoard';
 export const SCREEN_NAME_STORY_DETAILS = 'StoryDetails';
+export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
 
 export const SCREEN_NAME_PROFILE = "Profile";
 export const SCREEN_NAME_TEAMS = "Teams";
@@ -95,7 +97,7 @@ export default class Router
       },
       {
         initialRouteName: STACK_NAME_TEAMS,
-        contentComponent: (props) => <CustomDrawer {...props} />
+        contentComponent: (props) => <CustomDrawer {...props} />,
       }
     );
   }
@@ -123,13 +125,18 @@ export default class Router
       },
       [SCREEN_NAME_STORY_BOARD]:
       {
-        screen: ScreenStoryBoard, 
+        screen: ScreenStoryboard, 
         navigationOptions: getNavigationOptions("Storyboard", getBackIcon())
       },
       [SCREEN_NAME_STORY_DETAILS]:
       {
         screen: ScreenStoryDetails,
         navigationOptions: getNavigationOptions("Story Details", getBackIcon())
+      },
+      [SCREEN_NAME_STORY_CREATE]:
+      {
+        screen: ScreenStoryCreate,
+        navigationOptions: getNavigationOptions("Story Information", getBackIcon())
       }
     }, {
       initialRouteName: SCREEN_NAME_TEAMS,

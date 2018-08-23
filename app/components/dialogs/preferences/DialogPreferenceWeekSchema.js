@@ -66,37 +66,31 @@ const styles = {
     }
 }
 
-export default class DialogPreferenceWeekSchema extends Component {
-    constructor(props) {
+export default class DialogPreferenceWeekSchema extends AbstractPreferenceDialog 
+{
+    constructor(props) 
+    {
         super(props);
 
-        this.state = {
-            visible: this.props.visible,
-            storageValue: this.props.storageValue,
+        this.state = 
+        {
+            ...this.state, 
             pickerVisibilities: [{ 0: false, 1: false }, { 0: false, 1: false }, { 0: false, 1: false }, { 0: false, 1: false }, { 0: false, 1: false }, { 0: false, 1: false }, { 0: false, 1: false }],
             enabled: []
         }
     }
 
-    handleValueChange = (text) => {
-        this.setState({ value: text });
-        this.base.handleValueChange(text);
-        console.log("handleValueChange");
-
-    }
-
-    handleCheckboxPress = (index) => () => {
+    onCheckboxPress = (index) => () => 
+    {
         var newStorageValue = this.state.storageValue;
         newStorageValue[index].enabled = !newStorageValue[index].enabled;
 
-        this.setState({
-            storageValue: newStorageValue
-        });
+        this.onValueChange(newStorageValue);
     }
 
-    onTimeConfirmed = (index, fromOrTo) => (time) => {
-        console.log("HERE: " + index + ", " + fromOrTo)
-        this.handleClosePicker(index, fromOrTo);
+    onTimeConfirmed = (index, fromOrTo) => (time) => 
+    {
+        this.closeTimePicker(index, fromOrTo);
 
         var hours = time.getHours();
         var minutes = time.getMinutes();
@@ -127,8 +121,7 @@ export default class DialogPreferenceWeekSchema extends Component {
         }
 
         newStorageValue[index][fromOrTo] = timeString;
-        this.setState({ storageValue: newStorageValue });
-        this.base.handleValueChange(storageValue);
+        this.onValueChange(storageValue);
     }
 
     isBefore = (t1, t2) => {
@@ -150,7 +143,7 @@ export default class DialogPreferenceWeekSchema extends Component {
         return false;
     }
 
-    handleOpenPicker = (index, fromOrTo) => () => {
+    openTimePicker = (index, fromOrTo) => () => {
         if (this.isEnabled(index) == false) { return; }
 
         var newVisiblities = this.state.pickerVisibilities;
@@ -159,14 +152,14 @@ export default class DialogPreferenceWeekSchema extends Component {
         this.setState({ pickerVisibilities: newVisiblities });
     }
 
-    handleClosePicker = (index, fromOrTo) => {
+    closeTimePicker = (index, fromOrTo) => {
         var newVisibilities = this.state.pickerVisibilities;
         newVisibilities[index][fromOrTo] = false;
 
         this.setState({ newVisibilities });
     }
 
-    onCancel = (index, fromOrTo) => () => { this.handleClosePicker(index, fromOrTo); }
+    onCancel = (index, fromOrTo) => () => { this.closeTimePicker(index, fromOrTo); }
 
     getInnerWrapperStyle = (index) => {
         var style = {
@@ -193,7 +186,7 @@ export default class DialogPreferenceWeekSchema extends Component {
     }
 
     getTimespanFor = (item, index) => {
-        console.log("getTimespanFor");
+        //console.log("getTimespanFor: " + JSON.stringify(JSON.decycle(this.state.storageValue)));
 
         //Check whether the current value array contains the current index.
         var checked = this.state.storageValue[index].enabled;
@@ -204,34 +197,30 @@ export default class DialogPreferenceWeekSchema extends Component {
                     <View style={styles.contentWrapper}>
                         <Text style={styles.title}>{item}</Text>
                         <View style={this.getInnerWrapperStyle(index)}>
-                            <TouchableRipple disabled={this.isEnabled(index) == false} style={styles.touchable} onPress={this.handleOpenPicker(index, 0)}><Text>{this.state.storageValue[index][0]}</Text></TouchableRipple>
+                            <TouchableRipple disabled={this.isEnabled(index) == false} style={styles.touchable} onPress={this.openTimePicker(index, 0)}><Text>{this.state.storageValue[index][0]}</Text></TouchableRipple>
                             <Text style={styles.hyphen}> - </Text>
-                            <TouchableRipple disabled={this.isEnabled(index) == false} style={styles.touchable} onPress={this.handleOpenPicker(index, 1)}><Text>{this.state.storageValue[index][1]}</Text></TouchableRipple>
+                            <TouchableRipple disabled={this.isEnabled(index) == false} style={styles.touchable} onPress={this.openTimePicker(index, 1)}><Text>{this.state.storageValue[index][1]}</Text></TouchableRipple>
                         </View>
                     </View>
-                    <Checkbox style={styles.checkbox} checked={checked} onPress={this.handleCheckboxPress(index)} />
+                    <Checkbox style={styles.checkbox} checked={checked} onPress={this.onCheckboxPress(index)} />
                 </View>
                 <DateTimePicker datePickerModeAndroid="default" date={this.getInitialPickerTime(index, 0)} onCancel={this.onCancel(index, 0)} mode="time" isVisible={this.state.pickerVisibilities[index][0]} onConfirm={this.onTimeConfirmed(index, 0)} />
                 <DateTimePicker datePickerModeAndroid="default" date={this.getInitialPickerTime(index, 1)} onCancel={this.onCancel(index, 1)} mode="time" isVisible={this.state.pickerVisibilities[index][1]} onConfirm={this.onTimeConfirmed(index, 1)} />
             </View>
         );
     }
-
-    render() {
+    getDialogContent = () =>
+    {
         return (
             <View>
-                <AbstractPreferenceDialog ref={instance => this.base = instance} title={this.props.label} {...this.props} value={this.state.storageValue}>
-                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((item, index) => {
-                        return this.getTimespanFor(item, index)
-                    })}
-                </AbstractPreferenceDialog>
+                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((item, index) => {
+                    return this.getTimespanFor(item, index)
+                })}
             </View>
         );
     }
 }
 
 DialogPreferenceWeekSchema.propTypes = {
-    visible: PropTypes.bool.isRequired,
-    storageValue: PropTypes.array.isRequired,
     label: PropTypes.string.isRequired
 }

@@ -1,32 +1,17 @@
 import React, {Component} from "react";
 import {View} from "react-native";
-import PropTypes from "prop-types";
 import ListItemTeam from './ListItemTeam';
+import AbstractList from "../AbstractList";
 
-
-
-export default class ListTeams extends Component
+export default class ListTeams extends AbstractList
 {
-
-    constructor(props)
+    getListItemFor = (item, index) =>
     {
-        super(props)
+        console.log("KEY: " + item.id);
+        return <ListItemTeam 
+            key={item.id} 
+            item={item} 
+            index={index} 
+            {...this.props}/>
     }
-
-    render()
-    {
-        return(
-            <View>
-                {this.props.items.map((item, index) => {
-                    return <ListItemTeam key={item.id} team={item} index={index} onContextMenuItemSelected={this.props.onContextMenuItemSelected} onItemSelected={this.props.onItemSelected}/>
-                })}
-            </View>
-        );
-    }
-}
-
-ListTeams.propTypes = {
-    items: PropTypes.array.isRequired,
-    onItemSelected: PropTypes.func.isRequired,
-    onContextMenuItemSelected: PropTypes.func.isRequired
-}
+} 

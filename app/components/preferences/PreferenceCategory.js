@@ -4,6 +4,7 @@ import { Text } from 'react-native-paper';
 
 import Theme from '../../styles/Theme';
 import {Divider} from "react-native-paper";
+import PropTypes from "prop-types";
 
 const styles = {
     root:
@@ -31,4 +32,8 @@ export default class PreferenceCategory extends Component {
             </View>
         );
     }
+}
+
+PreferenceCategory.propTypes ={
+    title: PropTypes.string.isRequired,
 }

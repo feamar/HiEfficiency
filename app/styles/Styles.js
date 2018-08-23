@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet } from 'react-native';
 
 const colors = {
@@ -37,7 +36,7 @@ export const styles = StyleSheet.create({
   storyFinished: {
     borderColor: colors.myrtleGreenTint,
   },
-  /*------------------ Interruption list ------------------*/
+  /*------------------ Interruption list ------------------*/ 
   interruptionList: {
     marginHorizontal: 10,
     justifyContent: 'flex-start',

@@ -21,23 +21,20 @@ const styles = {
     checkbox: {}
 }
 
-export default class DialogPreferenceMultiSelect extends Component {
-    constructor(props) {
+export default class DialogPreferenceMultiSelect extends AbstractPreferenceDialog 
+{
+    constructor(props) 
+    {
         super(props);
 
-        this.state = {
-            visible: this.props.visible,
-            storageValue: this.props.storageValue,
+        this.state = 
+        {
+            ...this.state,
             options: this.props.options,
         }
     }
 
-    handleValueChange = (text) => {
-        this.setState({ value: text });
-        this.base.handleValueChange(text);
-    }
-
-    handleCheckboxPress = (index) => () => {
+    onCheckboxPress = (index) => () => {
         var newStorageValue = this.state.storageValue;
         var i = this.state.storageValue.indexOf(index);
         if(i > -1)
@@ -45,8 +42,7 @@ export default class DialogPreferenceMultiSelect extends Component {
         else
         {   newStorageValue.push(index);}
 
-        this.setState({storageValue: newStorageValue});
-        this.base.handleValueChange(newStorageValue);
+        this.onValueChange(newStorageValue);
     }
 
     getCheckboxFor = (item, index) => {
@@ -57,21 +53,18 @@ export default class DialogPreferenceMultiSelect extends Component {
         return (
             <View style={styles.item} key={index}>
                 <Text style={styles.title}>{item}</Text>
-                <Checkbox style={styles.checkbox} checked={checked} onPress={this.handleCheckboxPress(index)} />
+                <Checkbox style={styles.checkbox} checked={checked} onPress={this.onCheckboxPress(index)} />
             </View>
         );
     } 
 
-    render() {
+    getDialogContent = () =>
+    {
         return (
-            <View>
-                <AbstractPreferenceDialog ref={instance => this.base = instance} title={this.props.label} value={this.state.storageValue} {...this.props}>
-                    <View style={{margin: 25}}>
-                        {this.state.options.map((item, index) => {
-                            return this.getCheckboxFor(item, index)
-                        })}
-                    </View>
-                </AbstractPreferenceDialog>
+            <View style={{margin: 25}}>
+                {this.state.options.map((item, index) => {
+                    return this.getCheckboxFor(item, index)
+                })}
             </View>
         ); 
     }
@@ -80,8 +73,6 @@ export default class DialogPreferenceMultiSelect extends Component {
 
 
 DialogPreferenceMultiSelect.propTypes ={
-    visible: PropTypes.bool.isRequired,
-    storageValue: PropTypes.array.isRequired,
     options: PropTypes.array.isRequired,
     label: PropTypes.string.isRequired   
 }

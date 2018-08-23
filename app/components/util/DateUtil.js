@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const asTime = (date) => {
 	return date.toLocaleTimeString().substring(0, 5);

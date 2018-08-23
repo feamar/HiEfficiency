@@ -1,173 +1,177 @@
-import React, { Component } from 'react';
-import { ListView, View } from 'react-native';
-import {
-  Button,
-  Container,
-  Header,
-  Content,
-  Icon,
-  List,
-  ListItem,
-  Text,
-  Input,
-  Item,
-} from 'native-base';
-import { getStories } from '../firebase/FirebaseAdapter';
-import { styles } from '../../styles/Styles';
-import ModalStoryNew from '../modals/ModalStoryNew';
-import { SCREEN_NAME_STORY_DETAILS, TAB_NAME_TEAM_OVERVIEW } from '../routing/Router';
+import React, {Component} from "react";
+import {View, ToastAndroid, Keyboard} from "react-native";
+import PropTypes from "prop-types";
+import { getUsers, getTeams, getStories, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
+import ListStories from "../lists/stories/ListStories";
+import {ACTION_DELETE_STORY, ACTION_EDIT_STORY, ACTION_INSPECT_STORY, ACTION_UPVOTE_STORY} from  "../lists/stories/ListItemStory";
+import {SCREEN_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE} from "../routing/Router";
+import {FABGroup} from "react-native-paper";
+import DialogConfirmation, { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
+import { MODE_CREATE } from "./ScreenStoryCreate";
 
-export default class ScreenStoryBoard extends React.Component {
-  constructor(props) {
+const styles = {
+  
+};
+
+const ACTION_CREATE_STORY = "create_story";
+
+export default class ScreenStoryboard extends Component
+{
+  constructor(props)
+  {
     super(props);
-    console.log('TeamId: ' + props.navigation.getParam('teamId'));
-    this.state = {
-      listViewData: [],
-      modalItemSelected: undefined,
-      modalVisible: false,
-      mode: 'new',
-      teamId: props.navigation.getParam('teamId')
-    };
-  }
 
-  static navigationOptions = {
-    title: 'Stories',
-    headerTitleStyle: { flex: 1 }
-  };
+    this.unsubscribers = [];
+    this.state =
+    {
+      team: this.props.navigation.getParam("team"),
+      stories: [],
+      open: false
+    } 
+  } 
 
-  closeModal() {
-    this.setState({ modalVisible: false, modalItemSelected: undefined });
-  }
+  componentWillMount() 
+  {   
+    var unsubscriber = getStories(this.state.team.id).orderBy("upvotes", "desc").onSnapshot(this.onStoryDocumentsChanged);
+    this.unsubscribers.push(unsubscriber);
 
-  setModalVisible(visible) {
-    this.setState({ modalVisible: visible });
-  }
+    unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.setState({shouldFabGroupRender: true})});
+    this.unsubscribers.push(unsubscriber);
 
-  editStory = (story, mode) => {
-    return () => {
-      this.setState({
-        modalItemSelected: story,
-        mode: mode,
-      });
-      this.setModalVisible(true);
-    }
-  }
+    unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
+    this.unsubscribers.push(unsubscriber);
+    
+    unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
+    this.unsubscribers.push(unsubscriber);
 
-  registerDatabaseListener() {
-    var _this = this;
-    this.unregisterDatabaseListener = getStories(this.state.teamId).orderBy("upvotes", "desc").onSnapshot(function (querySnapshot) {
-      var i;
+    unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
+    this.unsubscribers.push(unsubscriber);
+  } 
 
-      const newData = [..._this.state.listViewData];
+  onStoryDocumentsChanged = (snapshot) =>
+  {
+      console.log("onStoryDocumentsChanged: " + snapshot.docChanges.length);
+      var stories = this.state.stories;
+      console.log("Stories: " + stories.length);
+      for(var i = 0 ;i < snapshot.docChanges.length ; i ++)
+      {
+        const current = snapshot.docChanges[i];
+        switch(current.type)
+        { 
+            case "added":
+              stories.splice(current.newIndex, 0, current.doc)
+              break;
 
-      for(i = 0 ; i < querySnapshot.docChanges.length ; i ++) {
-        let dcs = querySnapshot.docChanges[i];
-        if (dcs._type == 'added') {
-          newData.splice(dcs._newIndex, 0, dcs._document);
-        }
-        else if (dcs._type == 'removed') {
-          newData.splice(dcs._oldIndex, 1);
-        }
-        else if (dcs._type == 'modified') {
-          newData.splice(dcs._newIndex, 1, dcs._document);
+            case "removed":
+              stories.splice(current.oldIndex, 1);
+              break;
+
+            case "modified":
+              stories.splice(current.newIndex, 1, current.doc);
+              break;
         }
       }
 
-      _this.setState({ listViewData: newData });
-    });
+
+      this.setState({stories: stories});
+      
   }
 
-  componentDidMount() {
-    this.registerDatabaseListener();
-  }
-
-  componentWillUnmount() {
-    this.unregisterDatabaseListener();
-  }
-
-  // For deleting and adding rows to the database
-  deleteRow(data) {
-    getStories(this.state.teamId).doc(data.id).delete();
-  }
-
-  upvote(data) {
-    this.deleteRow(data);
-    getStories(this.state.teamId).add({
-      ...data.data(),
-      upvotes: data.data().upvotes + 1,
-    });
-  }
-
-  addRow(newStoryName) {
-    if (newStoryName !== undefined) {
-      getStories(this.state.teamId).add({
-        name: newStoryName,
-        upvotes: 0,
-      });
-    } else {
-      alert('You cannot add a story without giving it a name');
+  componentWillUnmount = () =>
+  {
+    for(var i = 0 ; i < this.unsubscribers.length ; i ++)
+    {
+      const unsubscriber = this.unsubscribers[i];
+      if(unsubscriber && unsubscriber instanceof Function)
+      {   unsubscriber();}  
     }
   }
 
-  render() {
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+  onItemSelected = (item, index) =>
+  {   this.props.navigation.navigate(SCREEN_NAME_STORY_DETAILS, {story: item});}
+
+  onContextMenuItemSelected = (item, index, action) =>
+  {
+    console.log("CONTEXT ACTION: " + action);
+    switch(action)
+    {
+      case ACTION_DELETE_STORY:
+      if(this.dialogConfirmDelete)
+      {
+        this.itemToDelete = item;
+        this.dialogConfirmDelete.setVisible(true);
+      }
+      break;
+  
+      case ACTION_EDIT_STORY:
+      this.props.navigation.navigate(SCREEN_NAME_STORY_CREATE, {team: this.state.team, story: item});
+      break;
+
+      case ACTION_INSPECT_STORY:
+      this.onItemSelected(item, index);
+      break; 
+
+      case ACTION_UPVOTE_STORY:
+      console.log("Updating: " + item.data().upvotes + " to " + (item.data().upvotes + 1));
+      var upvotes = item.data().upvotes + 1;
+      item.ref.update({upvotes: upvotes}); 
+      break;
+    }
+  }
+
+  onFabMenuItemSelected = (action) =>
+  {
+    switch(action)
+    {
+      case ACTION_CREATE_STORY:
+      this.props.navigation.navigate(SCREEN_NAME_STORY_CREATE, {team: this.state.team});
+      break;
+    }
+  }
+
+  onDialogActionPressed = (action) =>
+  {
+    switch(action)
+    {
+      case DIALOG_ACTION_OK:
+      this.itemToDelete.ref.delete().then(() => 
+      {   ToastAndroid.show("User story successfully deleted!", ToastAndroid.LONG);})
+      .catch(error => 
+      {   ToastAndroid.show("User story could not be deleted, please try again.", ToastAndroid.LONG);});
+      break;
+    }
+  }
+
+  getFabGroupActions = () =>
+  {
+    var actions = [];
+    actions.push({ icon: "add", label: "Create Issue", onPress: () => this.onFabMenuItemSelected(ACTION_CREATE_STORY) })
+
+    return actions;
+  }
+
+  getUnfinishedStories = (allStories) =>
+  {
+    var unfinishedStories = [];
+    for(var i = 0 ; i < allStories.length ; i ++)
+    {
+      const current = allStories[i];
+     
+      if(current.data().finishedOn === undefined)
+      {   unfinishedStories.push(current);}
+    }
+
+    return unfinishedStories;
+  }
+ 
+  render() 
+  {
     return (
-      <Container>
-        <Header style={{ height: 0 }} />
-        <Content>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Button style={styles.stories} onPress={() => {this.props.navigation.navigate(TAB_NAME_TEAM_OVERVIEW)}}>
-              <Icon name="arrow-back" />
-              <Text>Back</Text>
-            </Button>
-            <Button style={styles.stories} onPress={this.editStory(undefined, 'new')}>
-              <Icon name="add" />
-              <Text>New story</Text>
-            </Button>
-          </View>
-          <List
-            leftOpenValue={125}
-            rightOpenValue={-75}
-            dataSource={ds.cloneWithRows(this.state.listViewData.filter(function (item) { return item.data().finishedOn == undefined }))}
-            renderRow={doc => (
-              <ListItem style={[styles.storyOverviewItem, doc.data().finishedOn !== undefined ? styles.storyOpen : styles.storyFinished]} onPress={_ => this.props.navigation.navigate(SCREEN_NAME_STORY_DETAILS, {
-                story: doc,
-              })}>
-                <Text> {doc.data().name} </Text>
-              </ListItem>
-            )}
-            renderLeftHiddenRow={(doc, secId, rowId, rowMap) => (
-              <View style={{flexDirection: 'row', }}>
-                <Button full onPress={_ => {
-                  rowMap[`${secId}${rowId}`].props.closeRow();
-                  this.editStory(doc, 'edit')();
-                }}>
-                  <Icon active name="create" />
-                </Button>
-                <Button full onPress={() => {
-                  rowMap[`${secId}${rowId}`].props.closeRow();
-                  this.upvote(doc);
-                }}>
-                  <Icon active name="thumbs-up" />
-                </Button>
-              </View>
-            )}
-            renderRightHiddenRow={(doc, secId, rowId, rowMap) => (
-              <Button full danger onPress={_ => {
-                rowMap[`${secId}${rowId}`].props.closeRow();
-                this.deleteRow(doc);
-              }}>
-                <Icon active name="trash" />
-              </Button>
-            )}
-          />
-          <ModalStoryNew
-            parent={this}
-            modalVisible={this.state.modalVisible}
-            story={this.state.modalItemSelected}
-            mode={this.state.mode} />
-        </Content>
-      </Container>
+      <View>
+          <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this user story?" onDialogActionPressed={this.onDialogActionPressed} />
+          <ListStories items={this.getUnfinishedStories(this.state.stories)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+          {this.state.shouldFabGroupRender && <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+      </View>
     );
   }
 }
