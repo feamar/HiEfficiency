@@ -1,31 +1,3 @@
-/*import React, {Component} from "react";
-import {View} from "react-native";
-import PropTypes from "prop-types";
-
-
-export default class ScreenStoryDetails extends Component
-{
-    constructor(props)
-    {
-        super(props);
-
-        this.story = props.navigation.getParam("story");
-        this.state = {
-            
-        }
-    }
-    render()
-    {
-        return(
-
-        );
-    }
-}
-
-ScreenStoryDetails.propTypes = {
-
-}
-*/
 import React from 'react';
 import { View } from 'react-native';
 import {
@@ -243,7 +215,7 @@ export default class ScreenStoryDetails extends React.Component {
                 <View>
                     <Text>Started on {this.state.startedOn.toLocaleString()}</Text>
                     <Text>Finished on {this.state.finishedOn.toLocaleString()}</Text>
-                    <Text>Total time: {difference(this.state.finishedOn - this.state.startedOn)}</Text>
+                    <Text>Total time: {difference(this.state.startedOn, this.state.finishedOn)}</Text>
                     <Text>The times that the team was interrupted were:</Text>
                     {interruptionList}
                 </View>
