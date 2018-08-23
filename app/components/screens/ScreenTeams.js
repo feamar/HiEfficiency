@@ -9,14 +9,10 @@ import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FABGroup } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
-<<<<<<< HEAD
 import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_RENAME_TEAM, ACTION_DELETE_TEAM} from "../lists/teams/ListItemTeam"; 
 import { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
 const ACTION_JOIN_TEAM = "join_team";
 const ACTION_CREATE_TEAM = "create_team";
-=======
-import { ACTION_LEAVE, ACTION_INSPECT, ACTION_RENAME } from "../lists/teams/ListItemTeam";
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
 
 export default class ScreenTeams extends Component
 {
@@ -45,7 +41,6 @@ export default class ScreenTeams extends Component
 
     unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
     this.unsubscribers.push(unsubscriber);
-<<<<<<< HEAD
 
     unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
     this.unsubscribers.push(unsubscriber);
@@ -54,9 +49,6 @@ export default class ScreenTeams extends Component
     this.unsubscribers.push(unsubscriber);
   } 
   
-=======
-  }
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
 
   onUserUnavailableWhileMounting = () =>
   {   signOut();}
@@ -80,12 +72,7 @@ export default class ScreenTeams extends Component
 
   onUserDocumentChanged = (document) =>
   {
-<<<<<<< HEAD
     if (document.exists == false) 
-=======
-    console.log("onUserDocumentChanged(" + document + ")");
-    if (document.exists == false)
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
     {
       signOut();
       return;
@@ -100,14 +87,8 @@ export default class ScreenTeams extends Component
     this.teamUnsubscribers = [];
 
     //For each of the user's teams
-<<<<<<< HEAD
     document.data().teams.map((teamId) => 
     { 
-=======
-    document.data().teams.map((teamId) =>
-    {
-      console.log("TEAM ID: " + JSON.stringify(teamId)) ;
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
       //Fetch the team.
       teamsCollection.doc(teamId).get().then((team) =>
       {
@@ -152,22 +133,12 @@ export default class ScreenTeams extends Component
     {   this.teamUnsubscribers[i]();}
   }
 
-<<<<<<< HEAD
   onItemSelected = (item, index) => 
   {   this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, { team: item });}
-=======
-  onItemSelected = (item, index) =>
-  {   this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, { teamId: item.id });}
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
 
   onContextMenuItemSelected = (item, index, action) =>
   {
-<<<<<<< HEAD
     switch (action) 
-=======
-    console.log("onContextMenuItemSelected(" + item + ", " + index + ", " + action + ")");
-    switch (action)
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
     {
       case ACTION_LEAVE_TEAM:
         if(this.dialogConfirmLeave)
@@ -175,18 +146,10 @@ export default class ScreenTeams extends Component
           this.currentlyLeavingTeam = item;
           this.dialogConfirmLeave.setVisible(true);
         }
-<<<<<<< HEAD
         break;
 
       case ACTION_RENAME_TEAM:
         if (this.dialogRename) 
-=======
-
-        break;
-
-      case ACTION_RENAME:
-        if (this.dialogRename)
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
         {
           this.currentlyRenamingTeam = item;
           this.dialogRename.onValueChange(item.data().name);
@@ -197,7 +160,6 @@ export default class ScreenTeams extends Component
       case ACTION_INSPECT_TEAM:
         this.onItemSelected(item, index);
         break;
-<<<<<<< HEAD
 
       case ACTION_DELETE_TEAM:
         item.ref.delete().then(() => 
@@ -229,28 +191,15 @@ export default class ScreenTeams extends Component
   }
  
   onRenameDialogSubmitted = (value) => 
-=======
-    }
-  }
-
-  onRenameDialogSubmitted = (value) =>
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
   {
     //Update the team name in the firstore database.
     this.currentlyRenamingTeam.ref.update({name: value});
   }  
 
-<<<<<<< HEAD
   onJoinDialogSubmitted = (name, code) => 
   {
     //console.log("Name: " + name + " AND Code: " + code);
     getTeams().where("name", "==", name.toString()).get().then(teams => 
-=======
-  onJoinDialogSubmitted = (name, securityCode) =>
-  {
-    console.log("onJoinDialogSubmitted(" + name + ", " + securityCode + ")");
-    getTeams().where("name", "==", name).get().then(teams =>
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
     {
       //console.log("FOUND 1: " + teams.docs.length);
       for(var i = 0 ; i < teams.docs.length ; i ++)
@@ -276,7 +225,6 @@ export default class ScreenTeams extends Component
     });
   }
 
-<<<<<<< HEAD
   onCreateDialogSubmitted = (team) =>
   {
     //console.log("TEAM: " + JSON.stringify(team));
@@ -318,14 +266,6 @@ export default class ScreenTeams extends Component
   render() {
     return (  
       <View>  
-=======
-  handleCreateNewTeam = () =>
-  {   }
-
-  render() {
-    return (
-      <View>
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
         <ListTeams items={this.state.teams} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogPreferenceText ref={instance => this.dialogRename = instance} visible={false} label="Team Name" storageValue="" onDialogSubmitted={this.onRenameDialogSubmitted} />
         <DialogTeamJoin title="Join Team" ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
@@ -336,13 +276,9 @@ export default class ScreenTeams extends Component
     );
   }
 
-<<<<<<< HEAD
 
 
   getFabGroupActions = () => 
-=======
-  getFabGroupActions = () =>
->>>>>>> ea5edd27bc13067a4be0421fead193e0287602e4
   {
     var actions = [];
     actions.push({ icon: "add", label: "Create Team", onPress: () => this.onFabMenuItemSelected(ACTION_CREATE_TEAM) })
