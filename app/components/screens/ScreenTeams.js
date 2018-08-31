@@ -9,7 +9,7 @@ import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FABGroup } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
-import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_RENAME_TEAM, ACTION_DELETE_TEAM, ACTION_EDIT_TEAM} from "../lists/instances/teams/ListItemTeam"; 
+import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_DELETE_TEAM, ACTION_EDIT_TEAM} from "../lists/instances/teams/ListItemTeam"; 
 import { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
 const ACTION_JOIN_TEAM = "join_team";
 const ACTION_CREATE_TEAM = "create_team";
@@ -161,15 +161,6 @@ export default class ScreenTeams extends Component
         }
         break;
 
-      case ACTION_RENAME_TEAM:
-        if (this.dialogRename) 
-        {
-          this.currentlyRenamingTeam = item;
-          this.dialogRename.onValueChange(item.data().name);
-          this.dialogRename.setVisible(true);
-        }
-        break;
-
       case ACTION_INSPECT_TEAM:
         this.onItemSelected(item, index);
         break;
@@ -284,7 +275,6 @@ export default class ScreenTeams extends Component
     return (  
       <View>  
         <ListTeams containerHasFab={true} items={this.state.teams} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
-        <DialogPreferenceText ref={instance => this.dialogRename = instance} visible={false} label="Team Name" storageValue="" onDialogSubmitted={this.onRenameDialogSubmitted} />
         <DialogTeamJoin title="Join Team" ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
         <DialogTeamCreate title="Create Team" ref={instance => this.dialogCreateTeam = instance} visible={false} onDialogSubmitted={this.onCreateDialogSubmitted} />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />

@@ -33,7 +33,7 @@ export default class ScreenStoryboard extends Component
 
   componentWillMount() 
   {   
-    var unsubscriber = FirebaseAdapter.getStories(this.state.team.id).where("finishedOn", "==", null).orderBy("upvotes", "desc").onSnapshot(this.onStoryDocumentsChanged);
+    var unsubscriber = FirebaseAdapter.getStories(this.state.team.id).orderBy("upvotes", "desc").onSnapshot(this.onStoryDocumentsChanged);
     this.unsubscribers.push(unsubscriber);
 
     unsubscriber = this.props.navigation.addListener('willFocus', this.onScreenWillFocus);
@@ -80,7 +80,7 @@ export default class ScreenStoryboard extends Component
 
             case "modified":
               stories.splice(current.newIndex, 1, current.doc);
-              break;
+              break; 
         }
       }
 
@@ -181,7 +181,7 @@ export default class ScreenStoryboard extends Component
     return (
       <View>
           <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this user story?" onDialogActionPressed={this.onDialogActionPressed} />
-          <ListStories containerHasFab={true} items={this.state.stories} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+          <ListStories containerHasFab={true} items={this.getUnfinishedStories(this.state.stories)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
           {this.state.shouldFabGroupRender && <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
       </View>
     );
