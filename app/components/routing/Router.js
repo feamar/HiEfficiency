@@ -20,6 +20,7 @@ import ScreenStoryDetails from '../screens/ScreenStoryDetails';
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
+import ScreenTeamEdit from '../screens/ScreenTeamEdit';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -36,7 +37,7 @@ export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
 
 export const SCREEN_NAME_PROFILE = "Profile";
 export const SCREEN_NAME_TEAMS = "Teams";
-export const SCREEN_NAME_TEAM_METADATA = "TeamMetaData";
+export const SCREEN_NAME_TEAM_EDIT = "TeamEdit";
 
 export const TAB_NAME_TEAM_OVERVIEW = 'TeamOverview';
 export const TAB_NAME_PROFILE = 'Profile';
@@ -122,6 +123,11 @@ export default class Router
       {
         screen: ScreenTeams,
         navigationOptions: getNavigationOptions("Teams", getHamburgerIcon())
+      },
+      [SCREEN_NAME_TEAM_EDIT]:
+      {
+        screen: ScreenTeamEdit,
+        navigationOptions: getNavigationOptions("Edit Team", getBackIcon())
       },
       [SCREEN_NAME_STORY_BOARD]:
       {

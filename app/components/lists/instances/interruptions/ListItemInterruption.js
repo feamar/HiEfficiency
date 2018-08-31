@@ -60,7 +60,7 @@ export default class ListItemInterruption extends AbstractListItem
         if(this.props.item.editable == false && props.item.editable == true)
         {   this.addContextMenuItem("Edit", ACTION_EDIT_INTERRUPTION);}
 
-        if(this.props.item.deletable == false && props.item.deletable == true)
+        if(this.props.item.deletable == false && props.item.deletable == true && false) //Remove && false when deletion is properly handled not to leave orphan documents.
         {   this.addContextMenuItem("Delete", ACTION_DELETE_INTERRUPTION);}
     }
 

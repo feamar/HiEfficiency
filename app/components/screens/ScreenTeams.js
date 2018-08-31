@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, ToastAndroid, Keyboard} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
-import {SCREEN_NAME_STORY_BOARD} from "../routing/Router";
+import {SCREEN_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
 import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
 import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
@@ -9,7 +9,7 @@ import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FABGroup } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
-import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_RENAME_TEAM, ACTION_DELETE_TEAM} from "../lists/instances/teams/ListItemTeam"; 
+import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_RENAME_TEAM, ACTION_DELETE_TEAM, ACTION_EDIT_TEAM} from "../lists/instances/teams/ListItemTeam"; 
 import { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
 const ACTION_JOIN_TEAM = "join_team";
 const ACTION_CREATE_TEAM = "create_team";
@@ -183,6 +183,10 @@ export default class ScreenTeams extends Component
         {
           ToastAndroid.show("Team could not be deleted, please try again.", ToastAndroid.LONG);
         });
+        break;
+
+      case ACTION_EDIT_TEAM:
+        this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT, {team: item});
         break;
     } 
   }

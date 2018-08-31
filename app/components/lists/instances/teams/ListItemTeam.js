@@ -11,6 +11,7 @@ export const ACTION_LEAVE_TEAM = "leave";
 export const ACTION_RENAME_TEAM = "rename";
 export const ACTION_INSPECT_TEAM = "inspect";
 export const ACTION_DELETE_TEAM = "delete";
+export const ACTION_EDIT_TEAM = "edit";
 
 const styles = {
     teamName: {
@@ -28,6 +29,7 @@ export default class ListItemTeam extends AbstractListItem
         this.addContextMenuItem("Leave", ACTION_LEAVE_TEAM);
         this.addContextMenuItem("Rename", ACTION_RENAME_TEAM);
         this.addContextMenuItem("Inspect", ACTION_INSPECT_TEAM);
+        this.addContextMenuItem("Edit", ACTION_EDIT_TEAM);
         //this.addContextMenuItem("Delete", ACTION_DELETE_TEAM);
     }
 

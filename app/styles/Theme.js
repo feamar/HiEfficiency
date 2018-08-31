@@ -4,10 +4,10 @@ const Theme = {
     ...DefaultTheme,
     colors:{
         ...DefaultTheme.colors,
-        primary: "#FF5722",
-        primaryDark: "#E64A19",
-        primaryLight: "#FF8A65",
-        accent: "#FFC107",
+        primary: "#3c6e71",
+        primaryDark: "#376568",
+        primaryLight: "#437e82",
+        accent: "#284b63",
         selectedBackground: "#EFEFEF",
         typography:{
             title: "#434343",
