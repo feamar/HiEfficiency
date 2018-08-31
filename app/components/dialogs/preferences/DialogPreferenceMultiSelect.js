@@ -69,7 +69,6 @@ export default class DialogPreferenceMultiSelect extends AbstractPreferenceDialo
         ); 
     }
 }  
-/*  */
 
 
 DialogPreferenceMultiSelect.propTypes ={

@@ -4,7 +4,7 @@ const EnforcerInstance = new EnumEnforcer();
 
 export default class InterruptionType
 {
-    constructor(enforcer, dbId, iconColor, iconName, interruptionCategory, buttonText)
+    constructor(enforcer, dbId, iconColor, iconName, interruptionCategory, title)
     {
         if(enforcer !== EnforcerInstance)
         {   throw new Error("You cannot create additional enum values at runtime.");}
@@ -13,12 +13,12 @@ export default class InterruptionType
         this.iconColor = iconColor;
         this.iconName = iconName;
         this.interruptionCategory = interruptionCategory;
-        this.buttonText = buttonText;
+        this.title = title;
     }
 
-    static Meeting = new InterruptionType(EnforcerInstance, "meeting", "purple", "chatbubbles", "meeting", "Meeting");
-    static WaitingForOthers = new InterruptionType(EnforcerInstance, "waiting", "orange", "people", "waiting", "Waiting for others");
-    static Other = new InterruptionType(EnforcerInstance, "other", "blue", "hand", "other", "Other");
+    static Meeting = new InterruptionType(EnforcerInstance, "meeting", "purple", "chat", "meeting", "Meeting");
+    static WaitingForOthers = new InterruptionType(EnforcerInstance, "waiting", "orange", "people", "waiting", "Waiting");
+    static Other = new InterruptionType(EnforcerInstance, "other", "blue", "add", "other", "Other");
     static None = new InterruptionType(EnforcerInstance, undefined, "black", "help", undefined, undefined);
 
     static Values = [

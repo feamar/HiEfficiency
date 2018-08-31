@@ -19,6 +19,18 @@ export default class UtilityTime
         return hourString + separator + minuteString + separator + secondString;
     }
 
+    static dateToHHMM(date) 
+    {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+
+        if (hours < 10) { hours = "0" + hours; }
+
+        if (minutes < 10) { minutes = "0" + minutes; }
+
+        return hours + ":" + minutes;
+    }
+
     static millisecondsSinceEpochToTimeOfDay(milliseconds, separator)
     {
         if(milliseconds == false)
@@ -39,9 +51,11 @@ export default class UtilityTime
         {   return undefined;}
 
         if(options == undefined)
-        {   options = {year: 'numeric', month: 'numeric', day: 'numeric' };}
+        {   
+            options = {year: "numeric", month: "long", day: "numeric" };
+        }
 
-        var result = date.toLocaleDateString(undefined, options);
+        var result = date.toLocaleDateString("en-US", options);
         console.log("Date " + date + " converted to string representation: " + result + ".");
 
         return result;

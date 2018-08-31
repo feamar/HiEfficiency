@@ -42,6 +42,14 @@ export default class AbstractListItem extends Component
         
     }
 
+    componentWillReceiveProps = (props) =>
+    {
+        if(this.onComponentWillReceiveProps)
+        {   this.onComponentWillReceiveProps(props);}
+
+        this.setState({item: props.item, index: props.index});
+    }
+
     onListItemSelected = () => () =>
     {
         if(this.props.onItemSelected)
@@ -64,7 +72,20 @@ export default class AbstractListItem extends Component
     {
         var actions = this.state.actions;
         actions.push({text: text, name: name});
-        this.state = {...this.state, actions};
+        if(this.componentIsMounted)
+        {   this.setState({actions: actions});}
+        else
+        {   this.state = {...this.state, actions};}
+    }
+
+    componentWillMount = () =>
+    {
+        this.componentIsMounted = true;
+    }
+
+    componentWillUnmount = () =>
+    {
+        this.componentIsMounted = false;
     }
 
     hasContextMenuItems = () => 
@@ -94,7 +115,7 @@ export default class AbstractListItem extends Component
                         
                     </View>
                 </TouchableRipple>
-                <Divider /> 
+                <Divider />  
             </View>
         );
     }

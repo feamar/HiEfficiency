@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {View} from "react-native";
 import ListItemTeam from './ListItemTeam';
-import AbstractList from "../AbstractList";
+import AbstractList from "../../abstractions/list/AbstractList";
 
 export default class ListTeams extends AbstractList
 {

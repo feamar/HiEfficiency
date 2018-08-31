@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 const styles = {
     scrollView:
     {
-        height: "100%",
     }
 }
 

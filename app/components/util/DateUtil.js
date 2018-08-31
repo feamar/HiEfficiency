@@ -25,7 +25,7 @@ export const difference = (start, finish) => {
   difference -= hours;
   difference /= 24;
   days = difference;
-
+ 
   result = '';
   if (days > 0) {
     result += days + 'd';

@@ -3,8 +3,8 @@ import {View} from "react-native";
 import {Text, TouchableRipple} from "react-native-paper"
 import { Divider } from "react-native-paper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
-import AbstractListItem from "../AbstractListItem";
-import Theme from "../../../styles/Theme";
+import AbstractListItem from "../../abstractions/list/AbstractListItem";
+import Theme from "../../../../styles/Theme";
 
 
 export const ACTION_LEAVE_TEAM = "leave";

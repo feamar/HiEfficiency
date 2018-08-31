@@ -2,8 +2,8 @@ import React, {Component} from "react";
 import {View, ToastAndroid, Keyboard} from "react-native";
 import PropTypes from "prop-types";
 import { getUsers, getTeams, getStories, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
-import ListStories from "../lists/stories/ListStories";
-import {ACTION_DELETE_STORY, ACTION_EDIT_STORY, ACTION_INSPECT_STORY, ACTION_UPVOTE_STORY} from  "../lists/stories/ListItemStory";
+import ListStories from "../lists/instances/stories/ListStories";
+import {ACTION_DELETE_STORY, ACTION_EDIT_STORY, ACTION_INSPECT_STORY, ACTION_UPVOTE_STORY} from  "../lists/instances/stories/ListItemStory";
 import {SCREEN_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE} from "../routing/Router";
 import {FABGroup} from "react-native-paper";
 import DialogConfirmation, { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
@@ -22,6 +22,7 @@ export default class ScreenStoryboard extends Component
     super(props);
 
     this.unsubscribers = [];
+    this.keyboardUnsubscribers = [];
     this.state =
     {
       team: this.props.navigation.getParam("team"),
@@ -35,19 +36,30 @@ export default class ScreenStoryboard extends Component
     var unsubscriber = getStories(this.state.team.id).orderBy("upvotes", "desc").onSnapshot(this.onStoryDocumentsChanged);
     this.unsubscribers.push(unsubscriber);
 
-    unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.setState({shouldFabGroupRender: true})});
+    unsubscriber = this.props.navigation.addListener('willFocus', this.onScreenWillFocus);
     this.unsubscribers.push(unsubscriber);
 
-    unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
-    this.unsubscribers.push(unsubscriber);
-    
-    unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
-    this.unsubscribers.push(unsubscriber);
-
-    unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
+    unsubscriber = this.props.navigation.addListener('willBlur', this.onScreenWillBlur);
     this.unsubscribers.push(unsubscriber);
   } 
+  
+  onScreenWillFocus = (payload) =>
+  {
+    this.setState({shouldFabGroupRender: true})
 
+    var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
+    this.keyboardUnsubscribers.push(unsubscriber);
+
+    unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
+    this.keyboardUnsubscribers.push(unsubscriber);
+  }
+
+  onScreenWillBlur = (payload) =>
+  {
+    this.setState({shouldFabGroupRender: false})
+    this.keyboardUnsubscribers.forEach(unsubscriber => {unsubscriber.remove()});
+  }
+  
   onStoryDocumentsChanged = (snapshot) =>
   {
       console.log("onStoryDocumentsChanged: " + snapshot.docChanges.length);

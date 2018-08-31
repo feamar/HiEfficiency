@@ -3,9 +3,9 @@ import {View} from "react-native";
 import {Text, TouchableRipple} from "react-native-paper"
 import { Divider } from "react-native-paper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
-import AbstractListItem from "../AbstractListItem";
-import Theme from "../../../styles/Theme"
-import StoryType from "../../../enums/StoryType";
+import AbstractListItem from "../../abstractions/list/AbstractListItem";
+import Theme from "../../../../styles/Theme"
+import StoryType from "../../../../enums/StoryType";
 
 const styles = {
     wrapper:{

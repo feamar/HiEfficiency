@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View, ToastAndroid, Keyboard} from "react-native";
-import ListTeams from "../lists/teams/ListTeams";
+import ListTeams from "../lists/instances/teams/ListTeams";
 import {SCREEN_NAME_STORY_BOARD} from "../routing/Router";
 import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
 import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
@@ -9,7 +9,7 @@ import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FABGroup } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
-import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_RENAME_TEAM, ACTION_DELETE_TEAM} from "../lists/teams/ListItemTeam"; 
+import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_RENAME_TEAM, ACTION_DELETE_TEAM} from "../lists/instances/teams/ListItemTeam"; 
 import { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
 const ACTION_JOIN_TEAM = "join_team";
 const ACTION_CREATE_TEAM = "create_team";
@@ -29,6 +29,7 @@ export default class ScreenTeams extends Component
 
     this.unsubscribers = [];
     this.teamUnsubscribers = [];
+    this.keyboardUnsubscribers = [];
   }
 
   componentWillMount()
@@ -36,19 +37,31 @@ export default class ScreenTeams extends Component
     var unsubscriber = hookIntoUserSignin(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
     this.unsubscribers.push(unsubscriber);
 
-    unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.setState({shouldFabGroupRender: true})});
+    unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.onScreenWillFocus(payload)});
     this.unsubscribers.push(unsubscriber);
 
-    unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
+    unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.onScreenWillBlur(payload)});
     this.unsubscribers.push(unsubscriber);
 
-    unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
-    this.unsubscribers.push(unsubscriber);
-
-    unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
-    this.unsubscribers.push(unsubscriber);
   } 
   
+  onScreenWillFocus = (payload) =>
+  {
+    this.setState({shouldFabGroupRender: true})
+
+    var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
+    this.keyboardUnsubscribers.push(unsubscriber);
+
+    unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
+    this.keyboardUnsubscribers.push(unsubscriber);
+  }
+
+  onScreenWillBlur = (payload) =>
+  {
+    this.setState({shouldFabGroupRender: false})
+    this.keyboardUnsubscribers.forEach(unsubscriber => {unsubscriber.remove()});
+  }
+
 
   onUserUnavailableWhileMounting = () =>
   {   signOut();}

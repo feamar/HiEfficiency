@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {View} from "react-native";
 import PropTypes from "prop-types";
 import ListItemStory from './ListItemStory';
-import AbstractList from "../AbstractList";
+import AbstractList from "../../abstractions/list/AbstractList";
 
 export default class ListStories extends AbstractList
 {

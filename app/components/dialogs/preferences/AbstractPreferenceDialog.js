@@ -26,12 +26,16 @@ export default class AbstractPreferenceDialog extends AbstractDialog
 
     setVisible = (visible) =>
     {
-        this.setState({visible: visible});   
+        var error = this.state.error;
+        if(visible == false)
+        {   error = undefined;}
+
+        this.setState({visible: visible, error: error});   
     }
 
     onDismiss = () =>
     {
-        this.setState({visible: false});
+        this.setVisible(false);
 
         if(this.props.onDialogCanceled)
         {   this.props.onDialogCanceled();}
@@ -53,7 +57,7 @@ export default class AbstractPreferenceDialog extends AbstractDialog
         if(this.props.onDialogSubmitted)
         {   this.props.onDialogSubmitted(this.state.storageValue);}
 
-        this.setState({visible: false});
+        this.setState({error: undefined, visible: false});
     }
 
     onValueChange = (storageValue) =>
@@ -64,14 +68,17 @@ export default class AbstractPreferenceDialog extends AbstractDialog
 
     getInputValidationError = (storageValue) =>
     {
+        if(this.onValueValidation)
+        {
+            const error = this.onValueValidation(storageValue);
+            if(error !== undefined)
+            {   return error;}
+        }
+
         if(this.props.onValueValidation === undefined)
         {   return undefined;}
 
-        const error = this.props.onValueValidation(storageValue);
-        if(error === undefined)
-        {   return undefined;}
-
-        return error;
+        return this.props.onValueValidation(storageValue);
     }
 
     getDialogActions = ()  =>
