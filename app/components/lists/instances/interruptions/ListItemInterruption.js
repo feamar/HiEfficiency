@@ -88,7 +88,6 @@ export default class ListItemInterruption extends AbstractListItem
     getItemContent = () =>
     { 
         //const data = this.state.item.data();
-        
         return (
             <View style={styles.wrapper}>
                <Icon style={styles.icon} size={30} name={this.state.item.iconName}/>

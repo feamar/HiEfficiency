@@ -58,10 +58,10 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
         {   return "The end of the interruption cannot be before the start of the interruption.";}
 
         if(storageValue.previous && storageValue.start < storageValue.previous)
-        {   return "The start of the interruption cannot be before the end of the previous interruption in line (" +  UtilityTime.dateToHHMM(storageValue.previous) + ").";}
+        {   return "The start of the interruption cannot be before the end of the previous interruption in line (" +  UtilityTime.dateToHHMM(new Date(storageValue.previous)) + ").";}
 
         if(storageValue.end > storageValue.next)
-        {   return "The end of the interruption cannot be after the start of the next interruption in line (" + UtilityTime.dateToHHMM(storageValue.next) + ").";}
+        {   return "The end of the interruption cannot be after the start of the next interruption in line (" + UtilityTime.dateToHHMM(new Date(storageValue.next)) + ").";}
     }
 
     getDialogContent = () => 

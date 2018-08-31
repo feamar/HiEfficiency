@@ -1,5 +1,5 @@
 import React from 'react';
-import { initFirebase, hookIntoUserSignin } from './app/components/firebase/FirebaseAdapter';
+import FirebaseAdapter from "./app/components/firebase/FirebaseAdapter";
 
 import Theme from './app/styles/Theme';
 import {Provider as MaterialDesignProvider} from 'react-native-paper';
@@ -22,8 +22,8 @@ export default class App extends React.Component {
 
   componentDidMount() {
     this.loadFonts();
-    initFirebase();
-    hookIntoUserSignin(() => this.setState({ signedIn: true, checkedSignIn: true }),
+    FirebaseAdapter.getCurrentUser(
+      () => this.setState({ signedIn: true, checkedSignIn: true }),
       () => this.setState({ signedIn: false, checkedSignIn: true }));
   }
 

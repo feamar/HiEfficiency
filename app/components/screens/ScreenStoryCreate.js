@@ -5,7 +5,7 @@ import PreferenceCategory from "../preferences/PreferenceCategory";
 import PreferenceText from "../preferences/fields/PreferenceText";
 import PreferenceSelectSpinner from "../preferences/fields/PreferenceSelectSpinner";
 import StoryType from "../../enums/StoryType";
-import {getStories} from "../firebase/FirebaseAdapter";
+import FirebaseAdapter from "../firebase/FirebaseAdapter";
 
 import { FABGroup, Snackbar } from 'react-native-paper';
 
@@ -26,7 +26,9 @@ export default class ScreenStoryCreate extends Component
         super(props);
   
         var story = {
-            upvotes: 0
+            upvotes: 0,
+            startedOn: null,
+            finishedOn: null
         }
 
         const existingStory = props.navigation.getParam("story");
@@ -109,7 +111,7 @@ export default class ScreenStoryCreate extends Component
             switch(this.mode)
             { 
                 case MODE_CREATE:
-                    getStories(team.id).add(this.state.story).then(() => 
+                    FirebaseAdapter.getStories(team.id).add(this.state.story).then(() => 
                     {
                         ToastAndroid.show("Story successfully created!", ToastAndroid.LONG);
                         this.props.navigation.goBack();

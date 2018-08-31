@@ -2,11 +2,12 @@ import React, {Component} from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
 import PreferenceText from '../preferences/fields/PreferenceText';
 import { View } from "react-native";
-import { getUsers, hookIntoUserSignin, signOut } from "../firebase/FirebaseAdapter";
+import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import PreferenceMultiSelect from '../preferences/fields/PreferenceMultiSelect';
 import {STACK_NAME_AUTH} from '../routing/Router';
 import PreferenceWeekSchema from '../preferences/fields/PreferenceWeekSchema';
 import PreferenceSelectSpinner from '../preferences/fields/PreferenceSelectSpinner';
+import { Firebase } from 'react-native-firebase';
 
 const styles ={
   content: {padding: 0}
@@ -28,13 +29,13 @@ export default class ScreenProfile extends Component
 
   componentWillMount = () =>
   {
-    var unsubscriber = hookIntoUserSignin(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
+    var unsubscriber = FirebaseAdapter.getCurrentUser(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
     this.unsubscribers.push(unsubscriber);
   }
 
   onUserAvailableWhileMounting = (user) =>
   {
-    getUsers().doc(user.uid).get().then((doc) => 
+    FirebaseAdapter.getUsers().doc(user.uid).get().then((doc) => 
     {
       doc.ref.onSnapshot(this.onUserDocumentChanged);
       this.onUserDocumentChanged(doc);
@@ -47,7 +48,7 @@ export default class ScreenProfile extends Component
   }
 
   onUserUnavailableWhileMounting = () =>
-  {   signOut();}
+  {   FirebaseAdapter.logout();}
 
   componentWillUnmount = () =>
   {

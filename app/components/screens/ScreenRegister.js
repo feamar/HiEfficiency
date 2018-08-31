@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 //import { Card, Button, FormLabel, FormInput } from "react-native-elements";
-import { signUpWithEmailAndPassword } from "../firebase/FirebaseAdapter";
+import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import Theme from "../../styles/Theme";
 import {
   Button,
@@ -87,7 +87,7 @@ export default class ScreenRegister extends React.Component
 
     this.setState({email: this.state.email.trim()}, () => {
       //State change will automatically navigate to HOME route if successful.
-      signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
+      FirebaseAdapter.signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
     });
 
   }

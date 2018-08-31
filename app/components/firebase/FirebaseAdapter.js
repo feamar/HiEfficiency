@@ -1,77 +1,87 @@
 import firebase from 'react-native-firebase';
 
 
-export const initFirebase = () => {
-  //This is no longer necessary in Firebase RN.
-  //var firebaseConfig = require('./firebase.config.json');
-  //!firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
-}
+//TODO: Discuss with Frank whether this refactor is allright.
+export default class FirebaseAdapter 
+{
+  //Firestore
+  static getFireStore = () =>
+  {
+    var store = firebase.firestore();
+    store.settings({timestampsInSnapshots: true});
 
-export const getFireStore = () => {
-  //initFirebase();
-  store = firebase.firestore();
-  store.settings({ timestampsInSnapshots: true });
+    return store;
+  }
 
+  static getUsers = () =>
+  {   return FirebaseAdapter.getRootCollection("users");}
 
+  static getTeams = () =>
+  {   return FirebaseAdapter.getRootCollection("teams");}
 
-  return store;
-}
+  static getStories = (teamId) =>
+  {   return FirebaseAdapter.getTeams().doc(teamId).collection("stories");}
 
-// Specfic getters for collections that are for use with HiEfficiency app
+  static getRootCollection = (name) =>
+  {   return FirebaseAdapter.getFireStore().collection(name);}
 
-export const getUsers = () => {
-  return getRootCollection('users');
-}
+  static getInterruptionsFromTeam = (teamId, storyId) =>
+  {  
+    const story = FirebaseAdapter.getStories(teamId).doc(storyId);
+    return FirebaseAdapter.getInterruptionsFromStory(story);
+  }
 
-export const getTeams = () => {
-  return getRootCollection('teams');
-}
+  static getInterruptionsFromStory = (story) =>
+  {   return story.ref.collection("interruptionsPerUser");}
 
-export const getStories = (teamId) => {
-  return getTeams().doc(teamId).collection('stories');
-}
+  //Auth
+  static logout = () =>
+  {   return firebase.auth().signOut();}
+  
+  static signUpWithEmailAndPassword = (email, password) => 
+  {
+    return firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(email, password)
+    .then(userCredential => 
+    {
+      
+      getUsers().doc(userCredential.user.uid).set({
+        name: email,
+        teams: [],
+      });
 
-export const getRootCollection = (name) => {
-  return getFireStore().collection(name);
-}
+      userCredential.user.sendEmailVerification();
+      FirebaseAdapter.signInWithEmailAndPassword(email, password);
+    })
+    .catch(function (error) 
+    {   alert(error.code + ': ' + error.message)});
+  }
+  
+  static signInWithEmailAndPassword = (email, password) => 
+  {
+    return firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password)
+    .catch(function (error) 
+    {   alert(error.code + ': ' + error.message)});
+  }
 
-// Authorisation handled by firebase
+  static getCurrentUser = (userSignedInSuccesfullyCallback, userNotSignedInCallback) => 
+  {
+    return firebase.auth().onAuthStateChanged((user) => 
+    {
+      if (user) 
+      {   userSignedInSuccesfullyCallback(user);} 
+      else 
+      {   userNotSignedInCallback();}
+    });
+  }
 
-export const signOut = () => {
-  return firebase.auth().signOut();
-}
-
-export const createUserUnderUsers = (uid, displayName) => {
-  getUsers().doc(uid).set({
-    name: displayName,
-    teams: [],
-  });
-}
-
-export const signUpWithEmailAndPassword = (email, password) => {
-  return firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(email, password).then((userCredential) => {
-    createUserUnderUsers(userCredential.user.uid, email);
-    userCredential.user.sendEmailVerification();
-    signInWithEmailAndPassword(email, password);
-  }).catch(function (error) {
-    alert(error.code + ': ' + error.message)
-  });
-}
-
-export const signInWithEmailAndPassword = (email, password) => {
-  return firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password).catch(function (error) {
-    alert(error.code + ': ' + error.message)
-  });
-}
-
-// Hooks for interacting with firebase
-
-export const hookIntoUserSignin = (userSignedInSuccesfullyCallback, userNotSignedInCallback) => {
-  return firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      userSignedInSuccesfullyCallback(user);
-    } else {
-      userNotSignedInCallback();
-    }
-  });
+  static getCurrentUserOrThrow = (callback) =>
+  {
+    return firebase.auth().onAuthStateChanged(user => 
+      {
+        if(user)
+        {   callback(user);}
+        else
+        {   FirebaseAdapter.logout();}
+      });
+  }
 }

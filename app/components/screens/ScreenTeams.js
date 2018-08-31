@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { View, ToastAndroid, Keyboard} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
 import {SCREEN_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
-import { getUsers, getTeams, hookIntoUserSignin, signOut } from '../firebase/FirebaseAdapter';
+import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
@@ -34,7 +34,7 @@ export default class ScreenTeams extends Component
 
   componentWillMount()
   {
-    var unsubscriber = hookIntoUserSignin(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
+    var unsubscriber = FirebaseAdapter.getCurrentUser(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
     this.unsubscribers.push(unsubscriber);
 
     unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.onScreenWillFocus(payload)});
@@ -64,11 +64,11 @@ export default class ScreenTeams extends Component
 
 
   onUserUnavailableWhileMounting = () =>
-  {   signOut();}
+  {   FirebaseAdapter.logout();}
 
   onUserAvailableWhileMounting = (user) =>
   {
-    getUsers().doc(user.uid).get().then(doc =>
+    FirebaseAdapter.getUsers().doc(user.uid).get().then(doc =>
     {
       //Subscribe to updates on the user document.
       const unsubscriber = doc.ref.onSnapshot(this.onUserDocumentChanged);
@@ -87,14 +87,14 @@ export default class ScreenTeams extends Component
   {
     if (document.exists == false) 
     {
-      signOut();
+      FirebaseAdapter.logout();
       return;
     }
 
     //document.ref.update({teams: []});
     //return;
 
-    const teamsCollection = getTeams();
+    const teamsCollection = FirebaseAdapter.getTeams();
     this.setState({ user: document});
 
     this.teamUnsubscribers = [];
@@ -216,7 +216,7 @@ export default class ScreenTeams extends Component
   onJoinDialogSubmitted = (name, code) => 
   {
     //console.log("Name: " + name + " AND Code: " + code);
-    getTeams().where("name", "==", name.toString()).get().then(teams => 
+    FirebaseAdapter.getTeams().where("name", "==", name.toString()).get().then(teams => 
     {
       //console.log("FOUND 1: " + teams.docs.length);
       for(var i = 0 ; i < teams.docs.length ; i ++)
@@ -245,7 +245,7 @@ export default class ScreenTeams extends Component
   onCreateDialogSubmitted = (team) =>
   {
     //console.log("TEAM: " + JSON.stringify(team));
-    getTeams().add(team).then((doc) =>
+    FirebaseAdapter.getTeams().add(team).then((doc) =>
     {   
         ToastAndroid.show("Team successfully created!", ToastAndroid.LONG);
         const teams = this.state.user.data().teams;

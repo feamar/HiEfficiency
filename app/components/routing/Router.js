@@ -21,6 +21,7 @@ import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 import ScreenTeamEdit from '../screens/ScreenTeamEdit';
+import ScreenDeveloper from "../screens/ScreenDeveloper";
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -38,6 +39,8 @@ export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
 export const SCREEN_NAME_PROFILE = "Profile";
 export const SCREEN_NAME_TEAMS = "Teams";
 export const SCREEN_NAME_TEAM_EDIT = "TeamEdit";
+
+export const SCREEN_NAME_DEVELOPER = "Development";
 
 export const TAB_NAME_TEAM_OVERVIEW = 'TeamOverview';
 export const TAB_NAME_PROFILE = 'Profile';

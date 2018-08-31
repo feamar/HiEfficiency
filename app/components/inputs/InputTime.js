@@ -37,10 +37,10 @@ export default class InputTime extends Component
     onConfirm = (time) =>
     {
         this.close();
-        this.setState({time: time}, () => 
+        this.setState({time: time.getTime()}, () => 
         {
            if(this.props.onTimeSelected)
-           {    this.props.onTimeSelected(time);} 
+           {    this.props.onTimeSelected(time.getTime());} 
         });
     }
 
@@ -54,8 +54,8 @@ export default class InputTime extends Component
     {
         return(
             <View style={this.props.style}>
-                <TouchableRipple disabled={this.state.disabled} style={styles.touchable} onPress={this.open}><Text>{UtilityTime.dateToHHMM(this.state.time)}</Text></TouchableRipple>
-                <DateTimePicker datePickerModeAndroid="default" date={this.state.time} onCancel={this.onCancel} mode="time" isVisible={this.state.open} onConfirm={this.onConfirm} />
+                <TouchableRipple disabled={this.state.disabled} style={styles.touchable} onPress={this.open}><Text>{UtilityTime.dateToHHMM(new Date(this.state.time))}</Text></TouchableRipple>
+                <DateTimePicker datePickerModeAndroid="default" date={new Date(this.state.time)} onCancel={this.onCancel} mode="time" isVisible={this.state.open} onConfirm={this.onConfirm} />
             </View>
         );
     }
@@ -63,7 +63,7 @@ export default class InputTime extends Component
 
 
 InputTime.propTypes = {
-    time: PropTypes.object.isRequired,
+    time: PropTypes.number.isRequired,
     onTimeSelected: PropTypes.func.isRequired,
     disabled: PropTypes.bool
 }

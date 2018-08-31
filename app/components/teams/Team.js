@@ -2,7 +2,6 @@ import React from 'react';
 import { Modal, View } from 'react-native';
 import { Button, Icon, Text, Input, Item, } from 'native-base';
 import { styles } from '../../styles/Styles';
-import { getTeams } from '../firebase/FirebaseAdapter';
 
 export class Team extends React.Component {
   constructor(props) {

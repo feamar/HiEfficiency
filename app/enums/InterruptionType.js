@@ -16,10 +16,13 @@ export default class InterruptionType
         this.title = title;
     }
 
-    static Meeting = new InterruptionType(EnforcerInstance, "meeting", "purple", "chat", "meeting", "Meeting");
-    static WaitingForOthers = new InterruptionType(EnforcerInstance, "waiting", "orange", "people", "waiting", "Waiting");
-    static Other = new InterruptionType(EnforcerInstance, "other", "blue", "add", "other", "Other");
-    static None = new InterruptionType(EnforcerInstance, undefined, "black", "help", undefined, undefined);
+    //ATTENTION: Do not change the integer ids of the enum values. 
+    //Additionally, when creating new instances, always use a higher integer value than the highest number now available.
+    //Finally, when removing an instance that currently has the highest id, place a comment indicating the number, so that others wont add new values with that same id.
+    static Meeting = new InterruptionType(EnforcerInstance, 0, "purple", "chat", "meeting", "Meeting");
+    static WaitingForOthers = new InterruptionType(EnforcerInstance, 1, "orange", "people", "waiting", "Waiting");
+    static Other = new InterruptionType(EnforcerInstance, 2, "blue", "add", "other", "Other");
+    static None = new InterruptionType(EnforcerInstance, 3, "black", "help", undefined, undefined);
 
     static Values = [
         InterruptionType.Meeting, 

@@ -4,7 +4,7 @@ import Theme from "../../styles/Theme";
 import { View, ScrollView, Image, PixelRatio} from "react-native";
 import {Text, TouchableRipple, Divider} from "react-native-paper";
 import VersionNumber from 'react-native-version-number';
-import {signOut} from "../firebase/FirebaseAdapter";
+import FirebaseAdapter from "../firebase/FirebaseAdapter";
 
 const styles = {
     root:{
@@ -99,7 +99,7 @@ export default class CustomDrawer extends Component
                     <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
                     {this.props.navigation.state.routes.map(route => {   return this.getNavigationItem(route);})}
                     <Divider />
-                    {this.getEventItem("Logout", () => {signOut()})}
+                    {this.getEventItem("Logout", () => {FirebaseAdapter.logout()})}
                     </SafeAreaView> 
                 </ScrollView>
                 <Text style={styles.version}>Version {VersionNumber.appVersion}</Text>

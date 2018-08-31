@@ -1,6 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import { signInWithEmailAndPassword } from "../firebase/FirebaseAdapter";
+import FirebaseAdapter from "../firebase/FirebaseAdapter";
 
 import {
   Button,
@@ -73,7 +73,7 @@ export default class ScreenLogin extends React.Component
   handleLogin = () => 
   {
     this.setState({email: this.state.email.trim()}, () => {
-      signInWithEmailAndPassword(this.state.email, this.state.password);
+      FirebaseAdapter.signInWithEmailAndPassword(this.state.email, this.state.password);
     });
   }
 
