@@ -241,10 +241,11 @@ export default class ScreenStoryDetails extends Component
                     const last = interruptions[interruptions.length - 1];
                     if(last.duration == undefined)
                     {   last.duration = new Date().getTime() - last.timestamp;}
+
+                    this.interruptionsOfUser.ref.update({interruptions: interruptions});
                 }
 
                 this.story.ref.update({finishedOn: new Date()});
-                this.interruptionsOfUser.ref.update({interruptions: interruptions});
 
                 this.setLifecycleTo(LIFECYCLE_FINISHED);
                 break;
@@ -287,12 +288,11 @@ export default class ScreenStoryDetails extends Component
             case ACTION_EDIT_INTERRUPTION:
                 if(this.dialogInterruptionEdit)
                 {
-                    console.log("ITEM: "+ JSON.stringify(JSON.decycle(item)));
                     const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
                     const next = interruptions[item.id + 1];
                     const previous = interruptions[item.id - 1];
                     this.currentlyEditingInterruptionIndex = item.id;
-                    this.dialogInterruptionEdit.onValueChange({start: item.timestamp, end: item.timestamp + item.duration, next: next, previous: previous});
+                    this.dialogInterruptionEdit.onValueChange({type: item.type.dbId, start: item.timestamp, end: item.timestamp + item.duration, next: next, previous: previous});
                     this.dialogInterruptionEdit.setVisible(true);
                 }
             break;
@@ -305,6 +305,9 @@ export default class ScreenStoryDetails extends Component
         const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
         interruptions[this.currentlyEditingInterruptionIndex].timestamp = storageValue.start;
         interruptions[this.currentlyEditingInterruptionIndex].duration = storageValue.end - storageValue.start;
+        interruptions[this.currentlyEditingInterruptionIndex].category = storageValue.type;
+
+        console.log("STORAGE VALUE: " + JSON.stringify(JSON.decycle(interruptions[this.currentlyEditingInterruptionIndex])));
 
         this.interruptionsOfUser.ref.update({interruptions: interruptions});
     }
@@ -450,6 +453,7 @@ export default class ScreenStoryDetails extends Component
                 deletable: interruption.duration != undefined,
                 selectable: true,
                 duration: interruption.duration,
+                type: type
             };
             
             if(previousDate == null || previousDate != date)

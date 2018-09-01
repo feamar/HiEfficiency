@@ -15,7 +15,7 @@ import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
 import ScreenTeams from "../screens/ScreenTeams";
 import ScreenProfile from "../screens/ScreenProfile";
-import ScreenStoryboard from '../screens/ScreenStoryboard';
+import ScreenStoryBoard from '../screens/ScreenStoryBoard';
 import ScreenStoryDetails from '../screens/ScreenStoryDetails';
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
@@ -27,13 +27,16 @@ export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
 export const STACK_NAME_STORIES = 'Stories';
 export const STACK_NAME_PROFILE = "Profile";
-export const STACK_NAME_TEAMS = "Team";
+export const STACK_NAME_TEAMS = "Teams";
+export const STACK_NAME_STORY_BOARD = "StoryBoard";
 
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 
-export const SCREEN_NAME_STORY_BOARD = 'StoryBoard';
+export const SCREEN_NAME_STORY_BOARD_UNFINISHED = 'StoryBoardUnfinished';
+export const SCREEN_NAME_STORY_BOARD_FINISHED = "StoryBoardFinished";
 export const SCREEN_NAME_STORY_DETAILS = 'StoryDetails';
+export const SCREEN_NAME_STORY_INTERRUPTIONS = "StoryInterruptions";
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
 
 export const SCREEN_NAME_PROFILE = "Profile";
@@ -132,10 +135,10 @@ export default class Router
         screen: ScreenTeamEdit,
         navigationOptions: getNavigationOptions("Edit Team", getBackIcon())
       },
-      [SCREEN_NAME_STORY_BOARD]:
+      [STACK_NAME_STORY_BOARD]:
       {
-        screen: ScreenStoryboard, 
-        navigationOptions: getNavigationOptions("Storyboard", getBackIcon())
+        screen: Router.createStoryBoardStack(), 
+        navigationOptions: getNavigationOptions("Storyboard", getBackIcon(), true)
       },
       [SCREEN_NAME_STORY_DETAILS]:
       {
@@ -150,6 +153,26 @@ export default class Router
     }, {
       initialRouteName: SCREEN_NAME_TEAMS,
       backBehavior: "initialRoute"
+    });
+  }
+
+  static createStoryBoardStack = () =>
+  {
+    return createMaterialTopTabNavigator ({
+      [SCREEN_NAME_STORY_BOARD_UNFINISHED]:
+      {
+        screen: (props) => <ScreenStoryBoard mode={ScreenStoryBoard.MODE_UNFINISHED} {...props} />,
+        navigationOptions: getNavigationOptions("Story Board", getBackIcon())
+      },
+      [SCREEN_NAME_STORY_BOARD_FINISHED]:
+      {
+        screen: (props) => <ScreenStoryBoard mode={ScreenStoryBoard.MODE_FINISHED} {...props} />,
+        navigationOptions: getNavigationOptions("Finished", getBackIcon())
+      }
+    }, 
+    {
+      initialRouteName: SCREEN_NAME_STORY_BOARD_UNFINISHED,
+      tabBarOptions: getTabBarOptions()
     });
   }
 }
@@ -167,19 +190,46 @@ const getBackIcon = () => (navigation) =>
   return <View style={{paddingLeft: 15}}><Icon onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" /></View>
 }
 
-const getNavigationOptions = (title, action) =>
+const getTabBarOptions = () =>
 {
-    return  ({navigation}) => {
+  return {
+    tabStyle: {},
+    indicatorStyle: {
+      backgroundColor: Theme.colors.accent
+    },
+    style: {
+      backgroundColor: Theme.colors.primary
+    }
+  }
+}
+
+const getNavigationOptions = (title, action, removeHeaderShadow) =>
+{
+    return  ({navigation}) => 
+    {
       var headerLeft = null;
-      if (action) {
-        headerLeft = action(navigation);
-      }
-      return {
+      if (action) 
+      {   headerLeft = action(navigation);}
+      
+      const options = {
         title: title,
-        headerStyle: {backgroundColor: Theme.colors.primary},
+        headerStyle: {
+          backgroundColor: Theme.colors.primary
+        },
         headerTitleStyle: {color: "white"},
         headerTintColor: "white",
         headerLeft: headerLeft
       }
+
+      if(removeHeaderShadow)
+      {
+        options.headerStyle.shadowOpacity =  0;
+        options.headerStyle.shadowOffset = {height: 0, width: 0};
+        options.headerStyle.shadowRadius = 0;
+        options.headerStyle.elevation = 0;
+        options.headerStyle.shadowOpacity = 0;
+      }
+
+      return options;
     };
 }

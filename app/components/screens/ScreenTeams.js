@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, ToastAndroid, Keyboard} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
-import {SCREEN_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
+import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
@@ -147,7 +147,7 @@ export default class ScreenTeams extends Component
   }
 
   onItemSelected = (item, index) => 
-  {   this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD, { team: item });}
+  {   this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item });}
 
   onContextMenuItemSelected = (item, index, action) =>
   {
@@ -156,20 +156,20 @@ export default class ScreenTeams extends Component
       case ACTION_LEAVE_TEAM:
         if(this.dialogConfirmLeave)
         {
-          this.currentlyLeavingTeam = item;
+          this.currentlyLeavingTeam = item; 
           this.dialogConfirmLeave.setVisible(true);
         }
         break;
-
+ 
       case ACTION_INSPECT_TEAM:
         this.onItemSelected(item, index);
         break;
-
+ 
       case ACTION_DELETE_TEAM:
         item.ref.delete().then(() => 
         {
             ToastAndroid.show("Team successfully deleted!", ToastAndroid.LONG);
-        })
+        }) 
         .catch(error => 
         {
           ToastAndroid.show("Team could not be deleted, please try again.", ToastAndroid.LONG);

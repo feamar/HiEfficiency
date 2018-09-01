@@ -39,14 +39,11 @@ export default class ListItemTeam extends AbstractListItem
     {
         super(props);
 
-        this.state = {
-            ...this.state,
-            storyName: this.state.item.data().name,
-            storyUpvotes: this.state.item.data().upvotes
+        if(this.state.item.finishedOn == undefined)
+        {   
+            this.addContextMenuItem("Edit", ACTION_EDIT_STORY);
+            this.addContextMenuItem("Upvote", ACTION_UPVOTE_STORY);
         }
-
-        this.addContextMenuItem("Edit", ACTION_EDIT_STORY);
-        this.addContextMenuItem("Upvote", ACTION_UPVOTE_STORY);
         this.addContextMenuItem("Inspect", ACTION_INSPECT_STORY);
         this.addContextMenuItem("Delete", ACTION_DELETE_STORY);
     }
@@ -58,7 +55,7 @@ export default class ListItemTeam extends AbstractListItem
 
     getItemIndicatorStyle = () =>
     {
-        const type = StoryType.fromId(this.props.item.data().type);
+        const type = StoryType.fromId(this.props.item.type);
         var color = "#ADADAD";
         if(type)
         {   color = type.color;}
@@ -75,7 +72,7 @@ export default class ListItemTeam extends AbstractListItem
 
     getItemContent = () =>
     {
-        const data = this.state.item.data();
+        const data = this.state.item;
         const type = StoryType.fromId(data.type);
         var typeName = "Unknown";
         if(type)

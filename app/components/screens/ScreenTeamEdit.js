@@ -11,18 +11,22 @@ export default class ScreenTeamEdit extends Component
     constructor(props)
     {
         super(props);
-
+        console.log("HERE 12");
         this.keyboardUnsubscribers = [];
         this.team = this.props.navigation.getParam("team");
         this.state =
         {
-          team: this.team.data(),
+          team: {...this.team.data()},
           shouldFabGroupRender: true
         } 
+
+        console.log("STATE: " + JSON.stringify(this.state.team));
     }
 
     componentWillMount = () =>
     {
+        console.log("HERE 11");
+
         var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
         this.keyboardUnsubscribers.push(unsubscriber);
 
@@ -32,11 +36,15 @@ export default class ScreenTeamEdit extends Component
 
     componentWillUnmount = () =>
     {
+        console.log("HERE 16");
+
         this.keyboardUnsubscribers.forEach(unsubscriber => unsubscriber.remove());
     }
 
     onValueChanged = (field) => (value) =>
     {
+        console.log("HERE 15");
+
         console.log("FIELD: " + field);
         const team = this.state.team;
         team[field] = value;
@@ -45,6 +53,8 @@ export default class ScreenTeamEdit extends Component
 
     onFabPress = () =>
     {
+        console.log("HERE 14");
+
         this.team.ref.update(this.state.team).then(() => 
         {
             ToastAndroid.show("Team successfully updated!", ToastAndroid.LONG);
@@ -55,6 +65,8 @@ export default class ScreenTeamEdit extends Component
 
     render()
     {
+        console.log("HERE 13");
+
         return (
             <View>
                 <PreferenceCategory title="Basic Information">
