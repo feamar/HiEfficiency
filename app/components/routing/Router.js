@@ -182,12 +182,12 @@ export default class Router
 
 const getHamburgerIcon = () => (navigation) =>
 {
-  return <View style={{paddingLeft: 15}}><Icon onPress={() => navigation.openDrawer()} name= "menu" color="white" underlayColor="transparent" /></View>
+  return <Icon style={{paddingLeft: 15}}  onPress={() => navigation.openDrawer()} name= "menu" color="white" underlayColor="transparent" />
 }
 
 const getBackIcon = () => (navigation) =>
 {
-  return <View style={{paddingLeft: 15}}><Icon onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" /></View>
+  return <Icon style={{paddingLeft: 15}} onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" />
 }
 
 const getTabBarOptions = () =>
@@ -214,11 +214,14 @@ const getNavigationOptions = (title, action, removeHeaderShadow) =>
       const options = {
         title: title,
         headerStyle: {
-          backgroundColor: Theme.colors.primary
+          backgroundColor: Theme.colors.primary,
         },
-        headerTitleStyle: {color: "white"},
+        headerTitleStyle: {flex: 1},
         headerTintColor: "white",
-        headerLeft: headerLeft
+        headerLeft: headerLeft,
+        headerLeftContainerStyle: {
+          paddingLeft: 15
+        } 
       }
 
       if(removeHeaderShadow)
