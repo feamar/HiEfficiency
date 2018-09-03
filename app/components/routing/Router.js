@@ -182,12 +182,12 @@ export default class Router
 
 const getHamburgerIcon = () => (navigation) =>
 {
-  return <Icon style={{paddingLeft: 15}}  onPress={() => navigation.openDrawer()} name= "menu" color="white" underlayColor="transparent" />
+  return <Icon onPress={() => navigation.openDrawer()} name= "menu" color="white" underlayColor="transparent" />
 }
 
 const getBackIcon = () => (navigation) =>
 {
-  return <Icon style={{paddingLeft: 15}} onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" />
+  return <Icon onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" />
 }
 
 const getTabBarOptions = () =>
