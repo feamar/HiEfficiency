@@ -4,7 +4,7 @@ export const asTime = (date) => {
 }
 
 export const asDate = (date) => {
-	return date.toDateString().slice(4, 10);
+	return date.toDateString().slice(4, 15);
 }
 
 export const difference = (start, finish) => {

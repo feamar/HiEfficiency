@@ -5,10 +5,10 @@ import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from '../preferences/AbstractPreferenceDialog';
 import PropTypes from 'prop-types';
 import {Text} from "react-native-paper";
-import InputTime from '../../inputs/InputTime';
 import UtilityTime from '../../../utilities/UtilityTime';
 import { Dropdown } from 'react-native-material-dropdown';
 import InterruptionType from '../../../enums/InterruptionType';
+import InputDateTimeSeparate from "../../inputs/InputDateTimeSeparate";
 
 const styles = {
     error:{
@@ -40,6 +40,24 @@ const styles = {
     {
         color: Theme.colors.primary,
         marginTop: 10
+    },
+    fieldTitle3:
+    {
+        color: Theme.colors.primary,
+        marginTop: 10
+    },
+
+    field:
+    {
+        start:
+        {
+            marginTop: 5,
+            marginBottom: 5
+        },
+        end: {
+            marginTop: 5, 
+            marginBottom: 5
+        },
     }
 }
 export default class DialogInterruptionEdit extends AbstractPreferenceDialog
@@ -50,10 +68,11 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
         super(props);
     }
 
-    onTimeSelected = (field) => (time) =>
+    onDateTimeSelected = (field) => (timestamp) =>
     {
+        console.log("HERE! Timestamp is: " + timestamp);
         const storageValue = this.state.storageValue;
-        storageValue[field] = time;
+        storageValue[field] = timestamp;
         this.onValueChange(storageValue);
     }
 
@@ -77,21 +96,28 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
         {   error = "The end of the interruption cannot be before the start of the interruption.";}
 
         if(storageValue.previous && storageValue.start < (storageValue.previous.timestamp + storageValue.previous.duration))
-        {   error = "The start of the interruption cannot be before the end of the previous interruption in line (" +  UtilityTime.dateToHHMM(new Date(storageValue.previous.timestamp + storageValue.previous.duration)) + ").";}
+        {   
+            const date = new Date(storageValue.previous.timestamp + storageValue.previous.duration);
+            const previousTime = "on " + UtilityTime.dateToString(date) + " at " + UtilityTime.dateToHHMM(date);
+            error = "The start of the interruption cannot be before the end of the previous interruption in line (" + previousTime + ").";
+        }
 
         if(storageValue.next && storageValue.end > storageValue.next.timestamp)
-        {   error = "The end of the interruption cannot be after the start of the next interruption in line (" + UtilityTime.dateToHHMM(new Date(storageValue.next.timestamp)) + ").";}
+        {   
+            const date = new Date(storageValue.next.timestamp);
+            const nextTime = "on " + UtilityTime.dateToString(date) + " at " + UtilityTime.dateToHHMM(date);
+            error = "The end of the interruption cannot be after the start of the next interruption in line (" + nextTime + ").";
+        }
 
         return error;
     }
-
+ 
     getSpinnerOptions = () =>
-    {   return InterruptionType.Values.map(type => {return {value: type.title, storageValue: type.dbId}});}
+    {   return InterruptionType.Values.map(type  => {return {value: type.title, storageValue: type.dbId}});}
 
-    getDisplayValue = (storageValue) =>
+    getTypeDisplayValue = (storageValue) =>
     {
         const type = InterruptionType.fromDatabaseId(storageValue);
-        console.log("HERE: " + JSON.stringify(type));
         return type.title;
     }
 
@@ -102,14 +128,15 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
         return (
             <View style={styles.wrapper}>
-                <Text style={styles.fieldTitle}>Duration</Text>
-                <View style={styles.inputWrapper}>
-                    <InputTime style={styles.input} onTimeSelected={this.onTimeSelected("start")} time={this.state.storageValue.start} /><Text> - </Text><InputTime style={styles.input} onTimeSelected={this.onTimeSelected("end")} time={this.state.storageValue.end} />
-                </View>
+                <Text style={styles.fieldTitle}>Timestamp Start</Text>
+                <InputDateTimeSeparate style={styles.field.start} onSelected={this.onDateTimeSelected("start")} timestamp={this.state.storageValue.start} />
+                
+                <Text style={styles.fieldTitle2}>Timestamp End</Text>
+                <InputDateTimeSeparate style={styles.field.end} onSelected={this.onDateTimeSelected("end")} timestamp={this.state.storageValue.end} />
                 {this.state.error && <Text style={styles.error}>{this.state.error}</Text>}
 
-                <Text style={styles.fieldTitle2}>Type</Text>
-                <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={this.getDisplayValue(this.state.storageValue.type)} />
+                <Text style={styles.fieldTitle3}>Type</Text>
+                <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={this.getTypeDisplayValue(this.state.storageValue.type)} />
             </View>
         );
     }
@@ -117,3 +144,8 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
 DialogInterruptionEdit.propTypes = {
 }
+
+
+
+//<InputTime style={styles.input} onTimeSelected={this.onTimeSelected("start")} time={this.state.storageValue.start} />
+//<InputTime style={styles.input} onTimeSelected={this.onTimeSelected("end")} time={this.state.storageValue.end} />

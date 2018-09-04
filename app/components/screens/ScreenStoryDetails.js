@@ -184,12 +184,7 @@ export default class ScreenStoryDetails extends Component
         if(timestamp == undefined)
         {   timestamp = new Date().getTime();}
 
-        const interruption = {
-            timestamp: timestamp,
-            duration: undefined,
-            category: category.dbId
-        }
-
+        const interruption = this.createInterruption(timestamp, undefined, category.dbId);
         const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
         interruptions.push(interruption);
 
@@ -198,6 +193,15 @@ export default class ScreenStoryDetails extends Component
         else
         {   this.interruptionsOfUser.ref.update({interruptions: interruptions});}
     } 
+
+    createInterruption = (timestamp, duration, categoryId) =>
+    {
+        return {
+            timestamp: timestamp,
+            duration: duration,
+            category: categoryId
+        }
+    }
 
     getInterruptionsFromDocument = (document) =>
     {
@@ -282,15 +286,29 @@ export default class ScreenStoryDetails extends Component
             case ACTION_DELETE_INTERRUPTION:
                 var interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
                 interruptions.splice(item.id, 1);
-                this.interruptionsOfUser.ref.update({interruptionts: interruptions});
+                this.interruptionsOfUser.ref.update({interruptions: interruptions});
+
+                if(interruptions.length == 0)
+                {   this.interruptionsOfUser.ref.delete();}
                 break; 
 
             case ACTION_EDIT_INTERRUPTION:
                 if(this.dialogInterruptionEdit)
                 {
                     const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-                    const next = interruptions[item.id + 1];
-                    const previous = interruptions[item.id - 1];
+                    var next = interruptions[item.id + 1];
+                    var previous = interruptions[item.id - 1];
+
+                    if(next == undefined && this.story.data().finishedOn != undefined)
+                    {   next = this.createInterruption(new Date(this.story.data().finishedOn).getTime(), 0, undefined);}
+
+                    if(previous == undefined && this.story.data().startedOn != undefined)
+                    {   previous = this.createInterruption(new Date(this.story.data().startedOn).getTime(), 0, undefined);}
+
+                    console.log("Next: " + JSON.stringify(next));
+                    console.log("Previous: " + JSON.stringify(previous));
+                    console.log("Item: " + JSON.stringify(item));
+
                     this.currentlyEditingInterruptionIndex = item.id;
                     this.dialogInterruptionEdit.onValueChange({type: item.type.dbId, start: item.timestamp, end: item.timestamp + item.duration, next: next, previous: previous});
                     this.dialogInterruptionEdit.setVisible(true);

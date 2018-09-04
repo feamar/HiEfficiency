@@ -1,3 +1,5 @@
+import { NativeModules } from 'react-native'
+
 export default class UtilityTime
 {
     static millisecondsToHHMMSS(milliseconds, separator)
@@ -52,10 +54,10 @@ export default class UtilityTime
 
         if(options == undefined)
         {   
-            options = {year: "numeric", month: "long", day: "numeric" };
+            options = {year: "numeric", month: "short", day: "numeric" };
         }
 
-        var result = date.toLocaleDateString("en-US", options);
+        var result = date.toLocaleDateString("en-US",  {year: "numeric", month: "short", day: "numeric" });
         console.log("Date " + date + " converted to string representation: " + result + ".");
 
         return result;
