@@ -108,7 +108,7 @@ export default class Router
       }
     );
   }
-  
+
   static createProfileRouter = () =>
   {
     return createStackNavigator({
@@ -137,7 +137,7 @@ export default class Router
       },
       [STACK_NAME_STORY_BOARD]:
       {
-        screen: Router.createStoryBoardStack(), 
+        screen: Router.createStoryBoardStack(),
         navigationOptions: getNavigationOptions("Storyboard", getBackIcon(), true)
       },
       [SCREEN_NAME_STORY_DETAILS]:
@@ -169,7 +169,7 @@ export default class Router
         screen: (props) => <ScreenStoryBoard mode={ScreenStoryBoard.MODE_FINISHED} {...props} />,
         navigationOptions: getNavigationOptions("Finished", getBackIcon())
       }
-    }, 
+    },
     {
       initialRouteName: SCREEN_NAME_STORY_BOARD_UNFINISHED,
       tabBarOptions: getTabBarOptions()
@@ -205,23 +205,23 @@ const getTabBarOptions = () =>
 
 const getNavigationOptions = (title, action, removeHeaderShadow) =>
 {
-    return  ({navigation}) => 
+    return  ({navigation}) =>
     {
       var headerLeft = null;
-      if (action) 
+      if (action)
       {   headerLeft = action(navigation);}
-      
+
       const options = {
         title: title,
         headerStyle: {
           backgroundColor: Theme.colors.primary,
         },
-        headerTitleStyle: {flex: 1},
+        headerTitleStyle: {paddingLeft: 30, flex: 1},
         headerTintColor: "white",
         headerLeft: headerLeft,
         headerLeftContainerStyle: {
           paddingLeft: 15
-        } 
+        }
       }
 
       if(removeHeaderShadow)
