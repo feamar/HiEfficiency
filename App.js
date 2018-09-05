@@ -7,6 +7,12 @@ import { MenuProvider } from 'react-native-popup-menu';
 import Router from './app/components/routing/Router'
 import {StatusBar} from "react-native";
 
+const styles = {
+  root: {
+    backgroundColor: "purple"
+  }
+}
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -38,7 +44,7 @@ export default class App extends React.Component {
         <MaterialDesignProvider theme={Theme}>
           <MenuProvider>
             <StatusBar backgroundColor={Theme.colors.primaryDark}/>
-            <RouteStack />
+            <RouteStack  style={styles.root} />
           </MenuProvider>
         </MaterialDesignProvider>
     );
