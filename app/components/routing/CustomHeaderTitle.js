@@ -19,7 +19,7 @@ const styles = {
         fontSize: 18
     },
     subtitle:{
-        color: Theme.colors.header.typography.subtitle
+        color: Theme.colors.header.typography.subtitle,
     }
 }
    
@@ -48,7 +48,7 @@ export default class CustomHeaderTitle extends Component
         return (  
             <View style={styles.root}>   
                 <Text style={styles.title}>{this.state.title}</Text>
-                {this.state.subtitle && <Text style={styles.subtitle}>{this.state.subtitle}</Text>}
+                {this.state.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.state.subtitle}</Text>}
             </View> 
         );
     }
