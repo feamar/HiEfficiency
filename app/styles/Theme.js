@@ -13,6 +13,12 @@ const Theme = {
         typography:{
             title: "#434343",
             subtitle: "#A1A1A1"
+        },
+        header: {
+            typography:{
+                title: "#FFFFFF",
+                subtitle: "#EDEDED"
+            }
         }
     },
     opacities: {

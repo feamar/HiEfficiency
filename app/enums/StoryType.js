@@ -16,7 +16,7 @@ export default class StoryType
         this.icon = icon;
     }
 
-    static Bug = new StoryType(EnforcerInstance, 0, "Bug", Color.RED[500], undefined);
+    static Bug = new StoryType(EnforcerInstance, 0, "Bug", "#565656", undefined);
     static Task = new StoryType(EnforcerInstance, 1, "Task", "#3C5C71", undefined);
     static Improvement = new StoryType(EnforcerInstance, 2, "Improvement", "#3C7162", undefined);
     static Feature = new StoryType(EnforcerInstance, 3, "Feature", "#65A9AD", undefined);

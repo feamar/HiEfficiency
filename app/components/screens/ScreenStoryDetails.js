@@ -93,6 +93,14 @@ const styles = {
 
 export default class ScreenStoryDetails extends Component
 {
+    static navigationOptions = ({navigation}) => 
+    {
+        return {
+            title: "Story Details",
+            subtitle: navigation.state.params.subtitle
+        }
+    }
+
     constructor(props)
     {
         super(props);
@@ -107,6 +115,8 @@ export default class ScreenStoryDetails extends Component
             open: false,
             shouldFabGroupRender: true
         }
+
+        this.props.navigation.setParams({ subtitle: this.story.data().name })
     }
 
     onStoryDocumentChanged = (story) =>
@@ -124,7 +134,6 @@ export default class ScreenStoryDetails extends Component
 
     onInterruptionsOfUserChanged = (document) =>
     {
-        console.log("")
         this.interruptionsOfUser = document;
 
         const sections = this.getSectionsFromDocuments(this.story, this.interruptionsOfUser);
@@ -149,9 +158,7 @@ export default class ScreenStoryDetails extends Component
 
         FirebaseAdapter.getCurrentUserOrThrow(user => 
         {  
-            //console.log("USER: " + JSON.stringify(JSON.decycle(user)));
             const documentReference = FirebaseAdapter.getInterruptionsFromStory(this.story).doc(user.uid);
-            console.log("INTERRUPTIONS: " + JSON.stringify(JSON.decycle(this.interruptionsOfUser)));
             if(documentReference != undefined)
             {
                 var unsubscriber = documentReference.onSnapshot(this.onInterruptionsOfUserChanged);

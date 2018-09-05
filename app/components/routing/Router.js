@@ -19,6 +19,7 @@ import ScreenStoryBoard from '../screens/ScreenStoryBoard';
 import ScreenStoryDetails from '../screens/ScreenStoryDetails';
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
+import CustomHeaderTitle from "./CustomHeaderTitle";
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 import ScreenTeamEdit from '../screens/ScreenTeamEdit';
 import ScreenDeveloper from "../screens/ScreenDeveloper";
@@ -216,12 +217,13 @@ const getNavigationOptions = (title, action, removeHeaderShadow) =>
         headerStyle: {
           backgroundColor: Theme.colors.primary,
         },
-        headerTitleStyle: {paddingLeft: 30, flex: 1},
+        headerTitleStyle: {paddingLeft: 0, flex: 1},
         headerTintColor: "white",
         headerLeft: headerLeft,
         headerLeftContainerStyle: {
           paddingLeft: 15
-        }
+        },
+        headerTitle: <CustomHeaderTitle title={title} subtitle={navigation.getParam("subtitle")} navigation={navigation} />
       }
 
       if(removeHeaderShadow)
