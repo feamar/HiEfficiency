@@ -11,10 +11,11 @@ import { FABGroup } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
 import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_DELETE_TEAM, ACTION_EDIT_TEAM} from "../lists/instances/teams/ListItemTeam"; 
 import { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
+import UtilityScreen from "../../utilities/UtilityScreen";
 const ACTION_JOIN_TEAM = "join_team";
 const ACTION_CREATE_TEAM = "create_team";
 
-export default class ScreenTeams extends Component
+class ScreenTeams extends Component
 {
   constructor(props)
   {
@@ -27,41 +28,27 @@ export default class ScreenTeams extends Component
       open: false
     } 
 
-    this.unsubscribers = [];
     this.teamUnsubscribers = [];
-    this.keyboardUnsubscribers = [];
+    this.unsubscribers = [];
   }
 
   componentWillMount()
   {
     var unsubscriber = FirebaseAdapter.getCurrentUser(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
     this.unsubscribers.push(unsubscriber);
-
-    unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.onScreenWillFocus(payload)});
-    this.unsubscribers.push(unsubscriber);
-
-    unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.onScreenWillBlur(payload)});
-    this.unsubscribers.push(unsubscriber);
-
   } 
   
-  onScreenWillFocus = (payload) =>
+  componentWillUnmount()
   {
-    this.setState({shouldFabGroupRender: true})
+    for (var i = 0; i < this.unsubscribers.length; i++)
+    {   this.unsubscribers[i]();}
 
-    var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
-    this.keyboardUnsubscribers.push(unsubscriber);
-
-    unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
-    this.keyboardUnsubscribers.push(unsubscriber);
+    for(var i = 0 ; i < this.teamUnsubscribers.length; i++)
+    {   this.teamUnsubscribers[i]();}
   }
-
-  onScreenWillBlur = (payload) =>
-  {
-    this.setState({shouldFabGroupRender: false})
-    this.keyboardUnsubscribers.forEach(unsubscriber => {unsubscriber.remove()});
-  }
-
+ 
+  setFabVisibility = (visible) =>
+  {   this.setState({shouldFabGroupRender: visible});}
 
   onUserUnavailableWhileMounting = () =>
   {   FirebaseAdapter.logout();}
@@ -136,15 +123,6 @@ export default class ScreenTeams extends Component
     this.setState({teams: teams});
   }
 
-
-  componentWillUnmount()
-  {
-    for (var i = 0; i < this.unsubscribers.length; i++)
-    {   this.unsubscribers[i]();}
-
-    for(var i = 0 ; i < this.teamUnsubscribers.length; i++)
-    {   this.teamUnsubscribers[i]();}
-  }
 
   onItemSelected = (item, index) => 
   {   this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item });}
@@ -306,3 +284,6 @@ export default class ScreenTeams extends Component
     return -1;
   }
 }
+
+
+export default UtilityScreen.withFloatingActionButton(ScreenTeams)

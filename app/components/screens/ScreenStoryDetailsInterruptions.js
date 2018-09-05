@@ -14,6 +14,7 @@ import { ACTION_DELETE_INTERRUPTION, ACTION_EDIT_INTERRUPTION } from "../lists/i
 import UtilityTime from "../../utilities/UtilityTime";
 import DialogInterruptionEdit from "../dialogs/interruptions/DialogInterruptionEdit";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
+import UtilityObject from "../../utilities/UtilityObject";
 
 
 const LIFECYCLE_LOADING = 0;
@@ -91,14 +92,24 @@ const styles = {
     }
 }    
 
-export default class ScreenStoryDetails extends Component
+export default class ScreenStoryDetailsInterruptions extends Component
 {
+    static displayName = "Story Details Interruptions";
     static navigationOptions = ({navigation}) => 
     {
-        return {
+        const options =  {
             title: "Story Details",
             subtitle: navigation.state.params.subtitle
+        };
+
+        const parent = navigation.dangerouslyGetParent();
+        if(parent)
+        {
+               parent.navigationOptions = options;
+               parent.setParams(options);
         }
+        
+        return options;
     }
 
     constructor(props)
@@ -113,7 +124,7 @@ export default class ScreenStoryDetails extends Component
             lifecycle: this.getLifecycleFromDocuments(this.story, this.interruptionsOfUser),
             sections: this.getSectionsFromDocuments(this.story, this.interruptionsOfUser),
             open: false,
-            shouldFabGroupRender: true
+            shouldFabGroupRender: false
         }
 
         this.props.navigation.setParams({ subtitle: this.story.data().name })

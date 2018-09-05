@@ -5,14 +5,13 @@ import {FABGroup} from "react-native-paper";
 import {View, Keyboard, ToastAndroid} from 'react-native';
 import {Text} from 'react-native-paper';
 import PreferenceDateTime from '../preferences/fields/PreferenceDateTime';
+import UtilityScreen from '../../utilities/UtilityScreen';
 
-export default class ScreenTeamEdit extends Component
+class ScreenTeamEdit extends Component
 {
     constructor(props)
     {
         super(props);
-        console.log("HERE 12");
-        this.keyboardUnsubscribers = [];
         this.team = this.props.navigation.getParam("team");
         this.state =
         {
@@ -20,32 +19,14 @@ export default class ScreenTeamEdit extends Component
           shouldFabGroupRender: true
         } 
 
-        console.log("STATE: " + JSON.stringify(this.state.team));
     }
 
-    componentWillMount = () =>
-    {
-        console.log("HERE 11");
 
-        var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
-        this.keyboardUnsubscribers.push(unsubscriber);
-
-        unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
-        this.keyboardUnsubscribers.push(unsubscriber);
-    }
-
-    componentWillUnmount = () =>
-    {
-        console.log("HERE 16");
-
-        this.keyboardUnsubscribers.forEach(unsubscriber => unsubscriber.remove());
-    }
+    setFabVisibility = (visible) =>
+    {   this.setState({shouldFabGroupRender: visible});}
 
     onValueChanged = (field) => (value) =>
     {
-        console.log("HERE 15");
-
-        console.log("FIELD: " + field);
         const team = this.state.team;
         team[field] = value;
         this.setState({team: team});
@@ -53,8 +34,6 @@ export default class ScreenTeamEdit extends Component
 
     onFabPress = () =>
     {
-        console.log("HERE 14");
-
         this.team.ref.update(this.state.team).then(() => 
         {
             ToastAndroid.show("Team successfully updated!", ToastAndroid.LONG);
@@ -65,8 +44,6 @@ export default class ScreenTeamEdit extends Component
 
     render()
     {
-        console.log("HERE 13");
-
         return (
             <View>
                 <PreferenceCategory title="Basic Information">
@@ -81,3 +58,5 @@ export default class ScreenTeamEdit extends Component
         );
     }
 }
+
+export default UtilityScreen.withFloatingActionButton(ScreenTeamEdit);

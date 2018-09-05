@@ -8,6 +8,7 @@ import StoryType from "../../enums/StoryType";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
 
 import { FABGroup, Snackbar } from 'react-native-paper';
+import UtilityScreen from "../../utilities/UtilityScreen";
 
 const styles = {
     scrollView:{
@@ -18,8 +19,9 @@ const styles = {
 export const MODE_CREATE = "create";
 export const MODE_EDIT = "edit";
 
-export default class ScreenStoryCreate extends Component
+class ScreenStoryCreate extends Component
 {
+    static displayName = "Story Details Information";
 
     constructor(props)
     {
@@ -44,28 +46,12 @@ export default class ScreenStoryCreate extends Component
         this.state =
         {
             story: story,
-            shouldFabGroupRender: true
+            shouldFabGroupRender: false
         }
     }
 
-    componentWillMount = () =>
-    {
-        var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.setState({shouldFabGroupRender: false})});
-        this.unsubscribers.push(unsubscriber);
-
-        unsubscriber = Keyboard.addListener("keyboardDidHide", () => {this.setState({shouldFabGroupRender: true})});
-        this.unsubscribers.push(unsubscriber);
-    }
-
-    componentWillUnmount = () =>
-    {
-        for(var i = 0 ; i < this.unsubscribers.length ; i ++)
-        {
-            const unsubscriber = this.unsubscribers[i];
-            if(unsubscriber && unsubscriber instanceof Function)
-            {   unsubscriber();}
-        }
-    }
+    setFabVisibility = (visible) =>
+    {   this.setState({shouldFabGroupRender: visible});}
 
     onValueChanged = (field) => (value) =>
     {
@@ -126,7 +112,6 @@ export default class ScreenStoryCreate extends Component
                     this.props.navigation.getParam("story").ref.update(this.state.story).then(() => 
                     {
                         ToastAndroid.show("Story successfully updated!", ToastAndroid.LONG);
-                        this.props.navigation.goBack();
                     })
                     .catch(error => 
                     {
@@ -159,3 +144,5 @@ export default class ScreenStoryCreate extends Component
         );
     }
 } 
+
+export default UtilityScreen.withFloatingActionButton(ScreenStoryCreate);

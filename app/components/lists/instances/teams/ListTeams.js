@@ -7,7 +7,6 @@ export default class ListTeams extends AbstractList
 {
     getListItemFor = (item, index) =>
     {
-        console.log("KEY: " + item.id);
         return <ListItemTeam 
             key={item.id} 
             item={item} 

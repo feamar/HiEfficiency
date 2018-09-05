@@ -33,7 +33,6 @@ export default class CustomHeaderTitle extends Component
             title: this.props.title,
             subtitle: this.props.subtitle
         }
-        console.log("PROOOPS: " + JSON.stringify(JSON.decycle(props)));
     }
 
     componentWillReceiveProps = (props) =>

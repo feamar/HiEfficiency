@@ -54,7 +54,8 @@ export default class AbstractPreference extends Component
 
     validate = () =>
     {
-        if(this.props.required && this.state.storageValue == undefined)
+        const storageValue = this.state.storageValue;
+        if(this.props.required && (storageValue == undefined || storageValue == "" || storageValue == null))
         {   
             this.setState({error: "Please enter the " + this.props.title.toLowerCase() + "."});    
             return false;

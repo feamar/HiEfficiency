@@ -28,7 +28,6 @@ const styles = {
     }
 }
  
-export const ACTION_EDIT_STORY = "edit";
 export const ACTION_UPVOTE_STORY = "upvote";
 export const ACTION_INSPECT_STORY = "inspect";
 export const ACTION_DELETE_STORY = "delete";
@@ -41,7 +40,6 @@ export default class ListItemTeam extends AbstractListItem
 
         if(this.state.item.finishedOn == undefined)
         {   
-            this.addContextMenuItem("Edit", ACTION_EDIT_STORY);
             this.addContextMenuItem("Upvote", ACTION_UPVOTE_STORY);
         }
         this.addContextMenuItem("Inspect", ACTION_INSPECT_STORY);

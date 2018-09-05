@@ -86,7 +86,7 @@ export default class AbstractPreferenceDialog extends AbstractDialog
         return (
             <DialogActions>  
                 <Button color={Theme.colors.primary} onPress={this.onDismiss}>Cancel</Button> 
-                <Button color={Theme.colors.primary} onPress={this.onSave}>Save</Button>
+                <Button color={Theme.colors.primary} onPress={this.onSave}>OK</Button>
             </DialogActions>
         );
     }

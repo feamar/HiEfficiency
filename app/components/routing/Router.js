@@ -10,34 +10,34 @@ import
 import {View} from "react-native";
 import {Icon} from "react-native-elements";
 
-import { Platform, StatusBar } from "react-native";
 import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
 import ScreenTeams from "../screens/ScreenTeams";
 import ScreenProfile from "../screens/ScreenProfile";
 import ScreenStoryBoard from '../screens/ScreenStoryBoard';
-import ScreenStoryDetails from '../screens/ScreenStoryDetails';
-import Theme from '../../styles/Theme';
-import CustomDrawer from './CustomDrawer';
-import CustomHeaderTitle from "./CustomHeaderTitle";
+import ScreenStoryDetailsInterruptions from '../screens/ScreenStoryDetailsInterruptions';
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 import ScreenTeamEdit from '../screens/ScreenTeamEdit';
 import ScreenDeveloper from "../screens/ScreenDeveloper";
 
+import Theme from '../../styles/Theme';
+import CustomDrawer from './CustomDrawer';
+import CustomHeaderTitle from "./CustomHeaderTitle";
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
 export const STACK_NAME_STORIES = 'Stories';
 export const STACK_NAME_PROFILE = "Profile";
 export const STACK_NAME_TEAMS = "Teams";
 export const STACK_NAME_STORY_BOARD = "StoryBoard";
+export const STACK_NAME_STORY_DETAILS = "StoryDetails";
 
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 
 export const SCREEN_NAME_STORY_BOARD_UNFINISHED = 'StoryBoardUnfinished';
 export const SCREEN_NAME_STORY_BOARD_FINISHED = "StoryBoardFinished";
-export const SCREEN_NAME_STORY_DETAILS = 'StoryDetails';
-export const SCREEN_NAME_STORY_INTERRUPTIONS = "StoryInterruptions";
+export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Interruptions';
+export const SCREEN_NAME_STORY_DETAILS_INFO = 'Info';
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
 
 export const SCREEN_NAME_PROFILE = "Profile";
@@ -54,6 +54,10 @@ const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
     color: "white"
 }
+//const Values = [
+//  ScreenRegister, ScreenLogin, ScreenTeams, ScreenProfile, ScreenStoryBoard, 
+//  ScreenStoryDetailsInterruptions, ScreenStoryDetailsInfo, ScreenStoryCreate, ScreenTeamEdit, ScreenDeveloper
+//]
 
 export default class Router
 {
@@ -141,10 +145,10 @@ export default class Router
         screen: Router.createStoryBoardStack(),
         navigationOptions: getNavigationOptions("Storyboard", getBackIcon(), true)
       },
-      [SCREEN_NAME_STORY_DETAILS]:
+      [STACK_NAME_STORY_DETAILS]:
       {
-        screen: ScreenStoryDetails,
-        navigationOptions: getNavigationOptions("Story Details", getBackIcon())
+        screen: Router.createStoryDetailsStack(),
+        navigationOptions: getNavigationOptions("Story Details", getBackIcon(), true, )
       },
       [SCREEN_NAME_STORY_CREATE]:
       {
@@ -162,12 +166,12 @@ export default class Router
     return createMaterialTopTabNavigator ({
       [SCREEN_NAME_STORY_BOARD_UNFINISHED]:
       {
-        screen: (props) => <ScreenStoryBoard mode={ScreenStoryBoard.MODE_UNFINISHED} {...props} />,
+        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_UNFINISHED} />,
         navigationOptions: getNavigationOptions("Story Board", getBackIcon())
       },
       [SCREEN_NAME_STORY_BOARD_FINISHED]:
       {
-        screen: (props) => <ScreenStoryBoard mode={ScreenStoryBoard.MODE_FINISHED} {...props} />,
+        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_FINISHED} />,
         navigationOptions: getNavigationOptions("Finished", getBackIcon())
       }
     },
@@ -176,10 +180,27 @@ export default class Router
       tabBarOptions: getTabBarOptions()
     });
   }
+
+  static createStoryDetailsStack = () =>
+  {
+    return createMaterialTopTabNavigator ({
+      [SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS]:
+      {
+        screen: ScreenStoryDetailsInterruptions,
+        navigationOptions: getNavigationOptions("Interruptions", getBackIcon())
+      },
+      [SCREEN_NAME_STORY_DETAILS_INFO]:
+      {
+        screen: ScreenStoryCreate,
+        navigationOptions: getNavigationOptions("Information", getBackIcon())
+      } 
+    },
+    {
+      initialRouteName:SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS,
+      tabBarOptions: getTabBarOptions()
+    });
+  }
 }
-
-
-
 
 const getHamburgerIcon = () => (navigation) =>
 {
@@ -206,8 +227,9 @@ const getTabBarOptions = () =>
 
 const getNavigationOptions = (title, action, removeHeaderShadow) =>
 {
-    return  ({navigation}) =>
+    return  (props) =>
     {
+      const navigation = props.navigation;
       var headerLeft = null;
       if (action)
       {   headerLeft = action(navigation);}
@@ -238,3 +260,4 @@ const getNavigationOptions = (title, action, removeHeaderShadow) =>
       return options;
     };
 }
+
