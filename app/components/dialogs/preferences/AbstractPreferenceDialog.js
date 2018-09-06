@@ -18,6 +18,7 @@ export default class AbstractPreferenceDialog extends AbstractDialog
         super(props);
 
         this.state = {
+            ...this.state,
             visible: this.props.visible,
             storageValue: this.props.storageValue,
             error: undefined

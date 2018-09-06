@@ -41,11 +41,6 @@ class ScreenTeamEdit extends Component
         return true;
     }
 
-    /*componentDidMount = () =>
-    {   
-        this.props.navigation.setParams({onBackClicked: this.onBackClicked});
-    }*/
-
     setFabVisibility = (visible) =>
     {   this.setState({shouldFabGroupRender: visible});}
 
