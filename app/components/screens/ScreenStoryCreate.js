@@ -6,9 +6,12 @@ import PreferenceText from "../preferences/fields/PreferenceText";
 import PreferenceSelectSpinner from "../preferences/fields/PreferenceSelectSpinner";
 import StoryType from "../../enums/StoryType";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
-
-import { FABGroup, Snackbar } from 'react-native-paper';
+import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
+import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
+import { FAB, Snackbar } from 'react-native-paper';
 import UtilityScreen from "../../utilities/UtilityScreen";
+import UtilityObject from "../../utilities/UtilityObject";
+import DialogConfirmation, { DIALOG_ACTION_POSITIVE } from "../dialogs/instances/DialogConfirmation";
 
 const styles = {
     scrollView:{
@@ -41,14 +44,33 @@ class ScreenStoryCreate extends Component
             this.mode = MODE_EDIT;
         }
 
+        this.unsavedChanges = false;
         this.fields = {};
         this.unsubscribers = []
         this.state =
         {
             story: story,
-            shouldFabGroupRender: false
+            shouldFabGroupRender: true
         }
     }
+
+    onHardwareBackPress = () =>
+    {   return this.onSoftwareBackPress();}
+
+    onSoftwareBackPress = () =>
+    {
+        if(this.unsavedChanges == false || this.confirmationDialog == undefined)
+        {   return false;}
+
+        this.confirmationDialog.setVisible(true);
+        return true;
+    }
+
+    componentDidMount = () =>
+    {   
+        this.props.navigation.setParams({onBackClicked: this.onBackClicked});
+    }
+
 
     setFabVisibility = (visible) =>
     {   this.setState({shouldFabGroupRender: visible});}
@@ -56,6 +78,10 @@ class ScreenStoryCreate extends Component
     onValueChanged = (field) => (value) =>
     {
         const story = this.state.story;
+        if(story[field] == value)
+        {   return;}
+
+        this.unsavedChanges = true;
         story[field] = value;
         this.setState({story: story});
     }
@@ -88,7 +114,6 @@ class ScreenStoryCreate extends Component
             {   valid = false;}
         }   
 
-        console.log(JSON.stringify(JSON.decycle()));
         if(valid) 
         {
             var self = this;
@@ -125,11 +150,16 @@ class ScreenStoryCreate extends Component
     getStoryTypeOptions = () =>
     {   return StoryType.Values.map(type => {return {value: type.name, storageValue: type.id}});}
 
+    onDialogConfirmed = (action) =>
+    {
+        if(action == DIALOG_ACTION_POSITIVE)
+        {   this.props.navigation.goBack();}
+    }
+
     render()
     { 
         return ( 
-            <View> 
-                {this.state.shouldFabGroupRender && <FABGroup icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
+            <View style={{height: "100%"}}> 
                 <ScrollView style={styles.scrollView}>
                     <PreferenceCategory title="Mandatory">
                         <PreferenceText required ref={c => this.fields.name = c} title="Name" storageValue={this.state.story.name} onValueChanged={this.onValueChanged("name")} />
@@ -140,9 +170,13 @@ class ScreenStoryCreate extends Component
                         <PreferenceText ref={c => this.fields.points = c} title="Story Points" storageValue={this.state.story.points} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
                     </PreferenceCategory>
                 </ScrollView>
+                {this.state.shouldFabGroupRender && <FAB.Group icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
+                <DialogConfirmation ref={i => this.confirmationDialog = i} message="There are unsaved changes to the user story. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onDialogActionPressed={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />
             </View> 
         );
     }
 } 
 
-export default UtilityScreen.withFloatingActionButton(ScreenStoryCreate);
+
+
+export default withBackButtonInterceptor(ScreenStoryCreate);

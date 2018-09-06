@@ -10,7 +10,7 @@ import PreferenceSelectSpinner from '../preferences/fields/PreferenceSelectSpinn
 import { Firebase } from 'react-native-firebase';
 
 const styles ={
-  content: {padding: 0}
+  content: {padding: 0, height: "100%"}
 }
 
 export default class ScreenProfile extends Component

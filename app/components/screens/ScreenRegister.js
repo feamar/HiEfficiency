@@ -6,7 +6,6 @@ import Theme from "../../styles/Theme";
 import {
   Button,
   Card,
-  CardContent,
   TextInput,
   Title,
   Text
@@ -99,12 +98,12 @@ export default class ScreenRegister extends React.Component
         <View style={styles.header}>
           <Text style={styles.title}>Register</Text>
         </View> 
-        <CardContent>  
+        <Card.Content>  
           <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.handleInputChange("email")} />
           <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
           <TextInput style={styles.input} secureTextEntry id="confirmation" name="confirmation" label="Confirm Password" value={this.state.confirmation} onChangeText={this.handleInputChange("confirmation")} />
           <Button style={styles.buttons.login} dark raised primary variant="contained" onPress={this.handleRegister}>Register</Button>
-        </CardContent>    
+        </Card.Content>    
       </Card> 
     </View>    
   }

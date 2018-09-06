@@ -2,7 +2,7 @@ import React from 'react';
 import FirebaseAdapter from "./app/components/firebase/FirebaseAdapter";
 
 import Theme from './app/styles/Theme';
-import {Provider as MaterialDesignProvider} from 'react-native-paper';
+import {Provider, Portal} from 'react-native-paper';
 import { MenuProvider } from 'react-native-popup-menu';
 import Router from './app/components/routing/Router'
 import {StatusBar} from "react-native";
@@ -41,12 +41,14 @@ export default class App extends React.Component {
     const RouteStack = Router.createInitialStack(this.state.signedIn);
 
     return(
-        <MaterialDesignProvider theme={Theme}>
+        <Provider theme={Theme}>
           <MenuProvider>
             <StatusBar backgroundColor={Theme.colors.primaryDark}/>
-            <RouteStack  style={styles.root} />
+            <Portal.Host>
+              <RouteStack  style={styles.root} />
+            </Portal.Host>
           </MenuProvider>
-        </MaterialDesignProvider>
+        </Provider>
     );
   }
 

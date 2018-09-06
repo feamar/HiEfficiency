@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, ScrollView} from 'react-native';
-import { Button, DialogActions } from 'react-native-paper';
+import { Button, Dialog } from 'react-native-paper';
 import Theme from '../../../styles/Theme';
 import PropTypes from 'prop-types';
 import AbstractDialog from '../AbstractDialog';
@@ -24,14 +24,8 @@ export default class AbstractPreferenceDialog extends AbstractDialog
         }
     }
 
-    setVisible = (visible) =>
-    {
-        var error = this.state.error;
-        if(visible == false)
-        {   error = undefined;}
-
-        this.setState({visible: visible, error: error});   
-    }
+    onDialogClose = () =>
+    {   this.setState({error: undefined});}
 
     onDismiss = () =>
     {
@@ -84,10 +78,10 @@ export default class AbstractPreferenceDialog extends AbstractDialog
     getDialogActions = ()  =>
     { 
         return (
-            <DialogActions>  
+            <Dialog.Actions>  
                 <Button color={Theme.colors.primary} onPress={this.onDismiss}>Cancel</Button> 
                 <Button color={Theme.colors.primary} onPress={this.onSave}>OK</Button>
-            </DialogActions>
+            </Dialog.Actions>
         );
     }
 }

@@ -1,18 +1,26 @@
 import React, {Component} from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
 import PreferenceText from '../preferences/fields/PreferenceText';
-import {FABGroup} from "react-native-paper";
+import {FAB} from "react-native-paper";
 import {View, Keyboard, ToastAndroid} from 'react-native';
-import {Text} from 'react-native-paper';
 import PreferenceDateTime from '../preferences/fields/PreferenceDateTime';
 import UtilityScreen from '../../utilities/UtilityScreen';
+import {getBackIcon} from "../routing/Router";
+import UtilityObject from '../../utilities/UtilityObject';
+import DialogConfirmation, { DIALOG_ACTION_POSITIVE } from '../dialogs/instances/DialogConfirmation';
+import {compose} from "redux";
+import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
+import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 
 class ScreenTeamEdit extends Component
 {
+    static displayName = "Screen Team Edit";
     constructor(props)
     {
         super(props);
         this.team = this.props.navigation.getParam("team");
+        this.unsavedChanges = false;
+
         this.state =
         {
           team: {...this.team.data()},
@@ -21,6 +29,22 @@ class ScreenTeamEdit extends Component
 
     }
 
+    onHardwareBackPress = () =>
+    {   return this.onSoftwareBackPress();}
+ 
+    onSoftwareBackPress = () =>
+    {
+        if(this.unsavedChanges == false || this.confirmationDialog == undefined)
+        {   return false;}
+
+        this.confirmationDialog.setVisible(true);
+        return true;
+    }
+
+    /*componentDidMount = () =>
+    {   
+        this.props.navigation.setParams({onBackClicked: this.onBackClicked});
+    }*/
 
     setFabVisibility = (visible) =>
     {   this.setState({shouldFabGroupRender: visible});}
@@ -28,8 +52,23 @@ class ScreenTeamEdit extends Component
     onValueChanged = (field) => (value) =>
     {
         const team = this.state.team;
+
+        if(this.state.team[field] == value)
+        {   return;}
+
+        this.unsavedChanges = true;
         team[field] = value;
         this.setState({team: team});
+    }
+
+    onDialogConfirmed = (action) =>
+    {
+        switch(action) 
+        {
+            case DIALOG_ACTION_POSITIVE:
+            this.props.navigation.goBack();
+            break;
+        }
     }
 
     onFabPress = () =>
@@ -41,11 +80,10 @@ class ScreenTeamEdit extends Component
         });
     }
 
-
     render()
     {
         return (
-            <View>
+            <View style={{height: "100%"}}>
                 <PreferenceCategory title="Basic Information">
                     <PreferenceText title="Team Name" storageValue={this.state.team.name} onValueChanged={this.onValueChanged("name")}/>
                     <PreferenceText title="Security Code" storageValue={this.state.team.code} onValueChanged={this.onValueChanged("code")}/>
@@ -53,10 +91,11 @@ class ScreenTeamEdit extends Component
                 <PreferenceCategory title="Sprints">
                     <PreferenceDateTime title="Date of first sprint" mode="date" storageValue={this.state.team.dateOfFirstSprint} onValueChanged={this.onValueChanged("dateOfFirstSprint")} />
                 </PreferenceCategory>
-                {this.state.shouldFabGroupRender && <FABGroup icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
+                {this.state.shouldFabGroupRender && <FAB.Group icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
+                <DialogConfirmation ref={i => this.confirmationDialog = i} message="There are unsaved changes to the team. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onDialogActionPressed={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />
             </View>
         );
     }
 }
 
-export default UtilityScreen.withFloatingActionButton(ScreenTeamEdit);
+export default withBackButtonInterceptor(ScreenTeamEdit);

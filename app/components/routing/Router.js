@@ -23,6 +23,7 @@ import ScreenDeveloper from "../screens/ScreenDeveloper";
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import CustomHeaderTitle from "./CustomHeaderTitle";
+import UtilityObject from '../../utilities/UtilityObject';
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
 export const STACK_NAME_STORIES = 'Stories';
@@ -54,11 +55,6 @@ const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
     color: "white"
 }
-//const Values = [
-//  ScreenRegister, ScreenLogin, ScreenTeams, ScreenProfile, ScreenStoryBoard, 
-//  ScreenStoryDetailsInterruptions, ScreenStoryDetailsInfo, ScreenStoryCreate, ScreenTeamEdit, ScreenDeveloper
-//]
-
 export default class Router
 {
     static createInitialStack = (loggedIn) =>
@@ -177,7 +173,7 @@ export default class Router
     },
     {
       initialRouteName: SCREEN_NAME_STORY_BOARD_UNFINISHED,
-      tabBarOptions: getTabBarOptions()
+      tabBarOptions: getTabBarOptions(),
     });
   }
 
@@ -200,6 +196,18 @@ export default class Router
       tabBarOptions: getTabBarOptions()
     });
   }
+
+  static getCurrentRoute = (navigationState) =>
+  {
+    if (navigationState == undefined || navigationState.routes == undefined || navigationState.index == undefined) 
+    {   return navigationState;}
+
+    const route = navigationState.routes[navigationState.index];
+    if (route.routes) 
+    {   return getCurrentRoute(route);}
+
+    return route;
+  }
 }
 
 const getHamburgerIcon = () => (navigation) =>
@@ -207,9 +215,17 @@ const getHamburgerIcon = () => (navigation) =>
   return <Icon onPress={() => navigation.openDrawer()} name= "menu" color="white" underlayColor="transparent" />
 }
 
-const getBackIcon = () => (navigation) =>
+export const getBackIcon = (isForTabs) => (navigation) =>
 {
-  return <Icon onPress={() => navigation.goBack()} name= "arrow-back" color="white" underlayColor="transparent" />
+  const internal = () =>
+  {
+    const route = Router.getCurrentRoute(navigation.state);
+
+    if(route.params.onBackClicked == undefined || route.params.onBackClicked() == false)
+    {   navigation.goBack();}
+  }
+
+  return <Icon onPress={internal} name= "arrow-back" color="white" underlayColor="transparent" />
 }
 
 const getTabBarOptions = () =>
@@ -217,7 +233,7 @@ const getTabBarOptions = () =>
   return {
     tabStyle: {},
     indicatorStyle: {
-      backgroundColor: Theme.colors.accent
+      backgroundColor: Theme.colors.accent  
     },
     style: {
       backgroundColor: Theme.colors.primary
@@ -225,30 +241,38 @@ const getTabBarOptions = () =>
   }
 }
 
-const getNavigationOptions = (title, action, removeHeaderShadow) =>
+const getNavigationOptions = (title, action, hasTabs) =>
 {
     return  (props) =>
     {
       const navigation = props.navigation;
       var headerLeft = null;
+      var paddingLeft = 15;
       if (action)
-      {   headerLeft = action(navigation);}
+      {
+           headerLeft = action(navigation);
+           paddingLeft = 0;
+      }
 
       const options = {
         title: title,
         headerStyle: {
           backgroundColor: Theme.colors.primary,
         },
-        headerTitleStyle: {paddingLeft: 0, flex: 1},
+        headerTitleStyle: { flex: 1},
         headerTintColor: "white",
         headerLeft: headerLeft,
         headerLeftContainerStyle: {
           paddingLeft: 15
         },
+        headerTitleContainerStyle:
+        {
+          paddingLeft: paddingLeft
+        },
         headerTitle: <CustomHeaderTitle title={title} subtitle={navigation.getParam("subtitle")} navigation={navigation} />
       }
 
-      if(removeHeaderShadow)
+      if(hasTabs)
       {
         options.headerStyle.shadowOpacity =  0;
         options.headerStyle.shadowOffset = {height: 0, width: 0};
@@ -260,4 +284,3 @@ const getNavigationOptions = (title, action, removeHeaderShadow) =>
       return options;
     };
 }
-

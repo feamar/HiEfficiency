@@ -1,12 +1,11 @@
 import React, {Component} from "react";
 import {View, TouchableNativeFeedback} from "react-native";
-import { TouchableRipple, Text, Dimensions } from "react-native-paper";
+import { TouchableRipple, Text, Dimensions, FAB, Portal} from "react-native-paper";
 import * as Progress from 'react-native-progress';
 import Theme from "../../styles/Theme";
 import ListInterruptions from "../lists/instances/interruptions/ListInterruptions";
 import InterruptionType from "../../enums/InterruptionType";
 import {asDate } from "../util/DateUtil";
-import { FABGroup } from "react-native-paper";
 import BarActionButtons from "../bars/BarActionButtons";
 import Color from 'react-native-material-color';
 import ButtonSquare from "../bars/buttons/ButtonSquare";
@@ -15,7 +14,9 @@ import UtilityTime from "../../utilities/UtilityTime";
 import DialogInterruptionEdit from "../dialogs/interruptions/DialogInterruptionEdit";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import UtilityObject from "../../utilities/UtilityObject";
-
+import UtilityScreen from "../../utilities/UtilityScreen";
+import DialogConfirmation, {DIALOG_ACTION_POSITIVE, DIALOG_ACTION_NEGATIVE} from "../dialogs/instances/DialogConfirmation";
+import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
 
 const LIFECYCLE_LOADING = 0;
 const LIFECYCLE_UNSTARTED = 1;
@@ -84,7 +85,8 @@ const styles = {
     wrapper:
     {
         display: "flex",
-        flexGrow: 1
+        flexGrow: 1,
+        height: "100%"
     },
     fab:
     {
@@ -92,7 +94,7 @@ const styles = {
     }
 }    
 
-export default class ScreenStoryDetailsInterruptions extends Component
+class ScreenStoryDetailsInterruptions extends Component
 {
     static displayName = "Story Details Interruptions";
     static navigationOptions = ({navigation}) => 
@@ -124,7 +126,7 @@ export default class ScreenStoryDetailsInterruptions extends Component
             lifecycle: this.getLifecycleFromDocuments(this.story, this.interruptionsOfUser),
             sections: this.getSectionsFromDocuments(this.story, this.interruptionsOfUser),
             open: false,
-            shouldFabGroupRender: false
+            shouldFabGroupRender: true
         }
 
         this.props.navigation.setParams({ subtitle: this.story.data().name })
@@ -156,14 +158,14 @@ export default class ScreenStoryDetailsInterruptions extends Component
         })
     }
  
+    setFabVisibility = (visible) =>
+    {   this.setState({shouldFabGroupRender: visible});}
+
+    setLifecycleTo = (lifecycle) =>
+    {   this.setState({lifecycle: lifecycle});}  
+
     componentWillMount = () =>
     {
-        var unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.setState({shouldFabGroupRender: true})});
-        this.unsubscribers.push(unsubscriber);
-
-        unsubscriber = this.props.navigation.addListener('willBlur', (payload) => {this.setState({shouldFabGroupRender: false})});
-        this.unsubscribers.push(unsubscriber);
-
         unsubscriber = this.story.ref.onSnapshot(this.onStoryDocumentChanged);
         this.unsubscribers.push(unsubscriber);
 
@@ -190,12 +192,22 @@ export default class ScreenStoryDetailsInterruptions extends Component
 
     onStartIssue = () => 
     {   
-        this.story.ref.update({startedOn: new Date()});
-        this.setLifecycleTo(LIFECYCLE_UNINTERRUPTED);
-    }
+        if(this.confirmationDialog)
+        {
+            this.confirmationDialog.setTitle("Start Issue");
+            this.confirmationDialog.setMessage("Are you sure you want to start working on this issue?");
+            this.confirmationDialog.setActionTextPositive("Start");
+            this.confirmationDialog.setOnDialogActionPressedListener((action) => 
+            {
+                if(action != DIALOG_ACTION_POSITIVE)
+                {   return;}
 
-    setLifecycleTo = (lifecycle) =>
-    {   this.setState({lifecycle: lifecycle});}  
+                this.story.ref.update({startedOn: new Date()});
+                this.setLifecycleTo(LIFECYCLE_UNINTERRUPTED);
+            });
+            this.confirmationDialog.setVisible(true);
+        }
+    }
 
     addInterruption = (category, timestamp) => 
     {
@@ -257,24 +269,49 @@ export default class ScreenStoryDetailsInterruptions extends Component
         switch(action) 
         {
             case ACTION_FINISH_STORY:
-                const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-                if(interruptions.length > 0)
+
+                if(this.confirmationDialog)
                 {
-                    const last = interruptions[interruptions.length - 1];
-                    if(last.duration == undefined)
-                    {   last.duration = new Date().getTime() - last.timestamp;}
+                    this.confirmationDialog.setTitle("Finish Story");
+                    this.confirmationDialog.setMessage("Are you sure you want to finish this story?");
+                    this.confirmationDialog.setOnDialogActionPressedListener((action) => 
+                    {
+                        if(action != DIALOG_ACTION_POSITIVE)
+                        {   return; }
 
-                    this.interruptionsOfUser.ref.update({interruptions: interruptions});
+                        const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+                        if(interruptions.length > 0)
+                        {
+                            const last = interruptions[interruptions.length - 1];
+                            if(last.duration == undefined)
+                            {   last.duration = new Date().getTime() - last.timestamp;}
+        
+                            this.interruptionsOfUser.ref.update({interruptions: interruptions});
+                        }
+        
+                        this.story.ref.update({finishedOn: new Date()});
+        
+                        this.setLifecycleTo(LIFECYCLE_FINISHED);
+                    }); 
+                    this.confirmationDialog.setVisible(true);
                 }
-
-                this.story.ref.update({finishedOn: new Date()});
-
-                this.setLifecycleTo(LIFECYCLE_FINISHED);
                 break;
 
             case ACTION_REOPEN_STORY:
-                this.story.ref.update({finishedOn: null}); 
-                this.setLifecycleTo(this.getLifecycleFromDocuments(this.story));
+                if(this.confirmationDialog)
+                {
+                    this.confirmationDialog.setTitle("Reopen Story");
+                    this.confirmationDialog.setMessage("Are you sure you want to re-open this story?");
+                    this.confirmationDialog.setOnDialogActionPressedListener((action) => 
+                    {
+                        if(action != DIALOG_ACTION_POSITIVE)
+                        {   return;}
+
+                        this.story.ref.update({finishedOn: null}); 
+                        this.setLifecycleTo(this.getLifecycleFromDocuments(this.story));
+                    });
+                    this.confirmationDialog.setVisible(true);
+                }
                 break;
         }
     }
@@ -323,10 +360,6 @@ export default class ScreenStoryDetailsInterruptions extends Component
                     if(previous == undefined && this.story.data().startedOn != undefined)
                     {   previous = this.createInterruption(new Date(this.story.data().startedOn).getTime(), 0, undefined);}
 
-                    console.log("Next: " + JSON.stringify(next));
-                    console.log("Previous: " + JSON.stringify(previous));
-                    console.log("Item: " + JSON.stringify(item));
-
                     this.currentlyEditingInterruptionIndex = item.id;
                     this.dialogInterruptionEdit.onValueChange({type: item.type.dbId, start: item.timestamp, end: item.timestamp + item.duration, next: next, previous: previous});
                     this.dialogInterruptionEdit.setVisible(true);
@@ -352,7 +385,30 @@ export default class ScreenStoryDetailsInterruptions extends Component
     {   return <ListInterruptions style={styles.list} containerHasFab={true} sections={this.state.sections} onContextMenuItemSelected={this.onContextMenuItemSelected} />}
 
     getDialogComponent = () =>
-    {   return <DialogInterruptionEdit title="Edit Interruption" visible={false} onDialogSubmitted={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />}
+    {  
+         return (
+             <View>
+                <DialogInterruptionEdit title="Edit Interruption" visible={false} onDialogSubmitted={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
+                <DialogConfirmation ref={i => this.confirmationDialog = i}/>
+             </View>
+         );
+    }
+
+    getFabComponent = (icon, action, shouldHaveBottomMargin) =>
+    {
+        if(this.state.shouldFabGroupRender == false)
+        {   return null;}
+
+        var style = {};
+        if(shouldHaveBottomMargin)
+        {   
+            style = {
+                marginBottom: 56
+            }
+        }
+    
+        return <FAB.Group style={style} color="white" icon={icon} onPress={() => this.onFabMenuItemSelected(action)} open={false} actions={[]} onStateChange={(open) => {}} />
+    }
 
     render()
     {
@@ -368,6 +424,7 @@ export default class ScreenStoryDetailsInterruptions extends Component
             case LIFECYCLE_UNSTARTED:
                 return (
                     <View style={styles.unstarted.wrapper}>
+                        {this.getDialogComponent()}
                         <View style={styles.unstarted.backgroundWrapper}>
                             <TouchableRipple style={styles.unstarted.buttonStart} theme={Theme} onPress={this.onStartIssue} borderless={true}>
                                 <Text style={styles.unstarted.buttonText}>START</Text>
@@ -389,7 +446,7 @@ export default class ScreenStoryDetailsInterruptions extends Component
                                 })}
                             </BarActionButtons>
                         </View>
-                        {this.state.shouldFabGroupRender && <FABGroup style={styles.fab} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+                        {this.getFabComponent("done", ACTION_FINISH_STORY, true)}
                     </View>);
                 break;
 
@@ -404,7 +461,7 @@ export default class ScreenStoryDetailsInterruptions extends Component
                                 <ButtonSquare key={"resume"} iconName="play-arrow" iconColor="white" title="Resume Work" onPress={this.onResumeFromInterruption}/>
                             </BarActionButtons>
                         </View>
-                        {this.state.shouldFabGroupRender && <FABGroup style={styles.fab} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+                        {this.getFabComponent("done", ACTION_FINISH_STORY, true)}
                     </View>);
                 break;
  
@@ -413,7 +470,7 @@ export default class ScreenStoryDetailsInterruptions extends Component
                     <View style={styles.wrapper}>
                         {this.getListComponent()}
                         {this.getDialogComponent()}
-                        {this.state.shouldFabGroupRender && <FABGroup color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+                        {this.getFabComponent("lock-open", ACTION_REOPEN_STORY)}
                     </View>);
                 break;
 
@@ -456,11 +513,12 @@ export default class ScreenStoryDetailsInterruptions extends Component
         if(story.startedOn)
         {
             previousDate = asDate(new Date(story.startedOn));
-
+           
             const startItem = {
                 iconName: "location-on",
                 title: "Started",
-                timestamp: story.startedOn,
+                timestamp: story.startedOn.getTime(),
+                duration: 0,
                 id: -1
             }
             
@@ -479,7 +537,6 @@ export default class ScreenStoryDetailsInterruptions extends Component
             const type = InterruptionType.fromDatabaseId(interruption.category);
 
             const date = asDate(new Date(interruption.timestamp));
-            console.log("TIMESTAMP " + index + ": " + interruption.timestamp);
             const item = {
                 iconName: type.iconName,
                 title: type.title,
@@ -510,13 +567,12 @@ export default class ScreenStoryDetailsInterruptions extends Component
         //Add the productivity items in between the interruptions.
         for(var index = 0 ; index < sections.length ; index ++)
         {
-            if(sections[index].items.length == 0)
+            section = sections[index];
+            if(section.items.length == 0)
             {   continue;}
 
-            section = sections[index];
             var previousInterruption = section.items[0];
             var newItems = [previousInterruption];
-
             for(var inner = 1 ; inner < section.items.length; inner ++) 
             {
                 var currentInterruption = section.items[inner];
@@ -524,8 +580,7 @@ export default class ScreenStoryDetailsInterruptions extends Component
                 
                 var productive =  {
                     iconName: "build",  
-                    iconColor: "white",
-                    title: "Productive",
+                    iconColor: "transparent",
                     timestamp: productiveTimestamp,
                     id: index + "." + inner,
                     duration: currentInterruption.timestamp - productiveTimestamp
@@ -564,7 +619,19 @@ export default class ScreenStoryDetailsInterruptions extends Component
                 sections.push(section);
             }
             else
-            {   section.items.push(finishItem);}
+            {   
+                lastInterruption = section.items[section.items.length - 1];
+                const productiveTimestamp = lastInterruption.timestamp + lastInterruption.duration;
+                const productive =  {
+                    iconName: "build",  
+                    iconColor: "transparent",
+                    timestamp: productiveTimestamp,
+                    id: index + "." + inner,
+                    duration: story.finishedOn.getTime() - productiveTimestamp
+                };
+                section.items.push(productive);
+                section.items.push(finishItem);
+            }
         }
 
         var last = sections[sections.length - 1]
@@ -574,3 +641,6 @@ export default class ScreenStoryDetailsInterruptions extends Component
         return sections;
     }
 } 
+
+
+export default ScreenStoryDetailsInterruptions;

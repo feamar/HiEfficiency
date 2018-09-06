@@ -5,14 +5,15 @@ import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
 import {ACTION_DELETE_STORY, ACTION_INSPECT_STORY, ACTION_UPVOTE_STORY} from  "../lists/instances/stories/ListItemStory";
 import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE} from "../routing/Router";
-import {FABGroup} from "react-native-paper";
-import DialogConfirmation, { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
+import {FAB} from "react-native-paper";
+import DialogConfirmation, { DIALOG_ACTION_POSITIVE } from "../dialogs/instances/DialogConfirmation";
 import { MODE_CREATE } from "./ScreenStoryCreate";
 import * as Progress from 'react-native-progress';
 import Theme from "../../styles/Theme";
 import UtilityArray from "../../utilities/UtilityArray";
 import { Firebase } from "react-native-firebase";
 import UtilityScreen from "../../utilities/UtilityScreen";
+import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
 
 const styles = {
     loading: {
@@ -51,7 +52,8 @@ class ScreenStoryBoard extends Component
     {
       items: [],
       open: false, 
-      loading: true
+      loading: true,
+      shouldFabGroupRender: true
     } 
   }  
 
@@ -157,7 +159,7 @@ class ScreenStoryBoard extends Component
   {
     switch(action)
     {
-      case DIALOG_ACTION_OK:
+      case DIALOG_ACTION_POSITIVE:
         const document = await this.getStoryDocumentFromData(this.itemToDelete);
         document.ref.delete().then(() => 
         {   ToastAndroid.show("User story successfully deleted!", ToastAndroid.LONG);})
@@ -197,7 +199,7 @@ class ScreenStoryBoard extends Component
   render()   
   {
     return (
-      <View>
+      <View style={{height: "100%"}}>
           <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this user story?" onDialogActionPressed={this.onDialogActionPressed} />
           
           {this.state.loading && 
@@ -210,7 +212,7 @@ class ScreenStoryBoard extends Component
             <ListStories containerHasFab={true} items={this.filter(this.state.items)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
           }
 
-          {this.state.shouldFabGroupRender && this.state.loading == false && this.props.mode == ScreenStoryBoard.MODE_UNFINISHED && <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+          {this.state.shouldFabGroupRender && this.state.loading == false && this.props.mode == ScreenStoryBoard.MODE_UNFINISHED && <FAB.Group ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
       </View>
     );
   } 
@@ -236,4 +238,4 @@ class ScreenStoryBoard extends Component
   ;}
 }
 
-export default UtilityScreen.withFloatingActionButton(ScreenStoryBoard);
+export default ScreenStoryBoard;

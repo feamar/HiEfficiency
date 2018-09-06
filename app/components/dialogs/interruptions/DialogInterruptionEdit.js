@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View } from 'react-native';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paragraph, TextInput } from 'react-native-paper';
+import { Button, Paragraph, TextInput } from 'react-native-paper';
 import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from '../preferences/AbstractPreferenceDialog';
 import PropTypes from 'prop-types';

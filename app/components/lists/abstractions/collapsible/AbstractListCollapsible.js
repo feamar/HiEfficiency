@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {View, ScrollView} from "react-native";
-import {Divider,  ListAccordion } from "react-native-paper";
 import PropTypes from "prop-types";
 import AbstractListItemCollapsibleSection from "./AbstractListItemCollapsibleSection";
 

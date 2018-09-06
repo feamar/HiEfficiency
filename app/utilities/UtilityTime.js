@@ -47,6 +47,40 @@ export default class UtilityTime
         return result; 
     }
 
+    static millisecondsToLongDuration(milliseconds)
+    {
+        const days = Math.floor(milliseconds / 86400000);
+        milliseconds = milliseconds % 86400000;
+
+        const hours = Math.floor(milliseconds / 3600000);
+        milliseconds = milliseconds % 3600000;
+
+        const minutes = Math.floor(milliseconds / 60000);
+
+        if(days == 0 && hours == 0 && minutes == 0)
+        {   return "less than 1 minute.";}
+
+        var result = "";
+        if(days > 0)
+        {
+            result = days + " " +handlePlurality("day", "days", days) + " ";
+            if(hours > 0)
+            {   result +=  "and " + hours + " " + handlePlurality("hour", "hours", hours) + " ";}
+        }
+        else if(hours > 0)
+        {   
+            result =  hours + " " + handlePlurality("hour", "hours", hours) + " ";
+            if(minutes > 0)
+            {   result += "and " + minutes + handlePlurality("minute", "minutes", minutes) + ".";}  
+        }
+        else if(minutes > 0)
+        {   result = minutes + " " + handlePlurality("minute", "minutes", minutes) + ".";}
+        else
+        {   result = "less than 1 minute.";}
+
+        return result;
+    }
+
     static dateToString(date, options)  
     {
         if(date == false)
@@ -62,4 +96,12 @@ export default class UtilityTime
 
         return result;
     }
+}
+
+const handlePlurality = (singular, plural, value) =>
+{
+    if(value == 1)
+    {   return singular;}
+    else
+    {   return plural;}
 }

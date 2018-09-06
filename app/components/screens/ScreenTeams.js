@@ -7,11 +7,13 @@ import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
-import { FABGroup } from "react-native-paper";
+import { FAB } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
 import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_DELETE_TEAM, ACTION_EDIT_TEAM} from "../lists/instances/teams/ListItemTeam"; 
-import { DIALOG_ACTION_OK } from "../dialogs/instances/DialogConfirmation";
+import { DIALOG_ACTION_POSITIVE } from "../dialogs/instances/DialogConfirmation";
 import UtilityScreen from "../../utilities/UtilityScreen";
+import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
+
 const ACTION_JOIN_TEAM = "join_team";
 const ACTION_CREATE_TEAM = "create_team";
 
@@ -25,7 +27,8 @@ class ScreenTeams extends Component
     {
       user: null,
       teams: [],
-      open: false
+      open: false,
+      shouldFabGroupRender: true
     } 
 
     this.teamUnsubscribers = [];
@@ -229,7 +232,7 @@ class ScreenTeams extends Component
   {
     switch(action)
     {
-      case DIALOG_ACTION_OK:
+      case DIALOG_ACTION_POSITIVE:
         const item = this.currentlyLeavingTeam;
         var userTeams =  this.state.user.data().teams;
         var index = this.getIndexOfTeamById(userTeams, item.id);
@@ -251,12 +254,12 @@ class ScreenTeams extends Component
 
   render() {
     return (  
-      <View>  
+      <View style={{height: "100%"}}>  
         <ListTeams containerHasFab={true} items={this.state.teams} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogTeamJoin title="Join Team" ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
         <DialogTeamCreate title="Create Team" ref={instance => this.dialogCreateTeam = instance} visible={false} onDialogSubmitted={this.onCreateDialogSubmitted} />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />
-        {this.state.shouldFabGroupRender && <FABGroup ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
+        {this.state.shouldFabGroupRender && <FAB.Group ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
       </View>
     );
   }
@@ -286,4 +289,4 @@ class ScreenTeams extends Component
 }
 
 
-export default UtilityScreen.withFloatingActionButton(ScreenTeams)
+export default ScreenTeams;

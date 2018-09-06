@@ -69,31 +69,57 @@ export default class ListItemInterruption extends AbstractListItem
         if(this.state.item.duration == undefined)
         {   return undefined;}
 
-        return UtilityTime.millisecondsToHHMMSS(this.state.item.duration, ":");
+        //return UtilityTime.millisecondsToHHMMSS(this.state.item.duration, ":");
+        return UtilityTime.millisecondsToLongDuration(this.state.item.duration);
     } 
-
-    getDurationString = () =>
-    {
-        if(this.state.item.duration == undefined)
-        {   return null;}
-
-        return " for " + this.getDuration();
-    }
 
     getTimeOfDay = (timestamp) =>
     {  
         return asTime(new Date(timestamp));
     } 
 
+    getSubtitle = () =>
+    {
+        const durationString = this.getDuration();
+
+        if(this.isProductiveItem())
+        {   return "Time between: " + durationString;}
+        else if(durationString && !this.isStartItem() && ! this.isFinishItem())
+        {   return "At " + this.getTimeOfDay(this.state.item.timestamp) + " for " + durationString;}
+        else
+        {   return "At " + this.getTimeOfDay(this.state.item.timestamp);}
+    }
+
+    isStartItem = () => 
+    {   return this.state.item.title == "Started";}
+
+    isFinishItem = () =>
+    {   return this.state.item.title == "Finished";}
+
+    isProductiveItem = () =>
+    {   return this.state.item.iconColor == "transparent";}
+
+    getTextWrapperStyles = () =>
+    {
+        if(this.isProductiveItem() == false)
+        {   return styles.text.wrapper;}
+
+        var overridden = JSON.parse(JSON.stringify(styles.text.wrapper));
+        overridden.paddingTop = 6;
+        overridden.paddingBottom = 10;
+
+        return overridden;
+    }
+
     getItemContent = () =>
     { 
         //const data = this.state.item.data();
         return (
             <View style={styles.wrapper}>
-               <Icon style={styles.icon} size={30} name={this.state.item.iconName}/>
-               <View style={styles.text.wrapper}>
+               <Icon style={styles.icon} size={30} name={this.state.item.iconName} color={this.state.item.iconColor} />
+               <View style={this.getTextWrapperStyles()}>
                    <Text style={styles.text.title}>{this.state.item.title}</Text>
-                   <Text style={styles.text.subtitle}>At {this.getTimeOfDay(this.state.item.timestamp)}{this.getDurationString()}</Text>
+                   <Text style={styles.text.subtitle}>{this.getSubtitle()}</Text>
                </View>
             </View>
         );

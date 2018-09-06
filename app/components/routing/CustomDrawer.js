@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import { DrawerItems, SafeAreaView } from 'react-navigation';
+import { SafeAreaView } from 'react-navigation';
 import Theme from "../../styles/Theme";
 import { View, ScrollView, Image, PixelRatio} from "react-native";
 import {Text, TouchableRipple, Divider} from "react-native-paper";
@@ -108,5 +108,4 @@ export default class CustomDrawer extends Component
     }
 }
 
-//<DrawerItems activeTintColor={Theme.colors.primary} activeBackgroundColor={Theme.colors.selectedBackground} {...this.props} />
   

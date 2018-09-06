@@ -8,11 +8,14 @@ export default class UtilityObject
         if(object == undefined || object == null)
         {   return;}
 
+        if(indentation == undefined || indentation == null)
+        {   indentation = 0;}
+
         object = JSON.decycle(object);
 
         var whitespace = "";
         for(var i = 0 ; i < indentation ; i ++)
-        {   whitespace += " ";}
+        {   whitespace += "     ";}
 
         const keys = Object.keys(object);
         for(var i = 0 ; i < keys.length ; i ++)

@@ -5,7 +5,6 @@ import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import {
   Button,
   Card,
-  CardContent,
   TextInput,
   Title,
   Text
@@ -91,12 +90,12 @@ export default class ScreenLogin extends React.Component
           <View style={styles.header}>
             <Text style={styles.title}>Login</Text>
           </View> 
-          <CardContent>  
+          <Card.Content>  
             <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.handleInputChange("email")} />
             <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
-            <Button style={styles.buttons.login} dark raised primary variant="contained" onPress={this.handleLogin}>Login</Button>
+            <Button style={styles.buttons.login} dark mode="contained" onPress={this.handleLogin}>Login</Button>
             <Button style={styles.buttons.register} flat primary onPress={this.handleRegister}>Register</Button>
-          </CardContent>     
+          </Card.Content>     
         </Card> 
       </View>     
     );

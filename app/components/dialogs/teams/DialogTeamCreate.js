@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 
 import {View, ScrollView, ToastAndroid} from 'react-native';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Paragraph, TextInput } from 'react-native-paper';
+import { Button, Dialog, Paragraph, TextInput } from 'react-native-paper';
 import Theme from '../../../styles/Theme';
 import PropTypes from 'prop-types';
 import AbstractDialog from "../AbstractDialog";
@@ -79,10 +79,10 @@ export default class DialogTeamCreate extends AbstractDialog
     getDialogActions = () =>
     {
         return (
-            <DialogActions>
+            <Dialog.Actions>
                 <Button color={Theme.colors.primary} onPress={this.onCancel}>Cancel</Button>
                 <Button color={Theme.colors.primary} onPress={this.onSave}>Save</Button>
-            </DialogActions>
+            </Dialog.Actions>
         );
     }
 }
