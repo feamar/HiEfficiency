@@ -54,6 +54,7 @@ export default class InputDateTime extends Component
 
     getDisplayValue = (timestamp, mode) =>
     {
+        console.log("getDisplayValue: " + timestamp);
         const date = new Date(timestamp);
         switch(mode)
         {
@@ -86,7 +87,7 @@ InputDateTime.defaultProps ={
 
 
 InputDateTime.propTypes = {
-    timestamp: PropTypes.number.isRequired,
+    timestamp: PropTypes.any.isRequired,
     onSelected: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
     mode: PropTypes.string.isRequired

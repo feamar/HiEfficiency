@@ -21,6 +21,7 @@ export default class DialogTeamCreate extends AbstractDialog
 
         this.state =
         {
+            ...this.state, 
             fields:{
                 name: undefined,
                 code: undefined,

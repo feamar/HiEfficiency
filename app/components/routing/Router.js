@@ -101,7 +101,11 @@ export default class Router
         [STACK_NAME_PROFILE]:
         {
           screen: Router.createProfileRouter(),
-        }
+        },
+        //[SCREEN_NAME_DEVELOPER]:
+        //{
+        //  screen: ScreenDeveloper
+        //}
       },
       {
         initialRouteName: STACK_NAME_TEAMS,
@@ -193,7 +197,8 @@ export default class Router
     },
     {
       initialRouteName:SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS,
-      tabBarOptions: getTabBarOptions()
+      tabBarOptions: getTabBarOptions(),
+      backBehavior: "none"
     });
   }
 
@@ -221,7 +226,14 @@ export const getBackIcon = (isForTabs) => (navigation) =>
   {
     const route = Router.getCurrentRoute(navigation.state);
 
-    if(route.params.onBackClicked == undefined || route.params.onBackClicked() == false)
+    if(route.params.onBackClicked == undefined)
+    {
+        navigation.goBack();
+        return;
+    }
+
+    const handled = route.params.onBackClicked(); 
+    if(handled == false)
     {   navigation.goBack();}
   }
 

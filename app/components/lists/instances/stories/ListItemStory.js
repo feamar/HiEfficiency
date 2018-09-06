@@ -6,6 +6,7 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-m
 import AbstractListItem from "../../abstractions/list/AbstractListItem";
 import Theme from "../../../../styles/Theme"
 import StoryType from "../../../../enums/StoryType";
+import ActionType from "../../../../enums/ActionType";
 
 const styles = {
     wrapper:{
@@ -27,10 +28,6 @@ const styles = {
         color: Theme.colors.typography.subtitle
     }
 }
- 
-export const ACTION_UPVOTE_STORY = "upvote";
-export const ACTION_INSPECT_STORY = "inspect";
-export const ACTION_DELETE_STORY = "delete";
 
 export default class ListItemTeam extends AbstractListItem
 {
@@ -38,22 +35,16 @@ export default class ListItemTeam extends AbstractListItem
     {
         super(props);
 
-        if(this.state.item.finishedOn == undefined)
-        {   
-            this.addContextMenuItem("Upvote", ACTION_UPVOTE_STORY);
-        }
-        this.addContextMenuItem("Inspect", ACTION_INSPECT_STORY);
-        this.addContextMenuItem("Delete", ACTION_DELETE_STORY);
-    }
+        if(this.props.item.finishedOn == undefined)
+        {   this.addContextMenuItem("Upvote", ActionType.UPVOTE);}
 
-    componentWillReceiveProps = (props) => 
-    {
-        this.setState({item: props.item, index: props.index});
-    }  
+        this.addContextMenuItem("Inspect", ActionType.INSPECT);
+        this.addContextMenuItem("Delete", ActionType.DELETE);
+    }
 
     getItemIndicatorStyle = () =>
     {
-        const type = StoryType.fromId(this.props.item.type);
+        const type = StoryType.fromId(this.state.item.type);
         var color = "#ADADAD";
         if(type)
         {   color = type.color;}
@@ -70,8 +61,7 @@ export default class ListItemTeam extends AbstractListItem
 
     getItemContent = () =>
     {
-        const data = this.state.item;
-        const type = StoryType.fromId(data.type);
+        const type = StoryType.fromId(this.state.item.type);
         var typeName = "Unknown";
         if(type)
         {   typeName = type.name;}
@@ -80,8 +70,8 @@ export default class ListItemTeam extends AbstractListItem
             <View style={styles.wrapper}>
                 <View style={this.getItemIndicatorStyle()} />
                 <View style={styles.contentWrapper}>
-                    <Text style={styles.storyName}>{data.name}</Text>
-                    <Text style={styles.storyUpvotes}>{typeName}: {data.upvotes} votes</Text>
+                    <Text style={styles.storyName}>{this.state.item.name}</Text>
+                    <Text style={styles.storyUpvotes}>{typeName}: {this.state.item.upvotes} votes</Text>
                 </View>
             </View>
         );

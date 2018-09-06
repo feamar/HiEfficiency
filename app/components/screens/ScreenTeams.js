@@ -9,13 +9,12 @@ import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FAB } from "react-native-paper";
 import { NavigationEvents } from 'react-navigation';
-import {ACTION_LEAVE_TEAM, ACTION_INSPECT_TEAM, ACTION_DELETE_TEAM, ACTION_EDIT_TEAM} from "../lists/instances/teams/ListItemTeam"; 
-import { DIALOG_ACTION_POSITIVE } from "../dialogs/instances/DialogConfirmation";
 import UtilityScreen from "../../utilities/UtilityScreen";
 import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
-
-const ACTION_JOIN_TEAM = "join_team";
-const ACTION_CREATE_TEAM = "create_team";
+import ActionType from "../../enums/ActionType";
+import { Item } from "native-base";
+import ListItemTeam from "../lists/instances/teams/ListItemTeam";
+import AbstractList from "../lists/abstractions/list/AbstractList";
 
 class ScreenTeams extends Component
 {
@@ -81,9 +80,6 @@ class ScreenTeams extends Component
       return;
     }
 
-    //document.ref.update({teams: []});
-    //return;
-
     const teamsCollection = FirebaseAdapter.getTeams();
     this.setState({ user: document});
 
@@ -128,13 +124,13 @@ class ScreenTeams extends Component
 
 
   onItemSelected = (item, index) => 
-  {   this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item });}
+  {   this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item});}
 
   onContextMenuItemSelected = (item, index, action) =>
   {
     switch (action) 
     {
-      case ACTION_LEAVE_TEAM:
+      case ActionType.LEAVE:
         if(this.dialogConfirmLeave)
         {
           this.currentlyLeavingTeam = item; 
@@ -142,11 +138,11 @@ class ScreenTeams extends Component
         }
         break;
  
-      case ACTION_INSPECT_TEAM:
+      case ActionType.INSPECT:
         this.onItemSelected(item, index);
         break;
  
-      case ACTION_DELETE_TEAM:
+      case ActionType.DELETE:
         item.ref.delete().then(() => 
         {
             ToastAndroid.show("Team successfully deleted!", ToastAndroid.LONG);
@@ -157,7 +153,7 @@ class ScreenTeams extends Component
         });
         break;
 
-      case ACTION_EDIT_TEAM:
+      case ActionType.EDIT:
         this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT, {team: item});
         break;
     } 
@@ -167,12 +163,12 @@ class ScreenTeams extends Component
   {
     switch(action)
     {
-      case ACTION_JOIN_TEAM:
+      case ActionType.JOIN:
         if(this.dialogJoinTeam)
         {   this.dialogJoinTeam.setVisible(true);}
         break;
 
-      case ACTION_CREATE_TEAM:
+      case ActionType.CREATE:
         if(this.dialogCreateTeam)
         {   this.dialogCreateTeam.setVisible(true);}
         break;
@@ -232,7 +228,7 @@ class ScreenTeams extends Component
   {
     switch(action)
     {
-      case DIALOG_ACTION_POSITIVE:
+      case ActionType.POSITIVE:
         const item = this.currentlyLeavingTeam;
         var userTeams =  this.state.user.data().teams;
         var index = this.getIndexOfTeamById(userTeams, item.id);
@@ -269,8 +265,8 @@ class ScreenTeams extends Component
   getFabGroupActions = () => 
   {
     var actions = [];
-    actions.push({ icon: "add", label: "Create Team", onPress: () => this.onFabMenuItemSelected(ACTION_CREATE_TEAM) })
-    actions.push({ icon: "device-hub", label: "Join Team", onPress: () => {this.onFabMenuItemSelected(ACTION_JOIN_TEAM)} })
+    actions.push({ icon: "add", label: "Create Team", onPress: () => this.onFabMenuItemSelected(ActionType.CREATE) })
+    actions.push({ icon: "device-hub", label: "Join Team", onPress: () => {this.onFabMenuItemSelected(ActionType.JOIN)} })
 
     return actions;
   }

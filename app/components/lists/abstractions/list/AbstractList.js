@@ -2,6 +2,8 @@ import React, {Component} from "react";
 import {View, ScrollView} from "react-native";
 
 import PropTypes from "prop-types";
+import { Item } from "native-base";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 const styles = {
     scrollView:
@@ -11,14 +13,31 @@ const styles = {
 
 export default class AbstractList extends Component
 {
+    constructor(props) 
+    {
+        super(props)
+        {
+            this.state = {
+                items: this.props.items,
+                containerHasFab: this.props.containerHasFab
+            }
+        }
+    }
+
+    componentWillReceiveProps(props) 
+    {
+        console.log("CWRP in AbstractList: props:");
+        this.setState({items: props.items, containerHasFab: props.containerHasFab});
+    }
+
     render() 
     {
         return(
             <ScrollView style={styles.scrollView}> 
-                {this.props.items.map((item, index) => {
+                {this.state.items.map((item, index) => {
                     return this.getListItemFor(item, index);
                 })}
-                {this.props.containerHasFab && <View style={{height:88}}></View>}
+                {this.state.containerHasFab && <View style={{height:88}}></View>}
             </ScrollView>  
         ); 
     }    

@@ -9,6 +9,7 @@ import UtilityTime from '../../../utilities/UtilityTime';
 import { Dropdown } from 'react-native-material-dropdown';
 import InterruptionType from '../../../enums/InterruptionType';
 import InputDateTimeSeparate from "../../inputs/InputDateTimeSeparate";
+import UtilityObject from '../../../utilities/UtilityObject';
 
 const styles = {
     error:{
@@ -95,9 +96,9 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
         if(storageValue.end < storageValue.start)
         {   error = "The end of the interruption cannot be before the start of the interruption.";}
 
-        if(storageValue.previous && storageValue.start < (storageValue.previous.timestamp + storageValue.previous.duration))
+        if(storageValue.previous && storageValue.start.getTime() < (storageValue.previous.timestamp.getTime() + storageValue.previous.duration))
         {   
-            const date = new Date(storageValue.previous.timestamp + storageValue.previous.duration);
+            const date = new Date(storageValue.previous.timestamp.getTime() + storageValue.previous.duration);
             const previousTime = "on " + UtilityTime.dateToString(date) + " at " + UtilityTime.dateToHHMM(date);
             error = "The start of the interruption cannot be before the end of the previous interruption in line (" + previousTime + ").";
         }
@@ -109,6 +110,11 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
             error = "The end of the interruption cannot be after the start of the next interruption in line (" + nextTime + ").";
         }
 
+        UtilityObject.inspect({
+            error: error, 
+            storageValue: storageValue
+        });
+
         return error;
     }
  
@@ -117,7 +123,10 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
     getTypeDisplayValue = (storageValue) =>
     {
-        const type = InterruptionType.fromDatabaseId(storageValue);
+        var type = InterruptionType.fromDatabaseId(storageValue);
+        if(type == InterruptionType.None)
+        {   type = InterruptionType.Values[0];}
+        
         return type.title;
     }
 

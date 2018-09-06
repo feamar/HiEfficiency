@@ -8,6 +8,7 @@ import {Text} from "react-native-paper";
 
 const styles = {
     error:{
+        marginTop: 10,
         fontWeight: "bold",
         color: "red",
         opacity: 0.75

@@ -5,6 +5,7 @@ import Icon  from "react-native-vector-icons/MaterialIcons";
 import {Text, TouchableRipple} from "react-native-paper"
 import { Divider } from "react-native-paper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 const styles = {
     listItem:{ 
@@ -33,21 +34,29 @@ export default class AbstractListItem extends Component
     {
         super(props);
 
+        //console.log("Constructor props: " + UtilityObject.stringify(this.props));
         this.state = {
             item: this.props.item,
             index: this.props.index,
             actions: []
         }
-
-        
     }
 
     componentWillReceiveProps = (props) =>
-    {
+    {   
+        console.log("ComponentWillReceiveProps");
+        //console.log("componentWillReceiveProps: " + UtilityObject.stringify(props));
         if(this.onComponentWillReceiveProps)
-        {   this.onComponentWillReceiveProps(props);}
+        {
+            //console.log("onComponentWillReceiveProps");
+            this.onComponentWillReceiveProps(props);
+        }
 
-        this.setState({item: props.item, index: props.index});
+        if(props.item != undefined)
+        {   this.setState({item: props.item});}
+
+        if(props.index != undefined)
+        {   this.setState({index: props.index});}
     }
 
     onListItemSelected = () => () =>
@@ -122,7 +131,7 @@ export default class AbstractListItem extends Component
 }
 
 AbstractListItem.propTypes = {
-    item: PropTypes.object.isRequired,
+    item: PropTypes.any.isRequired,
     index: PropTypes.number.isRequired,
     onItemSelected: PropTypes.func,
     onContextMenuItemSelected: PropTypes.func

@@ -22,42 +22,54 @@ const styles = {
    }
 }
 
+const TIME_IS_LEADING = 0;
+const DATE_IS_LEADING = 1;
+
 export default class InputDateTimeSeparate extends Component
 {
     constructor(props)
     {
         super(props);
 
+        console.log("INPUT DATE: " + this.props.timestamp);
+
+        if(this.props.timestamp == undefined)
+        {   this.props.timestamp = new Date();}
+
         this.state = {
-            date: this.getDateComponentFrom(this.props.timestamp),
-            time: this.getTimeComponentFrom(this.props.timestamp)
+            time: this.props.timestamp,
+            timeComponent: this.getTimeComponentFrom(this.props.timestamp),
+            date: this.props.timestamp,
+            dateComponent: this.getDateComponentFrom(this.props.timestamp)
         }
     }
 
     onDateSelected = (timestamp) =>
     {
-        const dateComponent = this.getDateComponentFrom(timestamp.getTime());
-        this.setState({date: dateComponent}, () => 
+        const dateComponent = this.getDateComponentFrom(timestamp);
+        this.setState({date: timestamp, dateComponent: dateComponent}, () => 
         {
             if(this.props.onSelected)
-            {   this.props.onSelected(this.state.date + this.state.time)};
+            {   this.props.onSelected(new Date(this.state.dateComponent + this.state.timeComponent))};
         });
     }
 
     onTimeSelected = (timestamp) => 
     {
-        const timeComponent = this.getTimeComponentFrom(timestamp.getTime());
+        console.log("Separate Time: " + timestamp);
+        const timeComponent = this.getTimeComponentFrom(timestamp);
+        console.log("TIme component: " + timeComponent);
 
-        this.setState({time: timeComponent}, () => 
+        this.setState({time: timestamp, timeComponent: timeComponent}, () => 
         {
             if(this.props.onSelected)
-            {   this.props.onSelected(this.state.date + this.state.time)};
+            {   this.props.onSelected(new Date(this.state.dateComponent + this.state.timeComponent))};
         });
     }
 
     getDateComponentFrom = (timestamp) =>
     {
-        const ms = timestamp;
+        const ms = timestamp.getTime();
         const remainder = ms % 86400000;
 
         return ms - remainder;
@@ -65,7 +77,7 @@ export default class InputDateTimeSeparate extends Component
 
     getTimeComponentFrom = (timestamp) =>
     {
-        const ms = timestamp;
+        const ms = timestamp.getTime();
         const remainder = ms % 86400000;
 
         return remainder;
@@ -88,7 +100,7 @@ InputDateTimeSeparate.defaultProps ={
 }
 
 InputDateTimeSeparate.propTypes = {
-    timestamp: PropTypes.number.isRequired,
+    timestamp: PropTypes.any,
     onSelected: PropTypes.func.isRequired,
     disabled: PropTypes.bool
 }

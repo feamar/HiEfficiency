@@ -7,10 +7,11 @@ import PreferenceDateTime from '../preferences/fields/PreferenceDateTime';
 import UtilityScreen from '../../utilities/UtilityScreen';
 import {getBackIcon} from "../routing/Router";
 import UtilityObject from '../../utilities/UtilityObject';
-import DialogConfirmation, { DIALOG_ACTION_POSITIVE } from '../dialogs/instances/DialogConfirmation';
+import DialogConfirmation from '../dialogs/instances/DialogConfirmation';
 import {compose} from "redux";
 import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
 import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
+import ActionType from '../../enums/ActionType';
 
 class ScreenTeamEdit extends Component
 {
@@ -60,7 +61,7 @@ class ScreenTeamEdit extends Component
     {
         switch(action) 
         {
-            case DIALOG_ACTION_POSITIVE:
+            case ActionType.POSITIVE:
             this.props.navigation.goBack();
             break;
         }

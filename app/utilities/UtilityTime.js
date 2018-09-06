@@ -21,10 +21,26 @@ export default class UtilityTime
         return hourString + separator + minuteString + separator + secondString;
     }
 
+    static dateToMilliseconds = (date, accountForTimezone) =>
+    {
+        var result;
+        if(date == undefined)
+        {   result = new date().getTime();}
+        else
+        {   result = date.getTime();}
+
+        if(accountForTimezone)
+        {   result += date.getTimezoneOffset() * 60 * 1000;}
+
+        return result;
+    }
+
     static dateToHHMM(date) 
     {
+        //date.setTime(date.getTime() + (date.getTimezoneOffset() * 60 * 1000));
         var hours = date.getHours();
         var minutes = date.getMinutes();
+        
 
         if (hours < 10) { hours = "0" + hours; }
 
@@ -71,7 +87,7 @@ export default class UtilityTime
         {   
             result =  hours + " " + handlePlurality("hour", "hours", hours) + " ";
             if(minutes > 0)
-            {   result += "and " + minutes + handlePlurality("minute", "minutes", minutes) + ".";}  
+            {   result += "and " + minutes + " " + handlePlurality("minute", "minutes", minutes) + ".";}  
         }
         else if(minutes > 0)
         {   result = minutes + " " + handlePlurality("minute", "minutes", minutes) + ".";}

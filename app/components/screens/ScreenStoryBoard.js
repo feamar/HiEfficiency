@@ -3,10 +3,9 @@ import {View, ToastAndroid, Keyboard} from "react-native";
 import PropTypes from "prop-types";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
-import {ACTION_DELETE_STORY, ACTION_INSPECT_STORY, ACTION_UPVOTE_STORY} from  "../lists/instances/stories/ListItemStory";
 import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE} from "../routing/Router";
 import {FAB} from "react-native-paper";
-import DialogConfirmation, { DIALOG_ACTION_POSITIVE } from "../dialogs/instances/DialogConfirmation";
+import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import { MODE_CREATE } from "./ScreenStoryCreate";
 import * as Progress from 'react-native-progress';
 import Theme from "../../styles/Theme";
@@ -14,6 +13,10 @@ import UtilityArray from "../../utilities/UtilityArray";
 import { Firebase } from "react-native-firebase";
 import UtilityScreen from "../../utilities/UtilityScreen";
 import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
+import ActionType from "../../enums/ActionType";
+import ListItemStory from "../lists/instances/stories/ListItemStory";
+import AbstractList from "../lists/abstractions/list/AbstractList";
+import UtilityObject from "../../utilities/UtilityObject";
 
 const styles = {
     loading: {
@@ -30,9 +33,6 @@ const styles = {
       }
   },
 };
-
-const ACTION_CREATE_STORY = "create_story";
-const ACTION_SCAFFOLD_STORY = "create_story_dev";
 
 class ScreenStoryBoard extends Component
 {
@@ -99,7 +99,7 @@ class ScreenStoryBoard extends Component
         } 
       } 
       
-      this.setState({items: this.getItemsFromStories(this.stories), loading: false});
+      this.setState({items: this.filter(this.getItemsFromStories(this.stories)), loading: false});
   }
 
   componentWillUnmount = () => 
@@ -112,7 +112,7 @@ class ScreenStoryBoard extends Component
   {
     switch(action)
     {
-      case ACTION_DELETE_STORY:
+      case ActionType.DELETE:
         if(this.dialogConfirmDelete)
         {
           this.itemToDelete = item;
@@ -120,11 +120,11 @@ class ScreenStoryBoard extends Component
         }
         break;
 
-      case ACTION_INSPECT_STORY:
+      case ActionType.INSPECT:
         this.onItemSelected(item, index);
         break; 
 
-      case ACTION_UPVOTE_STORY:
+      case ActionType.UPVOTE:
         const document = await this.getStoryDocumentFromData(item);
         const data = document.data();
         data.upvotes += 1;
@@ -137,11 +137,11 @@ class ScreenStoryBoard extends Component
   {
     switch(action)
     {
-      case ACTION_CREATE_STORY:
+      case ActionType.CREATE:
         this.props.navigation.navigate(SCREEN_NAME_STORY_CREATE, {team: this.team});
         break;
 
-      case ACTION_SCAFFOLD_STORY:
+      case ActionType.SCAFFOLD:
         const story = {
           description: "Automatically scaffolded story for development purposes. This can be deleted in the production database if encounterd.",
           finishedOn: undefined,
@@ -159,7 +159,7 @@ class ScreenStoryBoard extends Component
   {
     switch(action)
     {
-      case DIALOG_ACTION_POSITIVE:
+      case ActionType.POSITIVE:
         const document = await this.getStoryDocumentFromData(this.itemToDelete);
         document.ref.delete().then(() => 
         {   ToastAndroid.show("User story successfully deleted!", ToastAndroid.LONG);})
@@ -172,10 +172,10 @@ class ScreenStoryBoard extends Component
   getFabGroupActions = () =>
   {
     var actions = [];
-    actions.push({ icon: "add", label: "Create Story", onPress: () => this.onFabMenuItemSelected(ACTION_CREATE_STORY) })
+    actions.push({ icon: "add", label: "Create Story", onPress: () => this.onFabMenuItemSelected(ActionType.CREATE) })
 
     if(__DEV__)
-    {   actions.push({icon: "add", label: "(Development) Scaffold Story", onPress: () => this.onFabMenuItemSelected(ACTION_SCAFFOLD_STORY)});}
+    {   actions.push({icon: "add", label: "(Development) Scaffold Story", onPress: () => this.onFabMenuItemSelected(ActionType.SCAFFOLD)});}
 
     return actions;
   }
@@ -209,7 +209,7 @@ class ScreenStoryBoard extends Component
           }
 
           {this.state.loading  == false && 
-            <ListStories containerHasFab={true} items={this.filter(this.state.items)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+            <ListStories containerHasFab={true} items={this.state.items} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
           }
 
           {this.state.shouldFabGroupRender && this.state.loading == false && this.props.mode == ScreenStoryBoard.MODE_UNFINISHED && <FAB.Group ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}

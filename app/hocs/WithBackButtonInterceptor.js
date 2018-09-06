@@ -35,7 +35,7 @@ export default withBackButtonInterceptor = (WrappedComponent) =>
             console.log("withBackButtonInterceptor - onHardwareBackPress");
 
             const results = this.callForEachListener("onHardwareBackPress");
-            return results.some(e => e == true);
+            return results.some(e => e == true); 
         }
         
         render()

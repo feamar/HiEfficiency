@@ -6,6 +6,7 @@ import Theme from '../../../styles/Theme';
 import PropTypes from 'prop-types';
 import AbstractDialog from "../AbstractDialog";
 import {Text} from "react-native-paper";
+import ActionType from "../../../enums/ActionType";
 
 const styles ={
     message:{
@@ -14,9 +15,6 @@ const styles ={
         paddingBottom: 10
     }
 }
-
-export const DIALOG_ACTION_NEGATIVE = 0;
-export const DIALOG_ACTION_POSITIVE = 1;
 
 export default class DialogConfirmation extends AbstractDialog
 {
@@ -69,8 +67,8 @@ export default class DialogConfirmation extends AbstractDialog
     {
         return (
             <Dialog.Actions>
-                <Button color={Theme.colors.primary} onPress={this.onActionPressed(DIALOG_ACTION_NEGATIVE)}>{this.state.textNegative}</Button> 
-                <Button color={Theme.colors.primary} onPress={this.onActionPressed(DIALOG_ACTION_POSITIVE)}>{this.state.textPositive}</Button>
+                <Button color={Theme.colors.primary} onPress={this.onActionPressed(ActionType.NEGATIVE)}>{this.state.textNegative}</Button> 
+                <Button color={Theme.colors.primary} onPress={this.onActionPressed(ActionType.POSITIVE)}>{this.state.textPositive}</Button>
             </Dialog.Actions>
         );
     }

@@ -1,12 +1,15 @@
 export default class UtilityObject 
 {
     static stringify = (object) =>
-    {   console.log(JSON.stringify(JSON.decycle(object)));}
+    {   return JSON.stringify(JSON.decycle(object));}
 
     static inspect = (object, indentation) =>
     {
         if(object == undefined || object == null)
-        {   return;}
+        {   
+            console.log("Inspection cannot happen on undefined or null object.");
+            return;
+        }
 
         if(indentation == undefined || indentation == null)
         {   indentation = 0;}
@@ -23,7 +26,11 @@ export default class UtilityObject
             const key = keys[i];
             const value = object[key];
 
-            if(typeof value === 'object')
+            if(value instanceof Date)
+            {
+                console.log(whitespace + "date " + key + ": " + value);
+            }
+            else if(typeof value === 'object')
             {
                 console.log(whitespace + "object " + key + ":");
                 UtilityObject.inspect(value, indentation + 1);

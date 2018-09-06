@@ -1,31 +1,31 @@
 import React, {Component} from "react";
-import {View, TouchableNativeFeedback} from "react-native";
-import { TouchableRipple, Text, Dimensions, FAB, Portal} from "react-native-paper";
+import {View} from "react-native";
+import { TouchableRipple, Text, FAB} from "react-native-paper";
 import * as Progress from 'react-native-progress';
 import Theme from "../../styles/Theme";
 import ListInterruptions from "../lists/instances/interruptions/ListInterruptions";
 import InterruptionType from "../../enums/InterruptionType";
 import {asDate } from "../util/DateUtil";
 import BarActionButtons from "../bars/BarActionButtons";
-import Color from 'react-native-material-color';
 import ButtonSquare from "../bars/buttons/ButtonSquare";
-import { ACTION_DELETE_INTERRUPTION, ACTION_EDIT_INTERRUPTION } from "../lists/instances/interruptions/ListItemInterruption";
-import UtilityTime from "../../utilities/UtilityTime";
 import DialogInterruptionEdit from "../dialogs/interruptions/DialogInterruptionEdit";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
+import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
+import { MODE_DATETIME_SEPARATE } from "../dialogs/preferences/DialogPreferenceDateTime";
+import ActionType from "../../enums/ActionType";
+import ListItemStart from "../lists/instances/interruptions/ListItemStart";
+import ListItemInterruption from "../lists/instances/interruptions/ListItemInterruption";
+import ListItemProductive from "../lists/instances/interruptions/ListItemProductive";
+import ListItemFinish from "../lists/instances/interruptions/ListItemFinish";
+import DialogPreferenceDateTime from "../dialogs/preferences/DialogPreferenceDateTime";
 import UtilityObject from "../../utilities/UtilityObject";
-import UtilityScreen from "../../utilities/UtilityScreen";
-import DialogConfirmation, {DIALOG_ACTION_POSITIVE, DIALOG_ACTION_NEGATIVE} from "../dialogs/instances/DialogConfirmation";
-import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
+import UtilityTime from "../../utilities/UtilityTime";
 
 const LIFECYCLE_LOADING = 0;
 const LIFECYCLE_UNSTARTED = 1;
 const LIFECYCLE_UNINTERRUPTED = 2;
 const LIFECYCLE_INTERRUPTED = 3;
 const LIFECYCLE_FINISHED = 4;
-
-const ACTION_FINISH_STORY = 0;
-const ACTION_REOPEN_STORY = 1;
 
 const styles = {
     loading: {
@@ -123,7 +123,7 @@ class ScreenStoryDetailsInterruptions extends Component
 
         this.state = 
         {
-            lifecycle: this.getLifecycleFromDocuments(this.story, this.interruptionsOfUser),
+            lifecycle: LIFECYCLE_LOADING,
             sections: this.getSectionsFromDocuments(this.story, this.interruptionsOfUser),
             open: false,
             shouldFabGroupRender: true
@@ -199,7 +199,7 @@ class ScreenStoryDetailsInterruptions extends Component
             this.confirmationDialog.setActionTextPositive("Start");
             this.confirmationDialog.setOnDialogActionPressedListener((action) => 
             {
-                if(action != DIALOG_ACTION_POSITIVE)
+                if(action != ActionType.POSITIVE)
                 {   return;}
 
                 this.story.ref.update({startedOn: new Date()});
@@ -212,7 +212,7 @@ class ScreenStoryDetailsInterruptions extends Component
     addInterruption = (category, timestamp) => 
     {
         if(timestamp == undefined)
-        {   timestamp = new Date().getTime();}
+        {   timestamp = new Date();}
 
         const interruption = this.createInterruption(timestamp, undefined, category.dbId);
         const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
@@ -245,6 +245,24 @@ class ScreenStoryDetailsInterruptions extends Component
         return data.interruptions;
     }
 
+    getFirstInterruption = (document) =>
+    {
+        const interruptions = this.getInterruptionsFromDocument(document);
+        if(interruptions.length == 0)
+        {   return undefined;}
+
+        return interruptions[0];
+    }
+
+    getLastInterruption = (document) =>
+    {
+        const interruptions = this.getInterruptionsFromDocument(document);
+        if(interruptions.length == 0)
+        {   return undefined;}
+
+        return interruptions[interruptions.length - 1];
+    }
+
     getFabGroupActions = () =>
     {
       var actions = [];
@@ -253,11 +271,11 @@ class ScreenStoryDetailsInterruptions extends Component
       {
           case LIFECYCLE_UNINTERRUPTED:
           case LIFECYCLE_INTERRUPTED:
-            actions.push({ icon: "done", label: "Finish Story",  onPress: () => this.onFabMenuItemSelected(ACTION_FINISH_STORY) });
+            actions.push({ icon: "done", label: "Finish Story",  onPress: () => this.onFabMenuItemSelected(ActionType.FINISH) });
             break;
 
         case LIFECYCLE_FINISHED:
-            actions.push({ icon: "lock-open", label: "Reopen Story", onPress: () => this.onFabMenuItemSelected(ACTION_REOPEN_STORY)});
+            actions.push({ icon: "lock-open", label: "Reopen Story", onPress: () => this.onFabMenuItemSelected(ActionType.REOPEN)});
             break;
       }
   
@@ -268,7 +286,7 @@ class ScreenStoryDetailsInterruptions extends Component
     {
         switch(action) 
         {
-            case ACTION_FINISH_STORY:
+            case ActionType.FINISH:
 
                 if(this.confirmationDialog)
                 {
@@ -276,7 +294,7 @@ class ScreenStoryDetailsInterruptions extends Component
                     this.confirmationDialog.setMessage("Are you sure you want to finish this story?");
                     this.confirmationDialog.setOnDialogActionPressedListener((action) => 
                     {
-                        if(action != DIALOG_ACTION_POSITIVE)
+                        if(action != ActionType.POSITIVE)
                         {   return; }
 
                         const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
@@ -284,7 +302,7 @@ class ScreenStoryDetailsInterruptions extends Component
                         {
                             const last = interruptions[interruptions.length - 1];
                             if(last.duration == undefined)
-                            {   last.duration = new Date().getTime() - last.timestamp;}
+                            {   last.duration = new Date().getTime() - last.timestamp.getTime();}
         
                             this.interruptionsOfUser.ref.update({interruptions: interruptions});
                         }
@@ -297,14 +315,14 @@ class ScreenStoryDetailsInterruptions extends Component
                 }
                 break;
 
-            case ACTION_REOPEN_STORY:
+            case ActionType.REOPEN:
                 if(this.confirmationDialog)
                 {
                     this.confirmationDialog.setTitle("Reopen Story");
                     this.confirmationDialog.setMessage("Are you sure you want to re-open this story?");
                     this.confirmationDialog.setOnDialogActionPressedListener((action) => 
                     {
-                        if(action != DIALOG_ACTION_POSITIVE)
+                        if(action != ActionType.POSITIVE)
                         {   return;}
 
                         this.story.ref.update({finishedOn: null}); 
@@ -328,45 +346,120 @@ class ScreenStoryDetailsInterruptions extends Component
         {
             const last = interruptions[interruptions.length - 1];
             if(last.duration == undefined)
-            {   last.duration = new Date().getTime() - last.timestamp;}
+            {   last.duration = new Date().getTime() - last.timestamp.getTime();}
         }
 
         this.interruptionsOfUser.ref.update({interruptions: interruptions});
     }
 
+    validateTimeStarted = (storageValue) =>
+    {
+        const first = this.getFirstInterruption(this.interruptionsOfUser);
+        if(first)
+        {   
+            if(storageValue > first.timestamp)
+            {return "The start time of a story can not be after the start time of the first interruption.";}
+        }
+        else 
+        {   
+            const finishedOn =this.story.data().finishedOn;
+            if(finishedOn != undefined && storageValue > finishedOn)
+            {   return "The start time of a story can not be after the finish time of the story.";}           
+        }
+    }
+    
+    validateTimeFinished = (storageValue) =>
+    {
+        console.log("Storage Value: " + storageValue + " AND las")
+        const last = this.getLastInterruption(this.interruptionsOfUser);
+        if(last)
+        {   
+            if(storageValue < last.timestamp)
+            {   return "The finish time of an story can not be before the end time of the previous interruption.";}
+        }
+        else if(storageValue < this.story.data().startedOn)
+        {   return "The finish time of a story can not be before the start time of the story.";}
+    }
+    
+    onEditTimeStart = (storageValue) =>
+    {
+        if(storageValue == this.story.data().startedOn)
+        {   return;}
+
+        this.story.ref.update({startedOn: storageValue});
+    }
+
+    onEditTimeFinish = (storageValue) =>
+    {
+        if(storageValue == this.story.data().finishedOn)
+        {   return;}
+        console.log("Storage Value: " + storageValue);
+        this.story.ref.update({finishedOn: storageValue});
+    }
+
     onContextMenuItemSelected = (item, index, action) =>
     { 
-        switch(action) 
+        console.log("ON Context MENU Item SELECTED: " + UtilityObject.stringify(item));
+        switch(item.ListItemType)
         {
-            case ACTION_DELETE_INTERRUPTION:
-                var interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-                interruptions.splice(item.id, 1);
-                this.interruptionsOfUser.ref.update({interruptions: interruptions});
-
-                if(interruptions.length == 0)
-                {   this.interruptionsOfUser.ref.delete();}
-                break; 
-
-            case ACTION_EDIT_INTERRUPTION:
-                if(this.dialogInterruptionEdit)
+            //For interruption items.
+            case ListItemInterruption:
+                switch(action) 
                 {
-                    const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-                    var next = interruptions[item.id + 1];
-                    var previous = interruptions[item.id - 1];
-
-                    if(next == undefined && this.story.data().finishedOn != undefined)
-                    {   next = this.createInterruption(new Date(this.story.data().finishedOn).getTime(), 0, undefined);}
-
-                    if(previous == undefined && this.story.data().startedOn != undefined)
-                    {   previous = this.createInterruption(new Date(this.story.data().startedOn).getTime(), 0, undefined);}
-
-                    this.currentlyEditingInterruptionIndex = item.id;
-                    this.dialogInterruptionEdit.onValueChange({type: item.type.dbId, start: item.timestamp, end: item.timestamp + item.duration, next: next, previous: previous});
-                    this.dialogInterruptionEdit.setVisible(true);
+                    case ActionType.DELETE:
+                        var interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+                        interruptions.splice(item.id, 1);
+                        this.interruptionsOfUser.ref.update({interruptions: interruptions});
+        
+                        if(interruptions.length == 0)
+                        {   this.interruptionsOfUser.ref.delete();}
+                        break; 
+        
+                    case ActionType.EDIT:
+                        if(this.dialogInterruptionEdit)
+                        {
+                            const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+                            var next = interruptions[item.id + 1];
+                            var previous = interruptions[item.id - 1];
+                            console.log("NEXT");
+                            UtilityObject.inspect(next);
+                            console.log("Prev");
+                            UtilityObject.inspect(previous);
+                            if(next == undefined && this.story.data().finishedOn != undefined)
+                            {   next = this.createInterruption(new Date(this.story.data().finishedOn), 0, undefined);}
+        
+                            if(previous == undefined && this.story.data().startedOn != undefined)
+                            {   previous = this.createInterruption(new Date(this.story.data().startedOn), 0, undefined);}
+                            
+                            this.currentlyEditingInterruptionIndex = item.id;
+                            this.dialogInterruptionEdit.onValueChange({type: item.type, start: item.timestamp, end: new Date(item.timestamp.getTime() + item.duration), next: next, previous: previous});
+                            this.dialogInterruptionEdit.setVisible(true);
+                        }
+                    break;
                 }
-            break;
-        }
+                break;
 
+            //For start items.
+            case ListItemStart:
+                switch(action)
+                {
+                    case ActionType.EDIT:
+                    if(this.dialogEditTimeStart)
+                    {   this.dialogEditTimeStart.setVisible(true);}
+                    break;
+                }
+                break;
+
+            //For start items.
+            case ListItemFinish:
+                switch(action)
+                {
+                    case ActionType.EDIT:
+                    if(this.dialogEditTimeFinish)
+                    {   this.dialogEditTimeFinish.setVisible(true);}
+                    break;
+                }
+        }
     }
 
     onInterruptionEdited = (storageValue) =>
@@ -376,19 +469,23 @@ class ScreenStoryDetailsInterruptions extends Component
         interruptions[this.currentlyEditingInterruptionIndex].duration = storageValue.end - storageValue.start;
         interruptions[this.currentlyEditingInterruptionIndex].category = storageValue.type;
 
-        console.log("STORAGE VALUE: " + JSON.stringify(JSON.decycle(interruptions[this.currentlyEditingInterruptionIndex])));
-
         this.interruptionsOfUser.ref.update({interruptions: interruptions});
     }
 
     getListComponent = () => 
-    {   return <ListInterruptions style={styles.list} containerHasFab={true} sections={this.state.sections} onContextMenuItemSelected={this.onContextMenuItemSelected} />}
+    {   
+        return (
+            <ListInterruptions style={styles.list} containerHasFab={true} sections={this.state.sections} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+        );
+    }
 
     getDialogComponent = () =>
     {  
          return (
              <View>
                 <DialogInterruptionEdit title="Edit Interruption" visible={false} onDialogSubmitted={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={this.story.data().startedOn} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onDialogSubmitted={this.onEditTimeStart}  />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={this.story.data().finishedOn} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onDialogSubmitted={this.onEditTimeFinish} />
                 <DialogConfirmation ref={i => this.confirmationDialog = i}/>
              </View>
          );
@@ -446,7 +543,7 @@ class ScreenStoryDetailsInterruptions extends Component
                                 })}
                             </BarActionButtons>
                         </View>
-                        {this.getFabComponent("done", ACTION_FINISH_STORY, true)}
+                        {this.getFabComponent("done", ActionType.FINISH, true)}
                     </View>);
                 break;
 
@@ -461,7 +558,7 @@ class ScreenStoryDetailsInterruptions extends Component
                                 <ButtonSquare key={"resume"} iconName="play-arrow" iconColor="white" title="Resume Work" onPress={this.onResumeFromInterruption}/>
                             </BarActionButtons>
                         </View>
-                        {this.getFabComponent("done", ACTION_FINISH_STORY, true)}
+                        {this.getFabComponent("done", ActionType.FINISH, true)}
                     </View>);
                 break;
  
@@ -470,7 +567,7 @@ class ScreenStoryDetailsInterruptions extends Component
                     <View style={styles.wrapper}>
                         {this.getListComponent()}
                         {this.getDialogComponent()}
-                        {this.getFabComponent("lock-open", ACTION_REOPEN_STORY)}
+                        {this.getFabComponent("lock-open", ActionType.REOPEN)}
                     </View>);
                 break;
 
@@ -512,16 +609,10 @@ class ScreenStoryDetailsInterruptions extends Component
         //Add the "started" item.
         if(story.startedOn)
         {
-            previousDate = asDate(new Date(story.startedOn));
+            previousDate = asDate(story.startedOn);
            
-            const startItem = {
-                iconName: "location-on",
-                title: "Started",
-                timestamp: story.startedOn.getTime(),
-                duration: 0,
-                id: -1
-            }
-            
+            //const startItem = <ListItemStart timestamp={story.startedOn} key={-1} />
+            const startItem = { timestamp: story.startedOn, id: -1, ListItemType: ListItemStart, duration: 0}
             section = {
                 title: previousDate,
                 items:[startItem]
@@ -536,26 +627,23 @@ class ScreenStoryDetailsInterruptions extends Component
             const interruption = interruptions[index];
             const type = InterruptionType.fromDatabaseId(interruption.category);
 
-            const date = asDate(new Date(interruption.timestamp));
+            const date = asDate(interruption.timestamp);
             const item = {
                 iconName: type.iconName,
                 title: type.title,
                 timestamp: interruption.timestamp,
                 id: index,
-                editable: interruption.duration != undefined,
-                deletable: interruption.duration != undefined,
-                selectable: true,
                 duration: interruption.duration,
-                type: type
-            };
-            
+                type: interruption.category,
+                ListItemType: ListItemInterruption
+            }
+
             if(previousDate == null || previousDate != date)
             {    
                 section = {
                     title: date,
                     items: [item] 
                 };
-
                 sections.push(section);
             }
             else
@@ -576,15 +664,14 @@ class ScreenStoryDetailsInterruptions extends Component
             for(var inner = 1 ; inner < section.items.length; inner ++) 
             {
                 var currentInterruption = section.items[inner];
-                const productiveTimestamp = previousInterruption.timestamp + previousInterruption.duration;
+                const productiveTimestamp = previousInterruption.timestamp.getTime() + previousInterruption.duration;
                 
-                var productive =  {
-                    iconName: "build",  
-                    iconColor: "transparent",
-                    timestamp: productiveTimestamp,
+                //const productive = <ListItemProductive key={index + "." + inner} duration={currentInterruption.props.timestamp - productiveTimestamp} />
+                const productive = {
                     id: index + "." + inner,
-                    duration: currentInterruption.timestamp - productiveTimestamp
-                };
+                    duration: currentInterruption.timestamp.getTime() - productiveTimestamp,
+                    ListItemType: ListItemProductive,
+                }
 
                 if(productive.duration > 0)
                 {   newItems.push(productive);}
@@ -602,32 +689,24 @@ class ScreenStoryDetailsInterruptions extends Component
         {
             var date = asDate(new Date(story.finishedOn));
 
-            const finishItem = {
-                iconName: "location-on",
-                title: "Finished",
-                timestamp: story.finishedOn,
-                id: -2
-            }
-
+            //const finishItem = <ListItemFinish timestamp={story.finishedOn} key={-2} />
+            const finishItem = {timestamp: story.finishedOn, id: -2, ListItemType: ListItemFinish, duration: 0}
             if(previousDate != date)
             {
-                section = 
-                {
+                section = {
                     title: date,
                     items: [finishItem]
-                }
+                };
                 sections.push(section);
             }
             else
             {   
                 lastInterruption = section.items[section.items.length - 1];
-                const productiveTimestamp = lastInterruption.timestamp + lastInterruption.duration;
+                const productiveTimestamp = lastInterruption.timestamp.getTime() + lastInterruption.duration;
                 const productive =  {
-                    iconName: "build",  
-                    iconColor: "transparent",
-                    timestamp: productiveTimestamp,
-                    id: index + "." + inner,
-                    duration: story.finishedOn.getTime() - productiveTimestamp
+                    id: 999999,
+                    duration: story.finishedOn - productiveTimestamp,
+                    ListItemType: ListItemProductive,
                 };
                 section.items.push(productive);
                 section.items.push(finishItem);

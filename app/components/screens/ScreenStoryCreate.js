@@ -11,7 +11,10 @@ import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import { FAB, Snackbar } from 'react-native-paper';
 import UtilityScreen from "../../utilities/UtilityScreen";
 import UtilityObject from "../../utilities/UtilityObject";
-import DialogConfirmation, { DIALOG_ACTION_POSITIVE } from "../dialogs/instances/DialogConfirmation";
+import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
+import ActionType from "../../enums/ActionType";
+import Router, { SCREEN_NAME_STORY_DETAILS_INFO } from "../routing/Router";
+
 
 const styles = {
     scrollView:{
@@ -59,18 +62,13 @@ class ScreenStoryCreate extends Component
 
     onSoftwareBackPress = () =>
     {
+        console.log("ON BACK PRESS");
         if(this.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
 
         this.confirmationDialog.setVisible(true);
         return true;
     }
-
-    componentDidMount = () =>
-    {   
-        this.props.navigation.setParams({onBackClicked: this.onBackClicked});
-    }
-
 
     setFabVisibility = (visible) =>
     {   this.setState({shouldFabGroupRender: visible});}
@@ -136,6 +134,7 @@ class ScreenStoryCreate extends Component
                 case MODE_EDIT:
                     this.props.navigation.getParam("story").ref.update(this.state.story).then(() => 
                     {
+                        this.unsavedChanges = false;
                         ToastAndroid.show("Story successfully updated!", ToastAndroid.LONG);
                     })
                     .catch(error => 
@@ -152,8 +151,19 @@ class ScreenStoryCreate extends Component
 
     onDialogConfirmed = (action) =>
     {
-        if(action == DIALOG_ACTION_POSITIVE)
-        {   this.props.navigation.goBack();}
+        if(action == ActionType.POSITIVE)
+        {
+            this.unsavedChanges = false; 
+
+            //If the screen is encapsulated in a tab navigator, we'll need to perform the navigation event on the parent tab navigator.
+            if(this.props.navigation.state.key == SCREEN_NAME_STORY_DETAILS_INFO)
+            {
+                const parent = this.props.navigation.dangerouslyGetParent();
+                parent.goBack();
+            }
+            else  
+            {   this.props.navigation.goBack();}
+        }
     }
 
     render()
