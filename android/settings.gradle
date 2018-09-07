@@ -1,4 +1,6 @@
 rootProject.name = 'HiEfficiency'
+include ':react-native-svg'
+project(':react-native-svg').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-svg/android')
 include ':react-native-background-task'
 project(':react-native-background-task').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-background-task/android')
 include ':react-native-version-number'   

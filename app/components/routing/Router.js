@@ -19,11 +19,13 @@ import ScreenStoryDetailsInterruptions from '../screens/ScreenStoryDetailsInterr
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 import ScreenTeamEdit from '../screens/ScreenTeamEdit';
 import ScreenDeveloper from "../screens/ScreenDeveloper";
+import ScreenSplash from "../screens/ScreenSplash";
 
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import CustomHeaderTitle from "./CustomHeaderTitle";
 import UtilityObject from '../../utilities/UtilityObject';
+
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
 export const STACK_NAME_STORIES = 'Stories';
@@ -31,7 +33,6 @@ export const STACK_NAME_PROFILE = "Profile";
 export const STACK_NAME_TEAMS = "Teams";
 export const STACK_NAME_STORY_BOARD = "StoryBoard";
 export const STACK_NAME_STORY_DETAILS = "StoryDetails";
-
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 
@@ -40,11 +41,10 @@ export const SCREEN_NAME_STORY_BOARD_FINISHED = "StoryBoardFinished";
 export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Interruptions';
 export const SCREEN_NAME_STORY_DETAILS_INFO = 'Info';
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
-
+export const SCREEN_NAME_SPLASH = "Splash";
 export const SCREEN_NAME_PROFILE = "Profile";
 export const SCREEN_NAME_TEAMS = "Teams";
 export const SCREEN_NAME_TEAM_EDIT = "TeamEdit";
-
 export const SCREEN_NAME_DEVELOPER = "Development";
 
 export const TAB_NAME_TEAM_OVERVIEW = 'TeamOverview';
@@ -55,20 +55,25 @@ const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
     color: "white"
 }
+
 export default class Router
 {
-    static createInitialStack = (loggedIn) =>
-    {
-        return createSwitchNavigator(
-            {
-                [STACK_NAME_AUTH]: Router.createAuthStack(),
-                [STACK_NAME_HOME]: Router.createHomeStack()
-            },
-            {
-                initialRouteName: loggedIn ? STACK_NAME_HOME : STACK_NAME_AUTH
-            }
-        )
-    }
+  static createInitialStack = (loggedIn, shouldSplash) =>
+  {
+      return createSwitchNavigator(
+          {
+              [SCREEN_NAME_SPLASH]: 
+              {
+                screen: ScreenSplash
+              },
+              [STACK_NAME_AUTH]: Router.createAuthStack(),
+              [STACK_NAME_HOME]: Router.createHomeStack()
+          },
+          {
+              initialRouteName: shouldSplash ? SCREEN_NAME_SPLASH : (loggedIn ? STACK_NAME_HOME : STACK_NAME_AUTH)
+          }
+      )
+  }
 
   static createAuthStack = ()  =>
   {

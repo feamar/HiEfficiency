@@ -6,6 +6,10 @@ import {Provider, Portal} from 'react-native-paper';
 import { MenuProvider } from 'react-native-popup-menu';
 import Router from './app/components/routing/Router'
 import {StatusBar} from "react-native";
+import UtilityObject from './app/utilities/UtilityObject';
+import {createStore} from "redux";
+import {Provider as ReduxProvider} from "react-redux";
+import ReducerInitial from "./app/redux/reducers/ReducerInitial";
 
 const styles = {
   root: {
@@ -17,48 +21,55 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      fontsLoaded: false,
       signedIn: false,
-      checkedSignIn: false
+      checkedSignIn: false,
+      shouldSplash: true
     };
+
+    this.timerIsSet = false;
+    //this.store = createStore(ReducerInitial);
 
     this.initializeCyclicJs();
   }
 
-
   componentDidMount() {
-    this.loadFonts();
     FirebaseAdapter.getCurrentUser(
       () => this.setState({ signedIn: true, checkedSignIn: true }),
       () => this.setState({ signedIn: false, checkedSignIn: true }));
+
   }
 
+  componentWillUnmount() {
+  }
+
+  setShouldSplash = (shouldSplash) =>
+  {   this.setState({shouldSplash: shouldSplash})}
+
   render() {
-    const { checkedSignIn, signedIn, fontsLoaded } = this.state;
+    const { checkedSignIn, signedIn} = this.state;
 
-    if (!checkedSignIn || !fontsLoaded) { return null; }
+    if (!checkedSignIn) { return null; }
 
-    const RouteStack = Router.createInitialStack(this.state.signedIn);
+    const RouteStack = Router.createInitialStack(this.state.signedIn, this.state.shouldSplash);
+
+    if(this.state.shouldSplash && this.timerIsSet == false)
+    {
+        this.timerIsSet = true;
+        setTimeout(() => {this.setState({shouldSplash: false})}, 3000);
+    }
+
 
     return(
         <Provider theme={Theme}>
           <MenuProvider>
             <StatusBar backgroundColor={Theme.colors.primaryDark}/>
             <Portal.Host>
-              <RouteStack  style={styles.root} />
+              <RouteStack style={styles.root} />
             </Portal.Host>
           </MenuProvider>
         </Provider>
     );
   }
-
-  // For basic functionality, we need to load some resources
-  async loadFonts() {
-
-    this.setState({ fontsLoaded: true });
-  }
-
-
 
   initializeCyclicJs = () => {
     JSON.decycle = function decycle(object, replacer) {
