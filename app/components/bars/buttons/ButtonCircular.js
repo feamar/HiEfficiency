@@ -39,8 +39,8 @@ export default class ButtonCircular extends Component
         styles.wrapper.width = this.props.buttonSize;
         styles.wrapper.height = this.props.buttonSize;
 
-        console.log(JSON.stringify(this.props));
-        console.log(JSON.stringify(styles));
+        //console.log(JSON.stringify(this.props));
+        //console.log(JSON.stringify(styles));
 
         return styles;
     }

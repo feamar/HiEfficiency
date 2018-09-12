@@ -17,7 +17,6 @@ export default withKeyboardListener = (WrappedComponent) =>
 
         onScreenWillFocus = (payload) =>
         {
-            console.log("withKeyboardListener - onScreenWillFocus");
             var unsubscriber = Keyboard.addListener('keyboardDidShow', () => {this.onKeyboardDidShow()});
             this.unsubscribers.push(unsubscriber);
         
@@ -27,19 +26,16 @@ export default withKeyboardListener = (WrappedComponent) =>
 
         onScreenWillBlur = (payload) =>
         {
-            console.log("withKeyboardListener - onScreenWillBlur");
             this.unsubscribers.forEach(unsubscriber => {unsubscriber.remove()});
         }
 
         onKeyboardDidShow = () =>
         {
-            console.log("withKeyboardListener - onKeyboardDidShow");
             this.callForEachListener("onKeyboardDidShow");
         }
 
         onKeyboardDidHide = () =>
         {   
-            console.log("withKeyboardListener - onKeyboardDidHide");
             this.callForEachListener("onKeyboardDidHide");
         }
 

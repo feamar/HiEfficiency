@@ -72,13 +72,16 @@ export default class ScreenLogin extends React.Component
   handleLogin = () => 
   {
     this.setState({email: this.state.email.trim()}, () => {
-      FirebaseAdapter.signInWithEmailAndPassword(this.state.email, this.state.password);
+      FirebaseAdapter.signInWithEmailAndPassword(this.state.email, this.state.password).then(() => 
+      {
+        
+      });
     });
   }
 
   handleRegister = () => 
   {
-    console.log("Handle register clicked: " + SCREEN_NAME_AUTH_REGISTER);
+    //console.log("Handle register clicked: " + SCREEN_NAME_AUTH_REGISTER);
     this.props.navigation.navigate(SCREEN_NAME_AUTH_REGISTER);
   }
 

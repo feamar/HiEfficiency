@@ -1,8 +1,8 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from 'redux'
+import ReducerUser from "./ReducerUser";
+import ReducerInspecting from './ReducerInspecting';
 
-
-const Reducers = combineReducers({
-    
+export default combineReducers({
+    user: ReducerUser,
+    inspecting: ReducerInspecting
 });
-
-export default Reducers;

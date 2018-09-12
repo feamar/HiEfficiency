@@ -18,32 +18,27 @@ export default withFloatingActionButton = (WrappedComponent) =>
 
         componentDidMount()
         {
-            console.log("withFloatingActionButton - componentWillMount");
             this.mounted = true;
             this.notify(this.state.visible)
         }
 
         componentWillUnmount()
         {
-            console.log("withFloatingActionButton - componentWillUnmount");
             this.mounted = false;
         }
 
         onKeyboardDidShow = () =>
         {
-            console.log("withFloatingActionButton - onKeyboardDidShow");
             this.notify(false);
         }
 
         onKeyboardDidHide = () =>
         {
-            console.log("withFloatingActionButton - onKeyboardDidHide");
             this.notify(true);
         }
 
         notify = (visible) =>
         {
-            console.log("withFloatingActionButton - notify(" + visible + ")");
             if(this.mounted)
             {
                 this.setState({visible: visible}, () => 

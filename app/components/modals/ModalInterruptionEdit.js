@@ -51,7 +51,7 @@ export default class ModalInterruptionEdit extends React.Component {
 	date = (index) => {
 		var result = index < 0 || index >= this.props.interruptions.length ? new Date() : new Date(this.props.interruptions[index]);
 
-		console.log("The input: " + index + " the interruption: " + this.props.interruptions[index] + " the result: " + result);
+		//console.log("The input: " + index + " the interruption: " + this.props.interruptions[index] + " the result: " + result);
 
 		return result;
 	}

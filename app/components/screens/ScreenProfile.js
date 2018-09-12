@@ -8,71 +8,46 @@ import {STACK_NAME_AUTH} from '../routing/Router';
 import PreferenceWeekSchema from '../preferences/fields/PreferenceWeekSchema';
 import PreferenceSelectSpinner from '../preferences/fields/PreferenceSelectSpinner';
 import { Firebase } from 'react-native-firebase';
+import {connect} from "react-redux";
+import WithReduxListener from '../../hocs/WithReduxListener';
+import UtilityObject from '../../utilities/UtilityObject';
 
 const styles ={
   content: {padding: 0, height: "100%"}
 }
 
-export default class ScreenProfile extends Component
+const mapStateToProps = (state, props) =>
 {
-  constructor()
-  {
-    super();
-
-    this.state ={
-      loading: true,
-      user: {}
-    }
-    
-    this.unsubscribers = [];
+  return {
+    user: state.user
   }
+}
 
-  componentWillMount = () =>
+class ScreenProfile extends Component
+{
+  static displayName = "Screen Profile";
+  constructor(props)
   {
-    var unsubscriber = FirebaseAdapter.getCurrentUser(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
-    this.unsubscribers.push(unsubscriber);
-  }
+    super(props);
 
-  onUserAvailableWhileMounting = (user) =>
-  {
-    FirebaseAdapter.getUsers().doc(user.uid).get().then((doc) => 
-    {
-      doc.ref.onSnapshot(this.onUserDocumentChanged);
-      this.onUserDocumentChanged(doc);
-    })
-    .catch((error) => 
-    {
-      console.log("Signed up user does not have a profile for user id: " + user.uid + ": " + JSON.stringify(error) + ".");
-      this.props.navigation.navigate(STACK_NAME_AUTH);
-    });
-  }
-
-  onUserUnavailableWhileMounting = () =>
-  {   FirebaseAdapter.logout();}
-
-  componentWillUnmount = () =>
-  {
-    for(var i = 0 ; i < this.unsubscribers.length; i ++)
-    {
-      const unsubscriber = this.unsubscribers[i];
-      unsubscriber();
+    this.state = {
+      user: undefined
     }
   }
 
-  onUserDocumentChanged = (user) =>
+  onReduxStateChanged = (props) =>
   {
-    if(user.data().weekSchema == undefined)
-    {
-      user.ref.update({weekSchema: this.getDefaultSchema()}).then(() => 
-      { this.setState({user:user, loading: false});});
-    } 
-    else
-    { this.setState({user:user, loading: false});}
+    if(this.state.user != props.user)
+    {   this.setState({user: props.user});}
   }
 
   onValueChanged = field => value => 
-  {
-    this.state.user.ref.update({[field]: value});
+  {   
+    var data = {[field]: value};
+    if(this.state.user.data.weekSchema == undefined && field != "weekSchema")
+    {   data = {...data, weekSchema: this.getDefaultSchema()};}
+
+    FirebaseAdapter.getUsers().doc(this.state.user.uid).update({[field]: value});
   }
 
   getDefaultSchema = () => {
@@ -89,21 +64,23 @@ export default class ScreenProfile extends Component
 
   render()
   {
-    const data = this.state.loading ? null : this.state.user.data();
+    if(this.state.user == undefined)
+    {   return null;}
+
     return (
       <View style={styles.content}>
-        {this.state.loading == false &&  
-          <View>
-            <PreferenceCategory title="Demographics">
-              <PreferenceText title="Nickname" storageValue={data.name} onValueChanged={this.onValueChanged("name")}/>
-              <PreferenceText title="Initials" storageValue={data.initials} onValueChanged={this.onValueChanged("initials")} />
-            </PreferenceCategory>
-            <PreferenceCategory title="Job">
-              <PreferenceWeekSchema title="Week Schema" storageValue={data.weekSchema} onValueChanged={this.onValueChanged("weekSchema")} />
-            </PreferenceCategory> 
-          </View>
-        }  
+        <View>
+          <PreferenceCategory title="Demographics">
+            <PreferenceText title="Nickname" storageValue={this.state.user.data.name} onValueChanged={this.onValueChanged("name")}/>
+            <PreferenceText title="Initials" storageValue={this.state.user.data.initials} onValueChanged={this.onValueChanged("initials")} />
+          </PreferenceCategory>
+          <PreferenceCategory title="Job">
+            <PreferenceWeekSchema title="Week Schema" storageValue={this.state.user.data.weekSchema} onValueChanged={this.onValueChanged("weekSchema")} />
+          </PreferenceCategory> 
+        </View>
       </View>
     ); 
   }
 }
+
+export default WithReduxListener(mapStateToProps, undefined, ScreenProfile);

@@ -35,7 +35,7 @@ export default class ListItemTeam extends AbstractListItem
     {
         super(props);
 
-        if(this.props.item.finishedOn == undefined)
+        if(this.props.item.data.finishedOn == undefined && this.props.item.data.startedOn == undefined)
         {   this.addContextMenuItem("Upvote", ActionType.UPVOTE);}
 
         this.addContextMenuItem("Inspect", ActionType.INSPECT);
@@ -44,7 +44,7 @@ export default class ListItemTeam extends AbstractListItem
 
     getItemIndicatorStyle = () =>
     {
-        const type = StoryType.fromId(this.state.item.type);
+        const type = StoryType.fromId(this.state.item.data.type);
         var color = "#ADADAD";
         if(type)
         {   color = type.color;}
@@ -61,7 +61,7 @@ export default class ListItemTeam extends AbstractListItem
 
     getItemContent = () =>
     {
-        const type = StoryType.fromId(this.state.item.type);
+        const type = StoryType.fromId(this.state.item.data.type);
         var typeName = "Unknown";
         if(type)
         {   typeName = type.name;}
@@ -70,8 +70,8 @@ export default class ListItemTeam extends AbstractListItem
             <View style={styles.wrapper}>
                 <View style={this.getItemIndicatorStyle()} />
                 <View style={styles.contentWrapper}>
-                    <Text style={styles.storyName}>{this.state.item.name}</Text>
-                    <Text style={styles.storyUpvotes}>{typeName}: {this.state.item.upvotes} votes</Text>
+                    <Text style={styles.storyName}>{this.state.item.data.name}</Text>
+                    <Text style={styles.storyUpvotes}>{typeName}: {this.state.item.data.upvotes} votes</Text>
                 </View>
             </View>
         );

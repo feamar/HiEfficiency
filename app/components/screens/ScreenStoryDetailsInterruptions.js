@@ -20,6 +20,11 @@ import ListItemFinish from "../lists/instances/interruptions/ListItemFinish";
 import DialogPreferenceDateTime from "../dialogs/preferences/DialogPreferenceDateTime";
 import UtilityObject from "../../utilities/UtilityObject";
 import UtilityTime from "../../utilities/UtilityTime";
+import WithReduxListener from "../../hocs/WithReduxListener";
+import * as Reducer from "../../redux/reducers/ReducerInspecting";
+import update from "immutability-helper";
+import ScreenTeamEdit from "./ScreenTeamEdit";
+const isEqual = require("react-fast-compare");
 
 const LIFECYCLE_LOADING = 0;
 const LIFECYCLE_UNSTARTED = 1;
@@ -94,6 +99,22 @@ const styles = {
     }
 }    
 
+const mapStateToProps = (state, props) =>
+{
+    return {
+        user: state.user,
+        inspecting: state.inspecting
+    }
+}
+
+const mapDispatchToProps = (dispatch, props) =>
+{
+    return {
+        onInspectStoryStart: (storyId) => dispatch(Reducer.onInspectStoryStart(storyId)),
+        onInspectStoryEnd: () => dispatch(Reducer.onInspectStoryEnd())
+    }
+} 
+
 class ScreenStoryDetailsInterruptions extends Component
 {
     static displayName = "Story Details Interruptions";
@@ -119,76 +140,51 @@ class ScreenStoryDetailsInterruptions extends Component
         super(props);
 
         this.unsubscribers = [];
-        this.story = props.navigation.getParam('story');
+        this.story = props.user.teams[this.props.inspecting.team].stories[this.props.inspecting.story];
 
         this.state = 
         {
-            lifecycle: LIFECYCLE_LOADING,
-            sections: this.getSectionsFromDocuments(this.story, this.interruptionsOfUser),
+            lifecycle: this.story == undefined ? LIFECYCLE_LOADING : this.getLifecycleFromStory(this.story),
+            sections: this.getSectionsFromStory(this.story),
             open: false,
             shouldFabGroupRender: true
         }
 
-        this.props.navigation.setParams({ subtitle: this.story.data().name })
+        this.props.navigation.setParams({ subtitle: this.story.data.name })
     }
 
-    onStoryDocumentChanged = (story) =>
-    { 
-        this.story = story;
-
-        const sections = this.getSectionsFromDocuments(this.story, this.interruptionsOfUser);
-        const lifecycle = this.getLifecycleFromDocuments(this.story, this.interruptionsOfUser);
-
-        this.setState({
-            sections: sections,
-            lifecycle: lifecycle
-        })
-    }
-
-    onInterruptionsOfUserChanged = (document) =>
+    onReduxStateChanged = (props) =>
     {
-        this.interruptionsOfUser = document;
+        if(isEqual(this.state.user, props.user))
+        {   return;}
 
-        const sections = this.getSectionsFromDocuments(this.story, this.interruptionsOfUser);
-        const lifecycle = this.getLifecycleFromDocuments(this.story, this.interruptionsOfUser);
+        const team = props.inspecting.team;
+        const story = props.user.teams[team].stories[this.story.id];
+        
+        if(isEqual(this.story, story) == false)
+        {
+            if(isEqual(this.story.data.name, story.data.name) == false)
+            {   this.props.navigation.setParams({ subtitle: story.data.name })}
 
-        this.setState({
-            sections: sections,
-            lifecycle: lifecycle
-        })
+            this.story = story;
+            const sections = this.getSectionsFromStory(this.story);
+            const lifecycle = this.getLifecycleFromStory(this.story);
+            
+            this.setState({sections: sections, lifecycle: lifecycle});
+        }
     }
- 
+
     setFabVisibility = (visible) =>
     {   this.setState({shouldFabGroupRender: visible});}
 
     setLifecycleTo = (lifecycle) =>
     {   this.setState({lifecycle: lifecycle});}  
 
-    componentWillMount = () =>
-    {
-        unsubscriber = this.story.ref.onSnapshot(this.onStoryDocumentChanged);
-        this.unsubscribers.push(unsubscriber);
-
-        FirebaseAdapter.getCurrentUserOrThrow(user => 
-        {  
-            const documentReference = FirebaseAdapter.getInterruptionsFromStory(this.story).doc(user.uid);
-            if(documentReference != undefined)
-            {
-                var unsubscriber = documentReference.onSnapshot(this.onInterruptionsOfUserChanged);
-                this.unsubscribers.push(unsubscriber);
-            }
-        });
-    }
+    componentDidMount() 
+    {   this.props.onInspectStoryStart(this.story.id);}
 
     componentWillUnmount = () =>
-    {
-      for(var i = 0 ; i < this.unsubscribers.length ; i ++)
-      {
-        const unsubscriber = this.unsubscribers[i];
-        if(unsubscriber && unsubscriber instanceof Function)
-        {   unsubscriber();}  
-      }
-    }
+    {   this.props.onInspectStoryEnd();}
 
     onStartIssue = () => 
     {   
@@ -202,7 +198,7 @@ class ScreenStoryDetailsInterruptions extends Component
                 if(action != ActionType.POSITIVE)
                 {   return;}
 
-                this.story.ref.update({startedOn: new Date()});
+                FirebaseAdapter.getStories(this.props.inspecting.team).doc(this.story.id).update({startedOn: new Date()});
                 this.setLifecycleTo(LIFECYCLE_UNINTERRUPTED);
             });
             this.confirmationDialog.setVisible(true);
@@ -215,14 +211,24 @@ class ScreenStoryDetailsInterruptions extends Component
         {   timestamp = new Date();}
 
         const interruption = this.createInterruption(timestamp, undefined, category.dbId);
-        const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-        interruptions.push(interruption);
+        const interruptions = update(this.story.interruptions, {$push: [interruption]});
+
+        var keys = Object.keys(interruptions);
+        var values = keys.map(v => interruptions[v]);
+
+        const document = this.getInterruptionsDocument(this.props.inspecting.team, this.props.inspecting.story, this.props.user.uid);
 
         if(interruptions.length == 1)
-        {   this.interruptionsOfUser.ref.set({interruptions: interruptions});}
+        {   document.set({interruptions: values});}
         else
-        {   this.interruptionsOfUser.ref.update({interruptions: interruptions});}
+        {   document.update({interruptions: values});}
     } 
+
+    getInterruptionsDocument = (teamId, storyId, userId) =>
+    {   return FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(userId);}
+
+    getStoryDocument = (teamId, storyId) =>
+    {   return FirebaseAdapter.getStories(teamId).doc(storyId);}
 
     createInterruption = (timestamp, duration, categoryId) =>
     {
@@ -232,35 +238,21 @@ class ScreenStoryDetailsInterruptions extends Component
             category: categoryId
         }
     }
-
-    getInterruptionsFromDocument = (document) =>
+    
+    getFirstInterruption = () =>
     {
-        if(document == undefined)
-        {   return [];}
-
-        const data = document.data();
-        if(data == undefined)
-        {   return [];}
-
-        return data.interruptions;
-    }
-
-    getFirstInterruption = (document) =>
-    {
-        const interruptions = this.getInterruptionsFromDocument(document);
-        if(interruptions.length == 0)
+        if(this.story.interruptions.length == 0)
         {   return undefined;}
 
-        return interruptions[0];
+        return this.story.interruptions[0];
     }
 
-    getLastInterruption = (document) =>
+    getLastInterruption = () =>
     {
-        const interruptions = this.getInterruptionsFromDocument(document);
-        if(interruptions.length == 0)
+        if(this.story.interruptions.length == 0)
         {   return undefined;}
 
-        return interruptions[interruptions.length - 1];
+        return this.story.interruptions[this.story.interruptions.length - 1];
     }
 
     getFabGroupActions = () =>
@@ -297,17 +289,22 @@ class ScreenStoryDetailsInterruptions extends Component
                         if(action != ActionType.POSITIVE)
                         {   return; }
 
-                        const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+                        var interruptions = this.story.interruptions;
                         if(interruptions.length > 0)
                         {
-                            const last = interruptions[interruptions.length - 1];
+                            var last = interruptions[interruptions.length - 1];
                             if(last.duration == undefined)
-                            {   last.duration = new Date().getTime() - last.timestamp.getTime();}
+                            {   
+                                last = update(last, {duration: {$set: new Date().getTime() - last.timestamp.getTime()}});
+                                interruptions = update(interruptions, {$splice: [[interruptions.length - 1, 1, last]]});
+                                const document = this.getInterruptionsDocument(this.props.inspecting.team, this.props.inspecting.story, this.props.user.uid);
+                                document.update({interruptions: interruptions});
+                            }
         
-                            this.interruptionsOfUser.ref.update({interruptions: interruptions});
+                            
                         }
         
-                        this.story.ref.update({finishedOn: new Date()});
+                        this.getStoryDocument(this.props.inspecting.team, this.props.inspecting.story).update({finishedOn: new Date()});
         
                         this.setLifecycleTo(LIFECYCLE_FINISHED);
                     }); 
@@ -325,8 +322,8 @@ class ScreenStoryDetailsInterruptions extends Component
                         if(action != ActionType.POSITIVE)
                         {   return;}
 
-                        this.story.ref.update({finishedOn: null}); 
-                        this.setLifecycleTo(this.getLifecycleFromDocuments(this.story));
+                        this.getStoryDocument(this.props.inspecting.team, this.props.inspecting.story).update({finishedOn: null}); 
+                        this.setLifecycleTo(this.getLifecycleFromStory(this.story));
                     });
                     this.confirmationDialog.setVisible(true);
                 }
@@ -341,20 +338,26 @@ class ScreenStoryDetailsInterruptions extends Component
 
     onResumeFromInterruption = () =>
     {
-        let interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+        var interruptions = this.story.interruptions;
+
         if(interruptions.length > 0)
         {
-            const last = interruptions[interruptions.length - 1];
+            var last = interruptions[interruptions.length - 1];
             if(last.duration == undefined)
-            {   last.duration = new Date().getTime() - last.timestamp.getTime();}
-        }
+            {   
+                last = update(last, {duration: {$set: new Date().getTime() - last.timestamp.getTime()}});
+                interruptions = update(interruptions, {$splice: [[interruptions.length - 1, 1, last]]});
+            }
 
-        this.interruptionsOfUser.ref.update({interruptions: interruptions});
+            const inspecting = this.props.inspecting;
+            const document = this.getInterruptionsDocument(inspecting.team, inspecting.story, this.props.user.uid);
+            document.update({interruptions: interruptions});
+        }
     }
 
     validateTimeStarted = (storageValue) =>
     {
-        const first = this.getFirstInterruption(this.interruptionsOfUser);
+        const first = this.getFirstInterruption();
         if(first)
         {   
             if(storageValue > first.timestamp)
@@ -362,7 +365,7 @@ class ScreenStoryDetailsInterruptions extends Component
         }
         else 
         {   
-            const finishedOn =this.story.data().finishedOn;
+            const finishedOn = this.story.data.finishedOn;
             if(finishedOn != undefined && storageValue > finishedOn)
             {   return "The start time of a story can not be after the finish time of the story.";}           
         }
@@ -370,36 +373,36 @@ class ScreenStoryDetailsInterruptions extends Component
     
     validateTimeFinished = (storageValue) =>
     {
-        console.log("Storage Value: " + storageValue + " AND las")
-        const last = this.getLastInterruption(this.interruptionsOfUser);
+        const last = this.getLastInterruption();
         if(last)
         {   
             if(storageValue < last.timestamp)
             {   return "The finish time of an story can not be before the end time of the previous interruption.";}
         }
-        else if(storageValue < this.story.data().startedOn)
+        else if(storageValue < this.story.data.startedOn)
         {   return "The finish time of a story can not be before the start time of the story.";}
     }
     
     onEditTimeStart = (storageValue) =>
     {
-        if(storageValue == this.story.data().startedOn)
+        if(storageValue == this.story.data.startedOn)
         {   return;}
 
-        this.story.ref.update({startedOn: storageValue});
+        const inspecting = this.props.inspecting;
+        this.getStoryDocument(inspecting.team, inspecting.story).update({startedOn: storageValue});
     }
 
     onEditTimeFinish = (storageValue) =>
     {
-        if(storageValue == this.story.data().finishedOn)
+        if(storageValue == this.story.data.finishedOn)
         {   return;}
-        console.log("Storage Value: " + storageValue);
-        this.story.ref.update({finishedOn: storageValue});
+
+        const inspecting = this.props.inspecting;
+        this.getStoryDocument(inspecting.team, inspecting.story).update({finishedOn: storageValue});
     }
 
     onContextMenuItemSelected = (item, index, action) =>
     { 
-        console.log("ON Context MENU Item SELECTED: " + UtilityObject.stringify(item));
         switch(item.ListItemType)
         {
             //For interruption items.
@@ -407,29 +410,30 @@ class ScreenStoryDetailsInterruptions extends Component
                 switch(action) 
                 {
                     case ActionType.DELETE:
-                        var interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-                        interruptions.splice(item.id, 1);
-                        this.interruptionsOfUser.ref.update({interruptions: interruptions});
-        
+                        var interruptions = this.story.interruptions;
+                        interruptions = update(interruptions, {$splice: [[item.id, 1]]});
+
+                        const inspecting = this.props.inspecting;
+                        const document = this.getInterruptionsDocument(inspecting.team, inspecting.story, this.props.user.uid);
+
                         if(interruptions.length == 0)
-                        {   this.interruptionsOfUser.ref.delete();}
+                        {   document.delete();}
+                        else
+                        {   document.update({interruptions: interruptions});}
                         break; 
         
                     case ActionType.EDIT:
                         if(this.dialogInterruptionEdit)
                         {
-                            const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+                            const interruptions = this.story.interruptions;
                             var next = interruptions[item.id + 1];
                             var previous = interruptions[item.id - 1];
-                            console.log("NEXT");
-                            UtilityObject.inspect(next);
-                            console.log("Prev");
-                            UtilityObject.inspect(previous);
-                            if(next == undefined && this.story.data().finishedOn != undefined)
-                            {   next = this.createInterruption(new Date(this.story.data().finishedOn), 0, undefined);}
+                            
+                            if(next == undefined && this.story.data.finishedOn != undefined)
+                            {   next = this.createInterruption(new Date(this.story.data.finishedOn), 0, undefined);}
         
-                            if(previous == undefined && this.story.data().startedOn != undefined)
-                            {   previous = this.createInterruption(new Date(this.story.data().startedOn), 0, undefined);}
+                            if(previous == undefined && this.story.data.startedOn != undefined)
+                            {   previous = this.createInterruption(new Date(this.story.data.startedOn), 0, undefined);}
                             
                             this.currentlyEditingInterruptionIndex = item.id;
                             this.dialogInterruptionEdit.onValueChange({type: item.type, start: item.timestamp, end: new Date(item.timestamp.getTime() + item.duration), next: next, previous: previous});
@@ -464,12 +468,15 @@ class ScreenStoryDetailsInterruptions extends Component
 
     onInterruptionEdited = (storageValue) =>
     {
-        const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
-        interruptions[this.currentlyEditingInterruptionIndex].timestamp = storageValue.start;
-        interruptions[this.currentlyEditingInterruptionIndex].duration = storageValue.end - storageValue.start;
-        interruptions[this.currentlyEditingInterruptionIndex].category = storageValue.type;
+        var interruptions = this.story.interruptions;
+        var current = interruptions[this.currentlyEditingInterruptionIndex];
 
-        this.interruptionsOfUser.ref.update({interruptions: interruptions});
+        current = update(current, {timestamp: {$set: storageValue.start}, duration: {$set: storageValue.end - storageValue.start}, category: {$set: storageValue.type}});
+        interruptions = update(interruptions, {$splice: [[this.currentlyEditingInterruptionIndex, 1, current]]});
+
+        const inspecting = this.props.inspecting;
+        const document = this.getInterruptionsDocument(inspecting.team, inspecting.story, this.props.user.uid);
+        document.update({interruptions: interruptions});
     }
 
     getListComponent = () => 
@@ -484,8 +491,8 @@ class ScreenStoryDetailsInterruptions extends Component
          return (
              <View>
                 <DialogInterruptionEdit title="Edit Interruption" visible={false} onDialogSubmitted={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
-                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={this.story.data().startedOn} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onDialogSubmitted={this.onEditTimeStart}  />
-                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={this.story.data().finishedOn} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onDialogSubmitted={this.onEditTimeFinish} />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={this.story.data.startedOn} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onDialogSubmitted={this.onEditTimeStart}  />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={this.story.data.finishedOn} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onDialogSubmitted={this.onEditTimeFinish} />
                 <DialogConfirmation ref={i => this.confirmationDialog = i}/>
              </View>
          );
@@ -576,43 +583,44 @@ class ScreenStoryDetailsInterruptions extends Component
         } 
     }
 
-    getLifecycleFromDocuments = (documentStory, documentInterruptions) =>
+    getLifecycleFromStory = (story) =>
     {
-        const data = documentStory.data();
+        const data = story.data;
         if(data.startedOn == undefined)
         {   return LIFECYCLE_UNSTARTED;}
         else if (data.finishedOn != undefined)
         {   return LIFECYCLE_FINISHED;}
         else 
         {
-            var interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+            var interruptions = story.interruptions;
             if(interruptions.length == 0)
             {   return LIFECYCLE_UNINTERRUPTED;}
 
             const last = interruptions[interruptions.length - 1];
-            if(last.duration == undefined)
-            {   return LIFECYCLE_INTERRUPTED;}
-            else
+            if(last == undefined || last.duration != undefined)
             {   return LIFECYCLE_UNINTERRUPTED;}
+            else
+            {   return LIFECYCLE_INTERRUPTED;}
         }
     }
 
-    getSectionsFromDocuments = (documentStory, documentInterruptions) =>
+    getSectionsFromStory = (story) =>
     {
-        const story = documentStory.data();
-        const interruptions = this.getInterruptionsFromDocument(this.interruptionsOfUser);
+        const data = story.data;
+        const interruptions = story.interruptions;
 
+        //console.log("Interruptions: " + UtilityObject.stringify(story));
         var sections = [];
         var previousDate = null;
         var section = null;
 
         //Add the "started" item.
-        if(story.startedOn)
+        if(data.startedOn)
         {
-            previousDate = asDate(story.startedOn);
+            previousDate = asDate(data.startedOn);
            
-            //const startItem = <ListItemStart timestamp={story.startedOn} key={-1} />
-            const startItem = { timestamp: story.startedOn, id: -1, ListItemType: ListItemStart, duration: 0}
+            //const startItem = <ListItemStart timestamp={data.startedOn} key={-1} />
+            const startItem = { timestamp: data.startedOn, id: -1, ListItemType: ListItemStart, duration: 0}
             section = {
                 title: previousDate,
                 items:[startItem]
@@ -624,6 +632,7 @@ class ScreenStoryDetailsInterruptions extends Component
         //Add the interruptions.
         for(var index = 0 ; index < interruptions.length ; index++)
         { 
+            //console.log("HERE 1");
             const interruption = interruptions[index];
             const type = InterruptionType.fromDatabaseId(interruption.category);
 
@@ -640,6 +649,8 @@ class ScreenStoryDetailsInterruptions extends Component
 
             if(previousDate == null || previousDate != date)
             {    
+            //console.log("HERE 1.1");
+
                 section = {
                     title: date,
                     items: [item] 
@@ -647,7 +658,9 @@ class ScreenStoryDetailsInterruptions extends Component
                 sections.push(section);
             }
             else
-            {   section.items.push(item);} 
+            {   
+                //console.log("HERE 1.2");
+                section.items.push(item);} 
 
             previousDate = date;
         }
@@ -685,12 +698,12 @@ class ScreenStoryDetailsInterruptions extends Component
         }
 
         //Add the "finished" item.
-        if(story.finishedOn)
+        if(data.finishedOn)
         {
-            var date = asDate(new Date(story.finishedOn));
+            var date = asDate(new Date(data.finishedOn));
 
-            //const finishItem = <ListItemFinish timestamp={story.finishedOn} key={-2} />
-            const finishItem = {timestamp: story.finishedOn, id: -2, ListItemType: ListItemFinish, duration: 0}
+            //const finishItem = <ListItemFinish timestamp={data.finishedOn} key={-2} />
+            const finishItem = {timestamp: data.finishedOn, id: -2, ListItemType: ListItemFinish, duration: 0}
             if(previousDate != date)
             {
                 section = {
@@ -705,7 +718,7 @@ class ScreenStoryDetailsInterruptions extends Component
                 const productiveTimestamp = lastInterruption.timestamp.getTime() + lastInterruption.duration;
                 const productive =  {
                     id: 999999,
-                    duration: story.finishedOn - productiveTimestamp,
+                    duration: data.finishedOn - productiveTimestamp,
                     ListItemType: ListItemProductive,
                 };
                 section.items.push(productive);
@@ -722,4 +735,4 @@ class ScreenStoryDetailsInterruptions extends Component
 } 
 
 
-export default ScreenStoryDetailsInterruptions;
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, ScreenStoryDetailsInterruptions);

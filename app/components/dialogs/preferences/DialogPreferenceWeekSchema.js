@@ -189,20 +189,20 @@ export default class DialogPreferenceWeekSchema extends AbstractPreferenceDialog
         //console.log("getTimespanFor: " + JSON.stringify(JSON.decycle(this.state.storageValue)));
 
         //Check whether the current value array contains the current index.
-        var checked = this.state.storageValue[index].enabled;
-
+        const enabled = this.isEnabled(index);
+        const status = enabled ? "checked" : "unchecked";
         return (
             <View style={styles.item} key={index}>
                 <View style={styles.wrapper}>
                     <View style={styles.contentWrapper}>
                         <Text style={styles.title}>{item}</Text>
                         <View style={this.getInnerWrapperStyle(index)}>
-                            <TouchableRipple disabled={this.isEnabled(index) == false} style={styles.touchable} onPress={this.openTimePicker(index, 0)}><Text>{this.state.storageValue[index][0]}</Text></TouchableRipple>
+                            <TouchableRipple disabled={enabled == false} style={styles.touchable} onPress={this.openTimePicker(index, 0)}><Text>{this.state.storageValue[index][0]}</Text></TouchableRipple>
                             <Text style={styles.hyphen}> - </Text>
-                            <TouchableRipple disabled={this.isEnabled(index) == false} style={styles.touchable} onPress={this.openTimePicker(index, 1)}><Text>{this.state.storageValue[index][1]}</Text></TouchableRipple>
+                            <TouchableRipple disabled={enabled == false} style={styles.touchable} onPress={this.openTimePicker(index, 1)}><Text>{this.state.storageValue[index][1]}</Text></TouchableRipple>
                         </View>
                     </View>
-                    <Checkbox style={styles.checkbox} checked={checked} onPress={this.onCheckboxPress(index)} />
+                    <Checkbox style={styles.checkbox} status={status} onPress={this.onCheckboxPress(index)} />
                 </View>
                 <DateTimePicker datePickerModeAndroid="default" date={this.getInitialPickerTime(index, 0)} onCancel={this.onCancel(index, 0)} mode="time" isVisible={this.state.pickerVisibilities[index][0]} onConfirm={this.onTimeConfirmed(index, 0)} />
                 <DateTimePicker datePickerModeAndroid="default" date={this.getInitialPickerTime(index, 1)} onCancel={this.onCancel(index, 1)} mode="time" isVisible={this.state.pickerVisibilities[index][1]} onConfirm={this.onTimeConfirmed(index, 1)} />

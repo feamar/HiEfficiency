@@ -58,7 +58,7 @@ export default class UtilityTime
         {   separator = ":";}
 
         var result = new Date(milliseconds).toLocaleTimeString();
-        console.log("Timestamp " + milliseconds + " converted to time of day: " + result + ".");
+        //console.log("Timestamp " + milliseconds + " converted to time of day: " + result + ".");
          
         return result; 
     }
@@ -99,7 +99,7 @@ export default class UtilityTime
 
     static dateToString(date, options)  
     {
-        if(date == false)
+        if(date == undefined)
         {   return undefined;}
 
         if(options == undefined)
@@ -108,7 +108,7 @@ export default class UtilityTime
         }
 
         var result = date.toLocaleDateString("en-US",  {year: "numeric", month: "short", day: "numeric" });
-        console.log("Date " + date + " converted to string representation: " + result + ".");
+        //console.log("Date " + date + " converted to string representation: " + result + ".");
 
         return result;
     }

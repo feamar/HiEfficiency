@@ -54,7 +54,7 @@ export default class InputDateTime extends Component
 
     getDisplayValue = (timestamp, mode) =>
     {
-        console.log("getDisplayValue: " + timestamp);
+        //console.log("getDisplayValue: " + timestamp);
         const date = new Date(timestamp);
         switch(mode)
         {

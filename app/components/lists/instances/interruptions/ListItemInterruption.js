@@ -55,7 +55,7 @@ export default class ListItemInterruption extends AbstractListItem
 
     onComponentWillReceiveProps = (props) =>
     {
-        console.log("Current duration: " + this.props.duration + " AND next duration: " + props.duration);
+        //console.log("Current duration: " + this.props.duration + " AND next duration: " + props.duration);
         if(this.props.item.duration == undefined && props.item.duration != undefined)
         {
             this.addContextMenuItem("Edit", ActionType.EDIT);

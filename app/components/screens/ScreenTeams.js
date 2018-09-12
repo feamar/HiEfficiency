@@ -15,9 +15,27 @@ import ActionType from "../../enums/ActionType";
 import { Item } from "native-base";
 import ListItemTeam from "../lists/instances/teams/ListItemTeam";
 import AbstractList from "../lists/abstractions/list/AbstractList";
+import WithReduxListener from "../../hocs/WithReduxListener";
+import update from 'immutability-helper';
+import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting"
+const mapStateToProps = (state, props) =>
+{
+  return {
+    user: state.user
+  }
+}
+
+const mapDispatchToProps = (dispatch, props) =>
+{
+  return {
+    onInspectTeamStart: (teamId) => dispatch(ReducerInspecting.onInspectTeamStart(teamId)),
+  }
+}
 
 class ScreenTeams extends Component
 {
+  static displayName = "Screen Teams";
+
   constructor(props)
   {
     super(props)
@@ -25,106 +43,31 @@ class ScreenTeams extends Component
     this.state =
     {
       user: null,
-      teams: [],
       open: false,
-      shouldFabGroupRender: true
+      shouldFabGroupRender: true,
+      teamListItems: []
     } 
-
-    this.teamUnsubscribers = [];
-    this.unsubscribers = [];
   }
 
-  componentWillMount()
+  onReduxStateChanged = (props) =>
   {
-    var unsubscriber = FirebaseAdapter.getCurrentUser(this.onUserAvailableWhileMounting, this.onUserUnavailableWhileMounting);
-    this.unsubscribers.push(unsubscriber);
-  } 
+    if(this.state.user != props.user)
+    { 
+      //FirebaseAdapter.getUsers().doc(this.props.user.uid).update({teams: []});      
+      //return;
+      const keys = Object.keys(props.user.teams);
+      const teamObjects = keys.map((key, index) => {return props.user.teams[key]});
+      this.setState({user: props.user, teamListItems: teamObjects});
+    }
+  }
   
-  componentWillUnmount()
-  {
-    for (var i = 0; i < this.unsubscribers.length; i++)
-    {   this.unsubscribers[i]();}
-
-    for(var i = 0 ; i < this.teamUnsubscribers.length; i++)
-    {   this.teamUnsubscribers[i]();}
-  }
- 
   setFabVisibility = (visible) =>
   {   this.setState({shouldFabGroupRender: visible});}
 
-  onUserUnavailableWhileMounting = () =>
-  {   FirebaseAdapter.logout();}
-
-  onUserAvailableWhileMounting = (user) =>
-  {
-    FirebaseAdapter.getUsers().doc(user.uid).get().then(doc =>
-    {
-      //Subscribe to updates on the user document.
-      const unsubscriber = doc.ref.onSnapshot(this.onUserDocumentChanged);
-      this.unsubscribers.push(unsubscriber);
-
-      //Call the first document change manually, to trigger team change subscriptions and insertion into the state.
-      this.onUserDocumentChanged(doc);
-    })
-    .catch(function (error)
-    {
-      console.log("Error getting user profile:", error);
-    });
-  }
-
-  onUserDocumentChanged = (document) =>
-  {
-    if (document.exists == false) 
-    {
-      FirebaseAdapter.logout();
-      return;
-    }
-
-    const teamsCollection = FirebaseAdapter.getTeams();
-    this.setState({ user: document});
-
-    this.teamUnsubscribers = [];
-
-    //For each of the user's teams
-    document.data().teams.map((teamId) => 
-    { 
-      //Fetch the team.
-      teamsCollection.doc(teamId).get().then((team) =>
-      {
-        //Subscribe to the updates on the team document.
-        const unsubscriber = team.ref.onSnapshot(this.onTeamDocumentChanged);
-        this.teamUnsubscribers.push(unsubscriber);
-
-        //Call the first document change manually, to trigger the insertion into the state.
-        this.onTeamDocumentChanged(team);
-      });
-    });
-  }
-
-  onTeamDocumentChanged = (team) =>
-  {
-    var teams = this.state.teams;
-    const index = this.getIndexOfTeamById(this.state.teams.map(current => {return current.id}), team.id);
-
-    if(team.exists == false)
-    {
-      teams.splice(index, 1);
-      this.state.user.ref.update({teams: teams.map(current => {return current.id})});
-      return;
-    }
-
-    //Determine whether to replace or push the team.
-    if(index > -1)
-    {   teams.splice(index, 1, team);}
-    else
-    {   teams.push(team);}
-
-    this.setState({teams: teams});
-  }
-
-
   onItemSelected = (item, index) => 
-  {   this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item});}
+  { 
+    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item});
+  }
 
   onContextMenuItemSelected = (item, index, action) =>
   {
@@ -143,14 +86,10 @@ class ScreenTeams extends Component
         break;
  
       case ActionType.DELETE:
-        item.ref.delete().then(() => 
-        {
-            ToastAndroid.show("Team successfully deleted!", ToastAndroid.LONG);
-        }) 
+        FirebaseAdapter.getTeams().doc(item.id).delete().then(() => 
+        {   ToastAndroid.show("Team successfully deleted!", ToastAndroid.LONG);}) 
         .catch(error => 
-        {
-          ToastAndroid.show("Team could not be deleted, please try again.", ToastAndroid.LONG);
-        });
+        {   ToastAndroid.show("Team could not be deleted, please try again.", ToastAndroid.LONG);});
         break;
 
       case ActionType.EDIT:
@@ -175,29 +114,21 @@ class ScreenTeams extends Component
     }
   }
  
-  onRenameDialogSubmitted = (value) => 
-  {
-    //Update the team name in the firstore database.
-    this.currentlyRenamingTeam.ref.update({name: value});
-  }  
-
   onJoinDialogSubmitted = (name, code) => 
   {
-    //console.log("Name: " + name + " AND Code: " + code);
     FirebaseAdapter.getTeams().where("name", "==", name.toString()).get().then(teams => 
     {
-      //console.log("FOUND 1: " + teams.docs.length);
       for(var i = 0 ; i < teams.docs.length ; i ++)
       { 
         const team = teams.docs[i];
         if(team.data().code.toString() == code.toString())
         {
-          var userTeams = this.state.user.data().teams;
-          if(userTeams.indexOf(team.id) > -1)
+          var newData = this.state.user.data.teams;
+          if(newData.indexOf(team.id) > -1)
           {   continue;}
 
-          userTeams.push(team.id);
-          this.state.user.ref.update({teams: userTeams});
+          newData = update(newData, {$push: [team.id]});
+          FirebaseAdapter.getUsers().doc(this.state.user.uid).update({teams: newData});
 
           return;
         }
@@ -212,13 +143,11 @@ class ScreenTeams extends Component
 
   onCreateDialogSubmitted = (team) =>
   {
-    //console.log("TEAM: " + JSON.stringify(team));
     FirebaseAdapter.getTeams().add(team).then((doc) =>
     {   
         ToastAndroid.show("Team successfully created!", ToastAndroid.LONG);
-        const teams = this.state.user.data().teams;
-        teams.push(doc.id);
-        this.state.user.ref.update({teams: teams});
+        const teams = update(this.state.user.data.teams, {$push: [doc.id]});
+        FirebaseAdapter.getUsers().doc(this.state.user.uid).update({teams: teams});
     })
     .catch(error => 
     {   ToastAndroid.show("Team could not be created, please try again.", ToastAndroid.LONG)});
@@ -230,28 +159,28 @@ class ScreenTeams extends Component
     {
       case ActionType.POSITIVE:
         const item = this.currentlyLeavingTeam;
-        var userTeams =  this.state.user.data().teams;
+        var userTeams =  this.state.user.data.teams;
         var index = this.getIndexOfTeamById(userTeams, item.id);
 
         if(index > -1)
         {
           //Remove the team from the user document.
-          userTeams.splice(index, 1);
-          this.state.user.ref.update({ teams: userTeams });
-
-          //Remove the team document from the state.
-          var teamDocs = this.state.teams;
-          teamDocs.splice(index, 1);
-          this.setState({teams: teamDocs});
+          userTeams = update(userTeams, {$splice: [[index, 1]]})
+          FirebaseAdapter.getUsers().doc(this.state.user.uid).update({ teams: userTeams });
         }
         break;
     }
   }
 
-  render() {
+  render() 
+  {
+    if(this.state.user == undefined || this.state.user.teams == undefined)
+    {   return null;}
+
+
     return (  
       <View style={{height: "100%"}}>  
-        <ListTeams containerHasFab={true} items={this.state.teams} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+        <ListTeams containerHasFab={true} items={this.state.teamListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogTeamJoin title="Join Team" ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
         <DialogTeamCreate title="Create Team" ref={instance => this.dialogCreateTeam = instance} visible={false} onDialogSubmitted={this.onCreateDialogSubmitted} />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />
@@ -285,4 +214,4 @@ class ScreenTeams extends Component
 }
 
 
-export default ScreenTeams;
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, ScreenTeams);

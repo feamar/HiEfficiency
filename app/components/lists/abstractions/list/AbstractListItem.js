@@ -44,11 +44,8 @@ export default class AbstractListItem extends Component
 
     componentWillReceiveProps = (props) =>
     {   
-        console.log("ComponentWillReceiveProps");
-        //console.log("componentWillReceiveProps: " + UtilityObject.stringify(props));
         if(this.onComponentWillReceiveProps)
         {
-            //console.log("onComponentWillReceiveProps");
             this.onComponentWillReceiveProps(props);
         }
 

@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import UtilityObject from "../utilities/UtilityObject";
 
 export default class AbstractHigherOrderComponent extends Component
 {
@@ -27,9 +28,7 @@ export default class AbstractHigherOrderComponent extends Component
         while(listener != undefined)
         {   
             if(listener[methodName] != undefined)
-            {   
-                results.push(listener[methodName](args));
-            }
+        {       results.push(listener[methodName](...args));}
 
             listener = listener.wrapped;
         }

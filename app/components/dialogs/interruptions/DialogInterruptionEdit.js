@@ -71,7 +71,7 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
     onDateTimeSelected = (field) => (timestamp) =>
     {
-        console.log("HERE! Timestamp is: " + timestamp);
+        //console.log("HERE! Timestamp is: " + timestamp);
         const storageValue = this.state.storageValue;
         storageValue[field] = timestamp;
         this.onValueChange(storageValue);

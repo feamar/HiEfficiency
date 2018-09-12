@@ -1,7 +1,6 @@
 import firebase from 'react-native-firebase';
 
 
-//TODO: Discuss with Frank whether this refactor is allright.
 export default class FirebaseAdapter 
 {
   //Firestore
@@ -28,11 +27,11 @@ export default class FirebaseAdapter
   static getInterruptionsFromTeam = (teamId, storyId) =>
   {  
     const story = FirebaseAdapter.getStories(teamId).doc(storyId);
-    return FirebaseAdapter.getInterruptionsFromStory(story);
+    return FirebaseAdapter.getInterruptionsFromStoryRef(story);
   }
 
-  static getInterruptionsFromStory = (story) =>
-  {   return story.ref.collection("interruptionsPerUser");}
+  static getInterruptionsFromStoryRef = (story) =>
+  {   return story.collection("interruptionsPerUser");}
 
   //Auth
   static logout = () =>

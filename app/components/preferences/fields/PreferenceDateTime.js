@@ -66,7 +66,7 @@ export default class PreferenceDateTime extends AbstractContainedPreference
         return (
             <View>
                 <Text>{this.getDisplayValue(this.state.storageValue)}</Text>
-                <DateTimePicker datePickerModeAndroid="default" date={this.state.storageValue} onCancel={this.onCancel} mode={this.state.mode} isVisible={this.state.open} onConfirm={this.onDateTimeConfirmed} />
+                <DateTimePicker datePickerModeAndroid="default" date={this.state.storageValue || new Date()} onCancel={this.onCancel} mode={this.state.mode} isVisible={this.state.open} onConfirm={this.onDateTimeConfirmed} />
             </View>
         );
     }

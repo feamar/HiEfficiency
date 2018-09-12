@@ -2,7 +2,7 @@ import React from 'react';
 import FirebaseAdapter from "./app/components/firebase/FirebaseAdapter";
 
 import Theme from './app/styles/Theme';
-import {Provider, Portal} from 'react-native-paper';
+import {Provider as ThemeProvider, Portal} from 'react-native-paper';
 import { MenuProvider } from 'react-native-popup-menu';
 import Router from './app/components/routing/Router'
 import {StatusBar} from "react-native";
@@ -10,64 +10,84 @@ import UtilityObject from './app/utilities/UtilityObject';
 import {createStore} from "redux";
 import {Provider as ReduxProvider} from "react-redux";
 import ReducerInitial from "./app/redux/reducers/ReducerInitial";
-
-const styles = {
-  root: {
-    backgroundColor: "purple"
-  }
-}
+import firebase from 'react-native-firebase';
+import {onUserLoggedIn, onUserLoggedOut, onUserDataChanged, onUserJoinsTeam, onUserLeftTeam} from "./app/redux/reducers/ReducerUser";
+import { connect } from 'react-redux'
+import ScreenSplash from './app/components/screens/ScreenSplash';
+import { onTeamDataChanged } from './app/redux/reducers/ReducerTeams';
+import UtilityArray from './app/utilities/UtilityArray';
+import FirebaseManager from './app/components/firebase/FirebaseManager';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       signedIn: false,
       checkedSignIn: false,
       shouldSplash: true
     };
 
-    this.timerIsSet = false;
-    //this.store = createStore(ReducerInitial);
-
     this.initializeCyclicJs();
+
+    this.store = createStore(ReducerInitial);
+    this.unsubscribers = [];
+    this.timerIsSet = false;
+
+
+    const unsubscriber = this.store.subscribe(this.onReduxStateChanged);
+    this.unsubscribers.push(unsubscriber);
   }
 
-  componentDidMount() {
-    FirebaseAdapter.getCurrentUser(
-      () => this.setState({ signedIn: true, checkedSignIn: true }),
-      () => this.setState({ signedIn: false, checkedSignIn: true }));
+  onReduxStateChanged = () =>
+  {
+    const globalState = this.store.getState();
+    if(this.state.checkedSignIn == false)
+    {   
+      this.setState({checkedSignIn: true, signedIn: globalState.user != undefined});
+    }
 
+    const signedIn = globalState.user != undefined;
+    if(signedIn != this.state.signedIn)
+    {   this.setState({signedIn: signedIn});}
   }
 
-  componentWillUnmount() {
+  componentDidMount() 
+  {
+    FirebaseManager.Instance.attach(this.store);
+  }
+
+  componentWillUnmount() 
+  {   
+    FirebaseManager.Instance.detach();
   }
 
   setShouldSplash = (shouldSplash) =>
   {   this.setState({shouldSplash: shouldSplash})}
 
   render() {
-    const { checkedSignIn, signedIn} = this.state;
-
-    if (!checkedSignIn) { return null; }
-
-    const RouteStack = Router.createInitialStack(this.state.signedIn, this.state.shouldSplash);
-
     if(this.state.shouldSplash && this.timerIsSet == false)
     {
         this.timerIsSet = true;
-        setTimeout(() => {this.setState({shouldSplash: false})}, 3000);
+        setTimeout(() => {this.setShouldSplash(false)}, __DEV__ ? 0 : 3000);
     }
 
+    if (this.state.checkedSignIn == false || this.state.shouldSplash) 
+    {   return <ScreenSplash />}
+
+    const RouteStack = Router.createInitialStack(this.state.signedIn, this.state.shouldSplash);
 
     return(
-        <Provider theme={Theme}>
+      <ReduxProvider store={this.store}>
+        <ThemeProvider theme={Theme}>
           <MenuProvider>
             <StatusBar backgroundColor={Theme.colors.primaryDark}/>
             <Portal.Host>
-              <RouteStack style={styles.root} />
-            </Portal.Host>
+              <RouteStack />
+            </Portal.Host>  
           </MenuProvider>
-        </Provider>
+        </ThemeProvider>
+      </ReduxProvider>
     );
   }
 
@@ -130,3 +150,4 @@ export default class App extends React.Component {
     };
   }
 }
+

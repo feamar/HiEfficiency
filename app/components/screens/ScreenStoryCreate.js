@@ -6,15 +6,15 @@ import PreferenceText from "../preferences/fields/PreferenceText";
 import PreferenceSelectSpinner from "../preferences/fields/PreferenceSelectSpinner";
 import StoryType from "../../enums/StoryType";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
-import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
-import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
+import WithBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import { FAB, Snackbar } from 'react-native-paper';
 import UtilityScreen from "../../utilities/UtilityScreen";
 import UtilityObject from "../../utilities/UtilityObject";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import ActionType from "../../enums/ActionType";
 import Router, { SCREEN_NAME_STORY_DETAILS_INFO } from "../routing/Router";
-
+import update from "immutability-helper";
+import {connect} from "react-redux";
 
 const styles = {
     scrollView:{
@@ -24,6 +24,13 @@ const styles = {
 
 export const MODE_CREATE = "create";
 export const MODE_EDIT = "edit";
+
+const mapStateToProps = (state, props)  =>
+{
+    return {
+        inspecting: state.inspecting
+    }
+}
 
 class ScreenStoryCreate extends Component
 {
@@ -36,14 +43,15 @@ class ScreenStoryCreate extends Component
         var story = {
             upvotes: 0,
             startedOn: null,
-            finishedOn: null
+            finishedOn: null,
+            createdOn: new Date()
         }
 
         const existingStory = props.navigation.getParam("story");
         this.mode = MODE_CREATE;
         if(existingStory) 
         {
-            story = existingStory.data();
+            story = existingStory.data;
             this.mode = MODE_EDIT;
         }
 
@@ -62,7 +70,6 @@ class ScreenStoryCreate extends Component
 
     onSoftwareBackPress = () =>
     {
-        console.log("ON BACK PRESS");
         if(this.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
 
@@ -75,12 +82,12 @@ class ScreenStoryCreate extends Component
 
     onValueChanged = (field) => (value) =>
     {
-        const story = this.state.story;
+        var story = this.state.story;
         if(story[field] == value)
         {   return;}
 
         this.unsavedChanges = true;
-        story[field] = value;
+        story = update(story, {[field]: {$set: value}});
         this.setState({story: story});
     }
 
@@ -101,7 +108,6 @@ class ScreenStoryCreate extends Component
     {
         var valid = true;
         const keys = Object.keys(this.fields);
-        var story = {};
 
         for(var i = 0 ; i < keys.length ; i++)
         {
@@ -114,13 +120,12 @@ class ScreenStoryCreate extends Component
 
         if(valid) 
         {
-            var self = this;
-            var team = this.props.navigation.getParam("team");
+            const teamId = this.props.inspecting.team;
 
             switch(this.mode)
             { 
                 case MODE_CREATE:
-                    FirebaseAdapter.getStories(team.id).add(this.state.story).then(() => 
+                    FirebaseAdapter.getStories(teamId).add(this.state.story).then(() => 
                     {
                         ToastAndroid.show("Story successfully created!", ToastAndroid.LONG);
                         this.props.navigation.goBack();
@@ -132,7 +137,8 @@ class ScreenStoryCreate extends Component
                     break;
 
                 case MODE_EDIT:
-                    this.props.navigation.getParam("story").ref.update(this.state.story).then(() => 
+                    const story = this.props.navigation.getParam("story");
+                    FirebaseAdapter.getStories(teamId).doc(story.id).update(this.state.story).then(() => 
                     {
                         this.unsavedChanges = false;
                         ToastAndroid.show("Story successfully updated!", ToastAndroid.LONG);
@@ -174,7 +180,7 @@ class ScreenStoryCreate extends Component
                     <PreferenceCategory title="Mandatory">
                         <PreferenceText required ref={c => this.fields.name = c} title="Name" storageValue={this.state.story.name} onValueChanged={this.onValueChanged("name")} />
                         <PreferenceText ref={c => this.fields.description = c} title="Description" storageValue={this.state.story.description} onValueChanged={this.onValueChanged("description")} multiline={true} numberOfLines={5} />
-                        <PreferenceSelectSpinner required ref={c => this.fields.type = c} title="Story Type" storageValue={this.state.story.type} onValueChanged={this.onValueChanged("type")} options={this.getStoryTypeOptions()} getDisplayValueFromItem={storageValue => { return StoryType.fromId(storageValue).name}}/> 
+                        <PreferenceSelectSpinner required ref={c => this.fields.type = c} title="Story Type" storageValue={this.state.story.type} onValueChanged={this.onValueChanged("type")} options={this.getStoryTypeOptions()} getDisplayValueFromItem={storageValue =>StoryType.fromId(storageValue).name}/> 
                     </PreferenceCategory>
                     <PreferenceCategory title="Optional">
                         <PreferenceText ref={c => this.fields.points = c} title="Story Points" storageValue={this.state.story.points} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
@@ -189,4 +195,4 @@ class ScreenStoryCreate extends Component
 
 
 
-export default withBackButtonInterceptor(ScreenStoryCreate);
+export default connect(mapStateToProps)(WithBackButtonInterceptor(ScreenStoryCreate));

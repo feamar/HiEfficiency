@@ -7,6 +7,7 @@ import AbstractListItem from "../../abstractions/list/AbstractListItem";
 import Theme from "../../../../styles/Theme";
 import ActionType from "../../../../enums/ActionType";
 import PropTypes from "prop-types";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 const styles = {
     teamName: {
@@ -31,7 +32,7 @@ export default class ListItemTeam extends AbstractListItem
 
     getItemContent = () => 
     {
-        return <Text style={styles.teamName}>{this.state.item.data().name}</Text>
+        return <Text style={styles.teamName}>{this.state.item.data.name}</Text>
     }
 }
 

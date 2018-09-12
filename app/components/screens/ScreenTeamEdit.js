@@ -12,6 +12,8 @@ import {compose} from "redux";
 import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
 import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import ActionType from '../../enums/ActionType';
+import FirebaseAdapter from '../firebase/FirebaseAdapter';
+import update from 'immutability-helper';
 
 class ScreenTeamEdit extends Component
 {
@@ -19,15 +21,14 @@ class ScreenTeamEdit extends Component
     constructor(props)
     {
         super(props);
-        this.team = this.props.navigation.getParam("team");
         this.unsavedChanges = false;
-
+        
+        const team = this.props.navigation.getParam("team");
         this.state =
         {
-          team: {...this.team.data()},
+          team: team,
           shouldFabGroupRender: true
         } 
-
     }
 
     onHardwareBackPress = () =>
@@ -47,13 +48,12 @@ class ScreenTeamEdit extends Component
 
     onValueChanged = (field) => (value) =>
     {
-        const team = this.state.team;
-
-        if(this.state.team[field] == value)
+        var team = this.state.team;
+        if(team.data[field] == value)
         {   return;}
 
         this.unsavedChanges = true;
-        team[field] = value;
+        team = update(team, {data: {[field]: {$set: value}}});
         this.setState({team: team});
     }
 
@@ -62,14 +62,14 @@ class ScreenTeamEdit extends Component
         switch(action) 
         {
             case ActionType.POSITIVE:
-            this.props.navigation.goBack();
-            break;
+                this.props.navigation.goBack();
+                break;
         }
     }
 
     onFabPress = () =>
     {
-        this.team.ref.update(this.state.team).then(() => 
+        FirebaseAdapter.getTeams().doc(this.state.team.id).update(this.state.team.data).then(() => 
         {
             ToastAndroid.show("Team successfully updated!", ToastAndroid.LONG);
             this.props.navigation.goBack();
@@ -81,11 +81,11 @@ class ScreenTeamEdit extends Component
         return (
             <View style={{height: "100%"}}>
                 <PreferenceCategory title="Basic Information">
-                    <PreferenceText title="Team Name" storageValue={this.state.team.name} onValueChanged={this.onValueChanged("name")}/>
-                    <PreferenceText title="Security Code" storageValue={this.state.team.code} onValueChanged={this.onValueChanged("code")}/>
+                    <PreferenceText title="Team Name" storageValue={this.state.team.data.name} onValueChanged={this.onValueChanged("name")}/>
+                    <PreferenceText title="Security Code" storageValue={this.state.team.data.code} onValueChanged={this.onValueChanged("code")}/>
                 </PreferenceCategory>
                 <PreferenceCategory title="Sprints">
-                    <PreferenceDateTime title="Date of first sprint" mode="date" storageValue={this.state.team.dateOfFirstSprint} onValueChanged={this.onValueChanged("dateOfFirstSprint")} />
+                    <PreferenceDateTime title="Date of first sprint" mode="date" storageValue={this.state.team.data.dateOfFirstSprint} onValueChanged={this.onValueChanged("dateOfFirstSprint")} />
                 </PreferenceCategory>
                 {this.state.shouldFabGroupRender && <FAB.Group icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
                 <DialogConfirmation ref={i => this.confirmationDialog = i} message="There are unsaved changes to the team. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onDialogActionPressed={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />

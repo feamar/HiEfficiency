@@ -31,7 +31,7 @@ export default class InputDateTimeSeparate extends Component
     {
         super(props);
 
-        console.log("INPUT DATE: " + this.props.timestamp);
+        //console.log("INPUT DATE: " + this.props.timestamp);
 
         if(this.props.timestamp == undefined)
         {   this.props.timestamp = new Date();}
@@ -56,9 +56,9 @@ export default class InputDateTimeSeparate extends Component
 
     onTimeSelected = (timestamp) => 
     {
-        console.log("Separate Time: " + timestamp);
+        //console.log("Separate Time: " + timestamp);
         const timeComponent = this.getTimeComponentFrom(timestamp);
-        console.log("TIme component: " + timeComponent);
+        //console.log("TIme component: " + timeComponent);
 
         this.setState({time: timestamp, timeComponent: timeComponent}, () => 
         {

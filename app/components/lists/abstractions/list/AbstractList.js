@@ -26,7 +26,6 @@ export default class AbstractList extends Component
 
     componentWillReceiveProps(props) 
     {
-        console.log("CWRP in AbstractList: props:");
         this.setState({items: props.items, containerHasFab: props.containerHasFab});
     }
 

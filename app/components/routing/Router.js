@@ -36,8 +36,9 @@ export const STACK_NAME_STORY_DETAILS = "StoryDetails";
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 
-export const SCREEN_NAME_STORY_BOARD_UNFINISHED = 'StoryBoardUnfinished';
-export const SCREEN_NAME_STORY_BOARD_FINISHED = "StoryBoardFinished";
+export const SCREEN_NAME_STORY_BOARD_TODO = 'StoryBoardTodo';
+export const SCREEN_NAME_STORY_BOARD_DOING = "StoryBoardDoing";
+export const SCREEN_NAME_STORY_BOARD_DONE = "StoryBoardDone";
 export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Interruptions';
 export const SCREEN_NAME_STORY_DETAILS_INFO = 'Info';
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
@@ -58,19 +59,15 @@ const ActionBarStyles = {
 
 export default class Router
 {
-  static createInitialStack = (loggedIn, shouldSplash) =>
+  static createInitialStack = (loggedIn) =>
   {
       return createSwitchNavigator(
           {
-              [SCREEN_NAME_SPLASH]: 
-              {
-                screen: ScreenSplash
-              },
               [STACK_NAME_AUTH]: Router.createAuthStack(),
               [STACK_NAME_HOME]: Router.createHomeStack()
           },
           {
-              initialRouteName: shouldSplash ? SCREEN_NAME_SPLASH : (loggedIn ? STACK_NAME_HOME : STACK_NAME_AUTH)
+              initialRouteName: loggedIn ? STACK_NAME_HOME : STACK_NAME_AUTH
           }
       )
   }
@@ -107,10 +104,10 @@ export default class Router
         {
           screen: Router.createProfileRouter(),
         },
-        //[SCREEN_NAME_DEVELOPER]:
-        //{
-        //  screen: ScreenDeveloper
-        //}
+        [SCREEN_NAME_DEVELOPER]:
+        {
+          screen: ScreenDeveloper
+        }
       },
       {
         initialRouteName: STACK_NAME_TEAMS,
@@ -169,19 +166,24 @@ export default class Router
   static createStoryBoardStack = () =>
   {
     return createMaterialTopTabNavigator ({
-      [SCREEN_NAME_STORY_BOARD_UNFINISHED]:
+      [SCREEN_NAME_STORY_BOARD_TODO]:
       {
-        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_UNFINISHED} />,
-        navigationOptions: getNavigationOptions("Story Board", getBackIcon())
+        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_TODO} />,
+        navigationOptions: getNavigationOptions("Todo", getBackIcon())
+      },  
+      [SCREEN_NAME_STORY_BOARD_DOING]:
+      {
+        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_DOING} />,
+        navigationOptions: getNavigationOptions("Doing", getBackIcon())
       },
-      [SCREEN_NAME_STORY_BOARD_FINISHED]:
+      [SCREEN_NAME_STORY_BOARD_DONE]:
       {
-        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_FINISHED} />,
-        navigationOptions: getNavigationOptions("Finished", getBackIcon())
+        screen: (props) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_DONE} />,
+        navigationOptions: getNavigationOptions("Done", getBackIcon())
       }
     },
     {
-      initialRouteName: SCREEN_NAME_STORY_BOARD_UNFINISHED,
+      initialRouteName: SCREEN_NAME_STORY_BOARD_TODO,
       tabBarOptions: getTabBarOptions(),
     });
   }
@@ -267,8 +269,7 @@ const getNavigationOptions = (title, action, hasTabs) =>
       var paddingLeft = 15;
       if (action)
       {
-           headerLeft = action(navigation);
-           paddingLeft = 0;
+        headerLeft = action(navigation);
       }
 
       const options = {
