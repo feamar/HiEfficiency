@@ -31,8 +31,10 @@ class ScreenProfile extends Component
     super(props);
 
     this.state = {
-      user: undefined
+      user: props.user
     }
+
+    this.props.setLoading(false);
   }
 
   onReduxStateChanged = (props) =>
