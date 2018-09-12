@@ -8,7 +8,7 @@ import
 } from "react-navigation";
 
 import {View} from "react-native";
-import {Icon} from "react-native-elements";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
@@ -51,6 +51,7 @@ export const SCREEN_NAME_DEVELOPER = "Development";
 export const TAB_NAME_TEAM_OVERVIEW = 'TeamOverview';
 export const TAB_NAME_PROFILE = 'Profile';
 
+export const PARAM_NAME_HEADER_RIGHT_INJECTION = "header_right_injection";
 
 const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
@@ -150,7 +151,7 @@ export default class Router
       [STACK_NAME_STORY_DETAILS]:
       {
         screen: Router.createStoryDetailsStack(),
-        navigationOptions: getNavigationOptions("Story Details", getBackIcon(), true, )
+        navigationOptions: getNavigationOptions("Story Details", getBackIcon(), true)
       },
       [SCREEN_NAME_STORY_CREATE]:
       {
@@ -224,7 +225,7 @@ export default class Router
 
 const getHamburgerIcon = () => (navigation) =>
 {
-  return <Icon onPress={() => navigation.openDrawer()} name= "menu" color="white" underlayColor="transparent" />
+  return <Icon size={26}  onPress={() => navigation.openDrawer()} name= "menu" color="white" />
 }
 
 export const getBackIcon = (isForTabs) => (navigation) =>
@@ -244,7 +245,7 @@ export const getBackIcon = (isForTabs) => (navigation) =>
     {   navigation.goBack();}
   }
 
-  return <Icon onPress={internal} name= "arrow-back" color="white" underlayColor="transparent" />
+  return <Icon onPress={internal} size={26} name= "arrow-back" color="white" />
 }
 
 const getTabBarOptions = () =>
@@ -260,17 +261,25 @@ const getTabBarOptions = () =>
   }
 }
 
-const getNavigationOptions = (title, action, hasTabs) =>
+const getNavigationOptions = (title, actionLeft, hasTabs) =>
 {
     return  (props) =>
     {
       const navigation = props.navigation;
-      var headerLeft = null;
       var paddingLeft = 15;
-      if (action)
+
+      var headerLeft = null;
+      if (actionLeft)
       {
-        headerLeft = action(navigation);
+        headerLeft = actionLeft(navigation);
+        paddingLeft = 0;
       }
+
+      var headerRight = undefined;
+      const headerRightInjection = navigation.getParam(PARAM_NAME_HEADER_RIGHT_INJECTION);
+      if(headerRightInjection)
+      {   headerRight = headerRightInjection();}
+
 
       const options = {
         title: title,
@@ -280,6 +289,7 @@ const getNavigationOptions = (title, action, hasTabs) =>
         headerTitleStyle: { flex: 1},
         headerTintColor: "white",
         headerLeft: headerLeft,
+        headerRight: headerRight,
         headerLeftContainerStyle: {
           paddingLeft: 15
         },

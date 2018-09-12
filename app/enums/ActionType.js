@@ -14,8 +14,9 @@ export default class ActionType
     static NEGATIVE = "negative";
     static NEUTRAL = "neutral";
     static SCAFFOLD = "scaffold";
+    static UNSTART = "unstart";
 
     static Values = [ActionType.EDIT, ActionType.DELETE, ActionType.LEAVE, ActionType.INSPECT, 
         ActionType.UPVOTE, ActionType.FINISH, ActionType.REOPEN, ActionType.JOIN, ActionType.CREATE,
-        ActionType.POSITIVE, ActionType.NEGATIVE, ActionType.Neutral, ActionType.SCAFFOLD];
+        ActionType.POSITIVE, ActionType.NEGATIVE, ActionType.Neutral, ActionType.SCAFFOLD, ActionType.UNSTART];
 }

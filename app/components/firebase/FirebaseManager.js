@@ -159,8 +159,7 @@ export default class FirebaseManager
         if(this.interruptionUnsubscriber)
         {   this.interruptionUnsubscriber();}
     }
-
-
+    
     onUserInspectingTeamStart = (teamId) =>
     {
         const state = this.store.getState();

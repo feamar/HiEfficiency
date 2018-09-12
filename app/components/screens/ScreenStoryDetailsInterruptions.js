@@ -23,7 +23,9 @@ import UtilityTime from "../../utilities/UtilityTime";
 import WithReduxListener from "../../hocs/WithReduxListener";
 import * as Reducer from "../../redux/reducers/ReducerInspecting";
 import update from "immutability-helper";
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 import ScreenTeamEdit from "./ScreenTeamEdit";
+import WithOverflowMenu from "../../hocs/WithOverflowMenu";
 const isEqual = require("react-fast-compare");
 
 const LIFECYCLE_LOADING = 0;
@@ -185,6 +187,16 @@ class ScreenStoryDetailsInterruptions extends Component
 
     componentWillUnmount = () =>
     {   this.props.onInspectStoryEnd();}
+
+    getOverflowMenuItems = () =>
+    {
+        return [
+            <MenuOption key={ActionType.UNSTART} text={"Unstart Story"} onSelect={() => this.onOverflowMenuItemSelected(ActionType.UNSTART)} />
+        ];
+    }
+
+    shouldShowOverflowMenu = () =>
+    {   return this.state.lifecycle != LIFECYCLE_FINISHED && this.state.lifecycle != LIFECYCLE_UNSTARTED && this.story.interruptions.length == 0}
 
     onStartIssue = () => 
     {   
@@ -399,6 +411,18 @@ class ScreenStoryDetailsInterruptions extends Component
 
         const inspecting = this.props.inspecting;
         this.getStoryDocument(inspecting.team, inspecting.story).update({finishedOn: storageValue});
+    }
+
+    onOverflowMenuItemSelected = (action) => 
+    {
+        switch(action)
+        {
+            case ActionType.UNSTART:
+                const inspecting = this.props.inspecting;
+                const document = this.getStoryDocument(inspecting.team, inspecting.story);
+                document.update({startedOn: undefined});
+                break;
+        }
     }
 
     onContextMenuItemSelected = (item, index, action) =>
@@ -734,5 +758,5 @@ class ScreenStoryDetailsInterruptions extends Component
     }
 } 
 
-
-export default WithReduxListener(mapStateToProps, mapDispatchToProps, ScreenStoryDetailsInterruptions);
+const hoc = WithOverflowMenu(ScreenStoryDetailsInterruptions);
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, hoc);

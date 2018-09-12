@@ -38,7 +38,7 @@ export default class ListItemTeam extends AbstractListItem
         if(this.props.item.data.finishedOn == undefined && this.props.item.data.startedOn == undefined)
         {   this.addContextMenuItem("Upvote", ActionType.UPVOTE);}
 
-        this.addContextMenuItem("Inspect", ActionType.INSPECT);
+        this.addContextMenuItem("Edit", ActionType.EDIT);
         this.addContextMenuItem("Delete", ActionType.DELETE);
     }
 

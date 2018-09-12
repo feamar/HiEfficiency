@@ -3,7 +3,7 @@ import {View, ToastAndroid, Keyboard} from "react-native";
 import PropTypes from "prop-types";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
-import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE} from "../routing/Router";
+import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO} from "../routing/Router";
 import {FAB} from "react-native-paper";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import { MODE_CREATE } from "./ScreenStoryCreate";
@@ -99,10 +99,13 @@ class ScreenStoryBoard extends Component
   componentWillUnmount()
   {   this.props.onInspectTeamEnd();}
 
-  onItemSelected = async (item, index) =>
+  onItemSelected = async (item, index, selectedTabScreenName) =>
   {   
     this.props.onInspectStoryStart(item.id);
     this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item});
+
+    if(selectedTabScreenName)
+    { this.props.navigation.navigate(selectedTabScreenName);}
   } 
 
   onContextMenuItemSelected = async (item, index, action) =>
@@ -117,8 +120,8 @@ class ScreenStoryBoard extends Component
         }
         break;
 
-      case ActionType.INSPECT:
-        this.onItemSelected(item, index);
+      case ActionType.EDIT:
+        this.onItemSelected(item, index, SCREEN_NAME_STORY_DETAILS_INFO);
         break; 
 
       case ActionType.UPVOTE:

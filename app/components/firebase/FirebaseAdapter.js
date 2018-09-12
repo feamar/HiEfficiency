@@ -39,10 +39,9 @@ export default class FirebaseAdapter
   
   static signUpWithEmailAndPassword = (email, password) => 
   {
-    return firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(email, password)
+     return firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(email, password)
     .then(userCredential => 
-    {
-      
+    {  
       getUsers().doc(userCredential.user.uid).set({
         name: email,
         teams: [],
