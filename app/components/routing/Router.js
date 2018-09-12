@@ -105,10 +105,10 @@ export default class Router
         {
           screen: Router.createProfileRouter(),
         },
-        [SCREEN_NAME_DEVELOPER]:
+        /*[SCREEN_NAME_DEVELOPER]:
         {
           screen: ScreenDeveloper
-        }
+        }*/
       },
       {
         initialRouteName: STACK_NAME_TEAMS,

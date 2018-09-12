@@ -14,7 +14,6 @@ import firebase from 'react-native-firebase';
 import {onUserLoggedIn, onUserLoggedOut, onUserDataChanged, onUserJoinsTeam, onUserLeftTeam} from "./app/redux/reducers/ReducerUser";
 import { connect } from 'react-redux'
 import ScreenSplash from './app/components/screens/ScreenSplash';
-import { onTeamDataChanged } from './app/redux/reducers/ReducerTeams';
 import UtilityArray from './app/utilities/UtilityArray';
 import FirebaseManager from './app/components/firebase/FirebaseManager';
 

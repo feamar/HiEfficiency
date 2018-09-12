@@ -64,7 +64,6 @@ class ScreenStoryBoard extends Component
   {
     super(props);
 
-    this.stories = [];
     this.team = this.props.navigation.getParam("team");
 
     this.state =
@@ -73,25 +72,47 @@ class ScreenStoryBoard extends Component
       open: false, 
       shouldFabGroupRender: true
     }
+
   }  
 
   onReduxStateChanged = (props) =>
   {
     if(this.state.user != props.user)
     { 
-      const keys = Object.keys(props.user.teams[this.team.id].stories);
-
-      const storyObjects = keys.map((key, index) => 
-      {
-        return props.user.teams[this.team.id].stories[key]
-      });
-
-      this.setState({user: props.user, storyListItems: this.filter(storyObjects, this.props.mode)});
+      this.setState({user: props.user, storyListItems: this.getStoryListItems(props)});
+      this.setLoading(props);
     }
+  }
+
+  setLoading = (props) =>
+  { 
+    const shouldBeLoading = props.user == undefined 
+                            || props.user.teams == undefined 
+                            || props.user.teams[this.team.id] == undefined 
+                            || props.user.teams[this.team.id].stories == undefined
+                            || props.user.teams[this.team.id].loaded == false;
+    return this.props.setLoading(shouldBeLoading);
+  }
+
+  getStoryListItems = (props) =>
+  {
+    const stories = props.user.teams[this.team.id].stories;
+    const keys = Object.keys(stories);
+    const collection = keys.map((key, index) => 
+    {   return stories[key]});
+    
+    return this.filter(collection, props.mode)
   }
 
   setFabVisibility = (visible) =>
   {   this.setState({shouldFabGroupRender: visible});}
+
+  componentWillMount() 
+  {
+    const items = this.getStoryListItems(this.props);
+    this.setState({storyListItems: items})
+    this.setLoading(this.props);
+  }
 
   componentDidMount()
   {   this.props.onInspectTeamStart(this.team.id); }

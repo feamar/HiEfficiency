@@ -18,6 +18,8 @@ import AbstractList from "../lists/abstractions/list/AbstractList";
 import WithReduxListener from "../../hocs/WithReduxListener";
 import update from 'immutability-helper';
 import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting"
+
+
 const mapStateToProps = (state, props) =>
 {
   return {
@@ -45,22 +47,30 @@ class ScreenTeams extends Component
       user: null,
       open: false,
       shouldFabGroupRender: true,
-      teamListItems: []
+      teamListItems: this.getTeamListItems(this.props.user.teams)
     } 
+
+    this.setLoading(this.props);
   }
 
   onReduxStateChanged = (props) =>
   {
     if(this.state.user != props.user)
     { 
-      //FirebaseAdapter.getUsers().doc(this.props.user.uid).update({teams: []});      
-      //return;
-      const keys = Object.keys(props.user.teams);
-      const teamObjects = keys.map((key, index) => {return props.user.teams[key]});
-      this.setState({user: props.user, teamListItems: teamObjects});
+      this.setState({user: props.user, teamListItems: this.getTeamListItems(props.user.teams)});
+      this.setLoading(props);
     }
   }
+
+  getTeamListItems = (teams) =>
+  {
+    const keys = Object.keys(teams);
+    return keys.map((key, index) => {return teams[key]});
+  }
   
+  setLoading = (props) =>
+  {   this.props.setLoading(props.user == undefined || props.user.teams == undefined && props.user.loaded == false);}
+
   setFabVisibility = (visible) =>
   {   this.setState({shouldFabGroupRender: visible});}
 

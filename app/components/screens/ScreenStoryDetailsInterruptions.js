@@ -153,12 +153,14 @@ class ScreenStoryDetailsInterruptions extends Component
         }
 
         this.props.navigation.setParams({ subtitle: this.story.data.name })
+        this.setLoading(props);
     }
 
     onReduxStateChanged = (props) =>
     {
         if(isEqual(this.state.user, props.user))
         {   return;}
+
 
         const team = props.inspecting.team;
         const story = props.user.teams[team].stories[this.story.id];
@@ -174,7 +176,12 @@ class ScreenStoryDetailsInterruptions extends Component
             
             this.setState({sections: sections, lifecycle: lifecycle});
         }
+
+        this.setLoading(props);
     }
+
+    setLoading = (props) =>
+    {   this.props.setLoading(this.story == undefined || this.story.interruptions == undefined || this.story.loaded == false);}
 
     setFabVisibility = (visible) =>
     {   this.setState({shouldFabGroupRender: visible});}

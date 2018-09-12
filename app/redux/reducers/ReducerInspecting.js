@@ -1,4 +1,5 @@
 import UtilityObject from "../../utilities/UtilityObject";
+import update from 'immutability-helper';
 
 export const ACTION_TYPE_INSPECT_TEAM_START = "inspect_team_start";
 export const ACTION_TYPE_INSPECT_TEAM_END = "inspect_team_end";
@@ -38,25 +39,23 @@ export const onInspectStoryEnd = () =>
 
 export default (inspecting = {}, action) => 
 {
-    //console.log("INSPECTING REDUCER: " + action.type);
-
-    const copy = {...inspecting}; 
+    var copy;
     switch(action.type)
     {
         case ACTION_TYPE_INSPECT_TEAM_START:
-            copy.team = action.teamId;
+            copy = update(inspecting, {team: {$set: action.teamId}});
             return copy;
 
         case ACTION_TYPE_INSPECT_TEAM_END:
-            copy.team = undefined;
+            copy = update(inspecting, {team: {$set: undefined}});
             return copy;
 
         case ACTION_TYPE_INSPECT_STORY_START:
-            copy.story = action.storyId;
+            copy = update(inspecting, {story:{$set: action.storyId}});
             return copy;
 
         case ACTION_TYPE_INSPECT_STORY_END:
-            copy.story = undefined;
+            copy = update(inspecting, {story: {$set: undefined}});
             return copy;
 
         default:

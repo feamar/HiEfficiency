@@ -129,7 +129,7 @@ export default (user = {}, action) =>
     switch(action.type)
     {
         case ACTION_TYPE_USER_LOGGED_IN:
-            copy = update(user, {uid: {$set: action.uid}, data: {$set: action.snapshot.data()}, teams: {$set: {}}}); 
+            copy = update(user, {uid: {$set: action.uid}, data: {$set: action.snapshot.data()}, teams: {$set: {}}, loaded: {$set: false}}); 
             return copy;
 
         case ACTION_TYPE_USER_DATA_CHANGED:
@@ -151,9 +151,10 @@ export default (user = {}, action) =>
             const newTeam = {
                 id: action.joinedTeamSnapshot.id,
                 data: action.joinedTeamSnapshot.data(),
-                stories: {}
+                stories: {},
+                loaded: false
             }
-            copy = update(user, {teams: {[action.joinedTeamSnapshot.id]: {$set: newTeam}}});
+            copy = update(user, {loaded: {$set: true}, teams: {[action.joinedTeamSnapshot.id]: {$set: newTeam}}});
             return copy;
 
         case ACTION_TYPE_TEAM_DATA_CHANGED:
@@ -165,7 +166,7 @@ export default (user = {}, action) =>
             return copy;
 
         case ACTION_TYPE_STORY_CREATED:
-            copy = update(user, {teams:{[action.teamId]: {stories: {[action.storyId]: {$set: {data: action.data, id: action.storyId, interruptions: []}}}}}});
+            copy = update(user, {teams:{[action.teamId]: {stories: {[action.storyId]: {$set: {loaded: false, data: action.data, id: action.storyId, interruptions: []}}}}}});
             return copy;
 
         case ACTION_TYPE_STORY_DELETED:
@@ -173,11 +174,11 @@ export default (user = {}, action) =>
             return copy;
 
         case ACTION_TYPE_STORIES_OF_TEAM_LOADED:
-            copy = update(user, {teams: {[action.teamId]: {stories: {$merge: action.docs}}}});
+            copy = update(user, {teams: {[action.teamId]: {loaded: {$set: true}, stories: {$merge: action.docs}}}});
             return copy;
 
         case ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED:
-            copy = update(user, {teams: {[action.teamId]: {stories: {[action.storyId] : {interruptions: {$set: action.interruptions}}}}}})
+            copy = update(user, {teams: {[action.teamId]: {stories: {[action.storyId] : {loaded: {$set: true}, interruptions: {$set: action.interruptions}}}}}})
             return copy;
             
         default:
