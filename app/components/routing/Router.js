@@ -26,6 +26,7 @@ import CustomDrawer from './CustomDrawer';
 import CustomHeaderTitle from "./CustomHeaderTitle";
 import UtilityObject from '../../utilities/UtilityObject';
 import CustomHeader from './CustomHeader';
+import { TouchableRipple } from '../../../node_modules/react-native-paper';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -233,7 +234,7 @@ export default class Router
 
 const getHamburgerIcon = () => (navigation) =>
 {
-  return <Icon size={26}  onPress={() => navigation.openDrawer()} name= "menu" color="white" />
+  return <TouchableRipple onPress={() => navigation.openDrawer()}><Icon size={26}   name= "menu" color="white" /></TouchableRipple>
 }
 
 export const getBackIcon = (isForTabs) => (navigation) =>
@@ -253,7 +254,7 @@ export const getBackIcon = (isForTabs) => (navigation) =>
     {   navigation.goBack();}
   }
 
-  return <Icon onPress={internal} size={26} name= "arrow-back" color="white" />
+  return <TouchableRipple onPress={internal}><Icon size={26} name= "arrow-back" color="white" /></TouchableRipple>
 }
 
 const getTabBarOptions = () =>

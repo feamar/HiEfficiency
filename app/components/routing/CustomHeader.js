@@ -1,13 +1,12 @@
 import React from "react";
-import {View} from "react-native";
+import {View, PixelRatio} from "react-native";
 import PropTypes from "prop-types";
 import Theme from "../../styles/Theme";
 import {Text} from "react-native-paper";
 
 const styles = {
     wrapper:{
-        paddingTop: 12,
-        paddingBottom: 12,
+        minHeight: PixelRatio.getPixelSizeForLayoutSize(13),
         backgroundColor: Theme.colors.primary,
         display: "flex",
         flexDirection: "row",
@@ -25,6 +24,7 @@ const styles = {
         justifyContent: "center",
     },
     right: {
+        flexGrow: 1, 
         paddingLeft: 15,
         paddingRight: 15
     },
@@ -35,7 +35,7 @@ const styles = {
     },
     subtitle:{
         color: Theme.colors.header.typography.subtitle,
-        fontSize: 12
+        fontSize: 13
     }
 }
    
@@ -59,8 +59,8 @@ export default class CustomHeader extends React.Component
                 }
 
                 <View style={styles.mid}>
-                    <Text style={styles.title}>{this.props.title}</Text>
-                    {this.props.subtitle && <Text style={styles.subtitle}>{this.props.subtitle}</Text>}
+                    <Text numberOfLines={1} style={styles.title}>{this.props.title}</Text>
+                    {this.props.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.props.subtitle}</Text>}
                 </View>
 
                 {this.props.right && 
