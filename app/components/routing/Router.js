@@ -25,6 +25,7 @@ import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import CustomHeaderTitle from "./CustomHeaderTitle";
 import UtilityObject from '../../utilities/UtilityObject';
+import CustomHeader from './CustomHeader';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -36,9 +37,9 @@ export const STACK_NAME_STORY_DETAILS = "StoryDetails";
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 
-export const SCREEN_NAME_STORY_BOARD_TODO = 'StoryBoardTodo';
-export const SCREEN_NAME_STORY_BOARD_DOING = "StoryBoardDoing";
-export const SCREEN_NAME_STORY_BOARD_DONE = "StoryBoardDone";
+export const SCREEN_NAME_STORY_BOARD_TODO = 'Todo';
+export const SCREEN_NAME_STORY_BOARD_DOING = "Doing";
+export const SCREEN_NAME_STORY_BOARD_DONE = "Done";
 export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Interruptions';
 export const SCREEN_NAME_STORY_DETAILS_INFO = 'Info';
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
@@ -53,6 +54,8 @@ export const TAB_NAME_PROFILE = 'Profile';
 
 export const PARAM_NAME_HEADER_RIGHT_INJECTION = "header_right_injection";
 export const PARAM_NAME_INITIAL_ROUTE_NAME = "initial_route_name";
+export const PARAM_NAME_SUBTITLE = "subtitle";
+
 const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
     color: "white"
@@ -285,8 +288,12 @@ const getNavigationOptions = (title, actionLeft, hasTabs) =>
       if(headerRightInjection)
       {   headerRight = headerRightInjection();}
 
-
       const options = {
+        header: <CustomHeader left={headerLeft} title={title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
+      }
+
+
+      /*const options = {
         title: title,
         headerStyle: {
           backgroundColor: Theme.colors.primary,
@@ -312,7 +319,7 @@ const getNavigationOptions = (title, actionLeft, hasTabs) =>
         options.headerStyle.shadowRadius = 0;
         options.headerStyle.elevation = 0;
         options.headerStyle.shadowOpacity = 0;
-      }
+      }*/
 
       return options;
     };

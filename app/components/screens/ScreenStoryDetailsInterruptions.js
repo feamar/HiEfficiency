@@ -121,23 +121,21 @@ class ScreenStoryDetailsInterruptions extends Component
     static displayName = "Story Details Interruptions";
     static navigationOptions = ({navigation}) => 
     {
-        const options =  {
-            title: "Story Details",
-            subtitle: navigation.state.params.subtitle
-        };
-
         const parent = navigation.dangerouslyGetParent();
         if(parent)
         {
+            const options =  {
+                title: "Story Details",
+            };
+    
+            if(navigation && navigation.state && navigation.state.params)
+            {   options.subtitle = navigation.state.params.subtitle;}
+
             parent.navigationOptions = options;
             parent.setParams(options);
-
-            const initialRouteName = parent.getParam(PARAM_NAME_INITIAL_ROUTE_NAME);
-            if(initialRouteName)
-            {   parent.navigate(initialRouteName);}
         }
         
-        return options;
+        return navigation.navigationOptions;
     }
 
     constructor(props)

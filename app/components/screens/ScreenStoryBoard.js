@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {View, ToastAndroid, Keyboard} from "react-native";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
-import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO, PARAM_NAME_INITIAL_ROUTE_NAME} from "../routing/Router";
+import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO, PARAM_NAME_INITIAL_ROUTE_NAME, SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS, PARAM_NAME_SUBTITLE} from "../routing/Router";
 import {FAB} from "react-native-paper";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import ActionType from "../../enums/ActionType";
@@ -109,8 +109,11 @@ class ScreenStoryBoard extends Component
 
   onItemSelected = async (item, index, selectedTabScreenName) =>
   {   
+    if(selectedTabScreenName == undefined)
+    {   selectedTabScreenName = SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS;}
+
     this.props.onInspectStoryStart(item.id);
-    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item, [PARAM_NAME_INITIAL_ROUTE_NAME]: selectedTabScreenName});
+    this.props.navigation.navigate({key: STACK_NAME_STORY_DETAILS, routeName: selectedTabScreenName, params: {title: "Hello!", [PARAM_NAME_SUBTITLE]: item.data.name}});
   } 
 
   onContextMenuItemSelected = async (item, index, action) =>

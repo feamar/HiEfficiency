@@ -15,7 +15,7 @@ const styles = {
     menuTrigger:{ 
         triggerWrapper:  
         {
-            padding:20 
+            padding:6 
         }
     }
 }
