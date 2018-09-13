@@ -1,5 +1,17 @@
+class SingletonEnforcer {}
+const EnforcerInstance = new SingletonEnforcer();
+
+
 export default class FirestoreFacade
 {
+    constructor(enforcer)
+    {
+        if(enforcer != EnforcerInstance)
+        {   throw new Error("Cannot create additional runtime instances of the FirestoreFacade singleton.");}
+
+        this.state = {};
+    }
+
        //Update user data
        //Update story data
        //Update team data

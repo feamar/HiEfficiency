@@ -6,7 +6,7 @@ import {Text} from "react-native-paper";
 
 const styles = {
     wrapper:{
-        minHeight: PixelRatio.getPixelSizeForLayoutSize(13),
+        minHeight: 56,
         backgroundColor: Theme.colors.primary,
         display: "flex",
         flexDirection: "row",
