@@ -26,6 +26,7 @@ export default class AbstractList extends Component
 
     componentWillReceiveProps(props) 
     {
+        console.log("WILL RECEIVE PROPS");
         this.setState({items: props.items, containerHasFab: props.containerHasFab});
     }
 

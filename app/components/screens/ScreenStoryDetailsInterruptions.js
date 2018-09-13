@@ -119,25 +119,6 @@ const mapDispatchToProps = (dispatch, props) =>
 class ScreenStoryDetailsInterruptions extends Component
 {
     static displayName = "Story Details Interruptions";
-    static navigationOptions = ({navigation}) => 
-    {
-        const parent = navigation.dangerouslyGetParent();
-        if(parent)
-        {
-            const options =  {
-                title: "Story Details",
-            };
-    
-            if(navigation && navigation.state && navigation.state.params)
-            {   options.subtitle = navigation.state.params.subtitle;}
-
-            parent.navigationOptions = options;
-            parent.setParams(options);
-        }
-        
-        return navigation.navigationOptions;
-    }
-
     constructor(props)
     {
         super(props);

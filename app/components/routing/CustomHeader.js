@@ -24,9 +24,7 @@ const styles = {
         justifyContent: "center",
     },
     right: {
-        flexGrow: 1, 
         paddingLeft: 15,
-        paddingRight: 15
     },
     title:{ 
         color: Theme.colors.header.typography.title,
@@ -42,10 +40,7 @@ const styles = {
 export default class CustomHeader extends React.Component
 {
     constructor(props)
-    {
-        super(props);
-
-    }
+    {   super(props);}
 
     render() 
     {

@@ -11,6 +11,7 @@ import ActionType from "../../enums/ActionType";
 import WithReduxListener from "../../hocs/WithReduxListener";
 import update from 'immutability-helper';
 import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting"
+import UtilityObject from "../../utilities/UtilityObject";
 
 
 const mapStateToProps = (state, props) =>
@@ -37,7 +38,7 @@ class ScreenTeams extends Component
 
     this.state =
     {
-      user: null,
+      user: this.props.user,
       open: false,
       shouldFabGroupRender: true,
       teamListItems: this.getTeamListItems(this.props.user.teams)
@@ -58,7 +59,9 @@ class ScreenTeams extends Component
   getTeamListItems = (teams) =>
   {
     const keys = Object.keys(teams);
-    return keys.map((key, index) => {return teams[key]});
+    const items = keys.map((key, index) => {return teams[key]});
+
+    return items;
   }
   
   setLoading = (props) =>
@@ -177,8 +180,10 @@ class ScreenTeams extends Component
 
   render() 
   {
+    console.log("RENDER 1: " + UtilityObject.stringify(this.state));
     if(this.state.user == undefined || this.state.user.teams == undefined)
     {   return null;}
+    console.log("RENDER 2");
 
 
     return (  

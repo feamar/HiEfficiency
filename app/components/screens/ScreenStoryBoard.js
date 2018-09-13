@@ -113,7 +113,10 @@ class ScreenStoryBoard extends Component
     {   selectedTabScreenName = SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS;}
 
     this.props.onInspectStoryStart(item.id);
-    this.props.navigation.navigate({key: STACK_NAME_STORY_DETAILS, routeName: selectedTabScreenName, params: {title: "Hello!", [PARAM_NAME_SUBTITLE]: item.data.name}});
+    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item, subtitle: item.data.name});
+
+    if(selectedTabScreenName)
+    {   this.props.navigation.navigate(selectedTabScreenName);}
   } 
 
   onContextMenuItemSelected = async (item, index, action) =>

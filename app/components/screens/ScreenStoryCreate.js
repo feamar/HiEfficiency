@@ -47,6 +47,8 @@ class ScreenStoryCreate extends Component
         }
 
         const existingStory = props.navigation.getParam("story");
+        console.log("EXISTING STORY: " + UtilityObject.stringify(existingStory));
+        UtilityObject.inspect(props.navigation.dangerouslyGetParent());
         this.mode = MODE_CREATE;
         if(existingStory) 
         {
