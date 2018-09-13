@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {View, ToastAndroid, Keyboard} from "react-native";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
-import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO} from "../routing/Router";
+import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO, PARAM_NAME_INITIAL_ROUTE_NAME} from "../routing/Router";
 import {FAB} from "react-native-paper";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import ActionType from "../../enums/ActionType";
@@ -110,12 +110,7 @@ class ScreenStoryBoard extends Component
   onItemSelected = async (item, index, selectedTabScreenName) =>
   {   
     this.props.onInspectStoryStart(item.id);
-    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item});
-
-    if(selectedTabScreenName)
-    { 
-      //this.props.navigation.navigate(selectedTabScreenName);
-    }
+    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item, [PARAM_NAME_INITIAL_ROUTE_NAME]: selectedTabScreenName});
   } 
 
   onContextMenuItemSelected = async (item, index, action) =>

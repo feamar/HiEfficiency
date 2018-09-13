@@ -23,6 +23,8 @@ import * as Reducer from "../../redux/reducers/ReducerInspecting";
 import update from "immutability-helper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 import WithOverflowMenu from "../../hocs/WithOverflowMenu";
+import {PARAM_NAME_INITIAL_ROUTE_NAME} from "../routing/Router";
+import UtilityObject from "../../utilities/UtilityObject";
 const isEqual = require("react-fast-compare");
 
 const LIFECYCLE_LOADING = 0;
@@ -127,8 +129,12 @@ class ScreenStoryDetailsInterruptions extends Component
         const parent = navigation.dangerouslyGetParent();
         if(parent)
         {
-               parent.navigationOptions = options;
-               parent.setParams(options);
+            parent.navigationOptions = options;
+            parent.setParams(options);
+
+            const initialRouteName = parent.getParam(PARAM_NAME_INITIAL_ROUTE_NAME);
+            if(initialRouteName)
+            {   parent.navigate(initialRouteName);}
         }
         
         return options;

@@ -52,7 +52,7 @@ export const TAB_NAME_TEAM_OVERVIEW = 'TeamOverview';
 export const TAB_NAME_PROFILE = 'Profile';
 
 export const PARAM_NAME_HEADER_RIGHT_INJECTION = "header_right_injection";
-
+export const PARAM_NAME_INITIAL_ROUTE_NAME = "initial_route_name";
 const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
     color: "white"
@@ -191,6 +191,11 @@ export default class Router
 
   static createStoryDetailsStack = () =>
   {
+    //const initial = navigation.state.getParam(PARAM_NAME_INITIAL_ROUTE_NAME);
+    //console.log("INITIAL: " + initial);
+
+   // UtilityObject.inspect(navigation);
+
     return createMaterialTopTabNavigator ({
       [SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS]:
       {
@@ -204,7 +209,7 @@ export default class Router
       } 
     },
     {
-      initialRouteName:SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS,
+      initialRouteName: SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS,
       tabBarOptions: getTabBarOptions(),
       backBehavior: "none"
     });
