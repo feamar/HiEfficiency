@@ -113,7 +113,9 @@ class ScreenStoryBoard extends Component
     this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item});
 
     if(selectedTabScreenName)
-    { this.props.navigation.navigate(selectedTabScreenName);}
+    { 
+      //this.props.navigation.navigate(selectedTabScreenName);
+    }
   } 
 
   onContextMenuItemSelected = async (item, index, action) =>
