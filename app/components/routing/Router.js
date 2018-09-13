@@ -195,11 +195,6 @@ export default class Router
 
   static createStoryDetailsStack = () =>
   {
-    //const initial = navigation.state.getParam(PARAM_NAME_INITIAL_ROUTE_NAME);
-    //console.log("INITIAL: " + initial);
-
-   // UtilityObject.inspect(navigation);
-
     return createMaterialTopTabNavigator ({
       [SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS]:
       {

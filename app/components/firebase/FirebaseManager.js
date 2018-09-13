@@ -85,11 +85,14 @@ export default class FirebaseManager
         const original = this.store.getState().user.data.teams;
         const next = snapshot.data().teams;
 
+        //Dispatch the change event to the Redux store.
         this.store.dispatch(ReducerUser.onUserDataChanged(snapshot));
 
+        //Dispatch leave events for each team that was removed.
         const removed = UtilityArray.getRemoved(original, next);
         removed.forEach(teamId => this.onUserLeftTeam(teamId));
 
+        //Dispatch join events for each team that was added.
         const added = UtilityArray.getAdded(original, next);
         added.forEach(teamId => this.onUserJoinedTeam(teamId));
     }
@@ -100,13 +103,7 @@ export default class FirebaseManager
         {   this.store.dispatch(ReducerUser.onTeamDataChanged(snapshot));}
         else
         {   
-            const state = this.store.getState();
-            const index = state.user.data.teams.indexOf(snapshot.id);
-            if(index >= 0)
-            {
-                const newTeams = update(state.user.data.teams, {$splice: [[index, 1]]});
-                FirebaseAdapter.getUsers().doc(state.user.uid).update({teams: newTeams});
-            }
+            this.onTeamDeleted(snapshot);
         }
     }
 
@@ -114,8 +111,7 @@ export default class FirebaseManager
     onStoryDocumentsChanged = (teamId) => (snapshot) =>
     {   
         const added = snapshot.docChanges.filter(d => d.type == "added");
-        if(added.length > 0)
-        {   this.store.dispatch(ReducerUser.onStoriesLoaded(teamId, added));}
+        this.store.dispatch(ReducerUser.onStoriesLoaded(teamId, added));
 
         for(var i = 0 ;i < snapshot.docChanges.length ; i ++)
         {
@@ -179,6 +175,23 @@ export default class FirebaseManager
     {   
         if(this.storyUnsubscriber)
         {   this.storyUnsubscriber();}
+    }
+
+    onTeamDeleted = (snapshot) =>
+    {
+        const state = this.store.getState();
+        const index = state.user.data.teams.indexOf(snapshot.id);
+        if(index >= 0)
+        {
+            const newTeams = update(state.user.data.teams, {$splice: [[index, 1]]});
+            FirebaseAdapter.getUsers().doc(state.user.uid).update({teams: newTeams})
+            .then(() => 
+            {   this.store.dispatch(ReducerUser.onTeamDeleted(snapshot.id));});
+        }
+        else
+        {
+            this.store.dispatch(ReducerUser.onTeamDeleted(snapshot.id));
+        }
     }
 
     onUserJoinedTeam = (teamId) =>

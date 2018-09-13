@@ -23,5 +23,5 @@ export default class PreferenceText extends AbstractDialogPreference
 
 PreferenceText.propTypes = {
     multiline: PropTypes.bool,
-    numberOfLines: PropTypes.number
+    numberOfLines: PropTypes.number,
 }

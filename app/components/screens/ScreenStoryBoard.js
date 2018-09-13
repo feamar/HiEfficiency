@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {View, ToastAndroid, Keyboard} from "react-native";
-import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
 import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO, PARAM_NAME_INITIAL_ROUTE_NAME, SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS, PARAM_NAME_SUBTITLE} from "../routing/Router";
 import {FAB} from "react-native-paper";
@@ -8,6 +7,9 @@ import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import ActionType from "../../enums/ActionType";
 import WithReduxListener from "../../hocs/WithReduxListener";
 import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting";
+import WithDatabase from "../../hocs/WithDatabase";
+import ResolveType from "../../enums/ResolveType";
+import UtilityObject from "../../utilities/UtilityObject";
 
 const styles = {
     loading: {
@@ -88,7 +90,9 @@ class ScreenStoryBoard extends Component
     const collection = keys.map((key, index) => 
     {   return stories[key]});
     
-    return this.filter(collection, props.mode)
+    const filtered = this.filter(collection, props.mode)
+
+    return filtered;
   }
 
   setFabVisibility = (visible) =>
@@ -136,8 +140,7 @@ class ScreenStoryBoard extends Component
         break; 
 
       case ActionType.UPVOTE:
-        const document = FirebaseAdapter.getStories(this.team.id).doc(item.id);
-        document.update({upvotes: item.data.upvotes + 1});
+        this.props.database.updateStory(this.team.id, item.id, {upvotes: item.data.upvotes + 1}, ResolveType.TOAST, ResolveType.TOAST);
         break;
     }
   }
@@ -160,7 +163,7 @@ class ScreenStoryBoard extends Component
           upvotes: 0,
           createdOn: new Date()
         }
-        FirebaseAdapter.getStories(this.team.id).add(story);
+        this.props.database.createStory(this.team.id, story, ResolveType.TOAST, ResolveType.TOAST);
     }
   }
 
@@ -169,20 +172,7 @@ class ScreenStoryBoard extends Component
     switch(action)
     {
       case ActionType.POSITIVE:
-
-        const document = FirebaseAdapter.getStories(this.team.id).doc(this.itemToDelete.id);
-
-        document.collection("interruptionsPerUser").get().then(interruptions => 
-        {
-          interruptions.docs.forEach(doc => {doc.ref.delete()});
-
-          document.delete().then(() =>
-          {   ToastAndroid.show("User story successfully deleted!", ToastAndroid.LONG);})
-          .catch(error => 
-          {   ToastAndroid.show("User story could not be deleted, please try again.", ToastAndroid.LONG);});
-        });
-
-        
+        this.props.database.deleteStory(this.team.id, this.itemToDelete.id, ResolveType.TOAST, ResolveType.TOAST);
         break;
     }
   }
@@ -218,6 +208,7 @@ class ScreenStoryBoard extends Component
         result = result.sort((a, b) => {  return b.data.finishedOn - a.data.finishedOn}); //Sort on "finishedOn" in descending order.
         break;
     }
+
     return result;
   }
   
@@ -233,4 +224,4 @@ class ScreenStoryBoard extends Component
   } 
 }
 
-export default WithReduxListener(mapStateToProps, mapDispatchToProps, ScreenStoryBoard);
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, WithDatabase(ScreenStoryBoard));

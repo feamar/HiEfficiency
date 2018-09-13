@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { View, ToastAndroid} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
 import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
-import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
@@ -12,6 +11,9 @@ import WithReduxListener from "../../hocs/WithReduxListener";
 import update from 'immutability-helper';
 import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting"
 import UtilityObject from "../../utilities/UtilityObject";
+import WithDatabase from "../../hocs/WithDatabase";
+import ResolveType from "../../enums/ResolveType";
+import FirestoreFacade from "../firebase/FirestoreFacade";
 
 
 const mapStateToProps = (state, props) =>
@@ -92,10 +94,12 @@ class ScreenTeams extends Component
         break;
  
       case ActionType.DELETE:
-        FirebaseAdapter.getTeams().doc(item.id).delete().then(() => 
-        {   ToastAndroid.show("Team successfully deleted!", ToastAndroid.LONG);}) 
-        .catch(error => 
-        {   ToastAndroid.show("Team could not be deleted, please try again.", ToastAndroid.LONG);});
+
+        if(this.dialogConfirmDelete)
+        {
+          this.currentlyDeletingTeam = item;
+          this.dialogConfirmDelete.setVisible(true); 
+        }
         break;
 
       case ActionType.EDIT:
@@ -121,42 +125,11 @@ class ScreenTeams extends Component
   }
  
   onJoinDialogSubmitted = (name, code) => 
-  {
-    FirebaseAdapter.getTeams().where("name", "==", name.toString()).get().then(teams => 
-    {
-      for(var i = 0 ; i < teams.docs.length ; i ++)
-      { 
-        const team = teams.docs[i];
-        if(team.data().code.toString() == code.toString())
-        {
-          var newData = this.state.user.data.teams;
-          if(newData.indexOf(team.id) > -1)
-          {   continue;}
-
-          newData = update(newData, {$push: [team.id]});
-          FirebaseAdapter.getUsers().doc(this.state.user.uid).update({teams: newData});
-
-          return;
-        }
-      }
-
-      if(teams.docs.length <= 0)
-      {   alert("No team called '" + name + "' could be found.");}
-      else
-      {   alert("A team called '" + name + "' could be found, but the security code was incorrect.")}
-    });
-  }
+  {   this.props.database.joinTeam(name, code, this.props.user.data.teams, this.props.user.uid, ResolveType.NONE, ResolveType.TOAST);}
 
   onCreateDialogSubmitted = (team) =>
   {
-    FirebaseAdapter.getTeams().add(team).then((doc) =>
-    {   
-        ToastAndroid.show("Team successfully created!", ToastAndroid.LONG);
-        const teams = update(this.state.user.data.teams, {$push: [doc.id]});
-        FirebaseAdapter.getUsers().doc(this.state.user.uid).update({teams: teams});
-    })
-    .catch(error => 
-    {   ToastAndroid.show("Team could not be created, please try again.", ToastAndroid.LONG)});
+      this.props.database.createTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid, ResolveType.TOAST, ResolveType.TOAST);
   }
  
   onLeaveDialogActionPressed = (action) =>
@@ -164,27 +137,25 @@ class ScreenTeams extends Component
     switch(action)
     {
       case ActionType.POSITIVE:
-        const item = this.currentlyLeavingTeam;
-        var userTeams =  this.state.user.data.teams;
-        var index = this.getIndexOfTeamById(userTeams, item.id);
+        this.props.database.leaveTeam(this.currentlyLeavingTeam.id, this.state.user.data.teams, this.state.user.uid, ResolveType.TOAST, ResolveType.TOAST);
+        break;
+    }
+  }
 
-        if(index > -1)
-        {
-          //Remove the team from the user document.
-          userTeams = update(userTeams, {$splice: [[index, 1]]})
-          FirebaseAdapter.getUsers().doc(this.state.user.uid).update({ teams: userTeams });
-        }
+  onDeleteDialogActionPressed = (action) =>
+  {
+    switch(action)
+    {
+      case ActionType.POSITIVE:
+        this.props.database.deleteTeam(this.currentlyDeletingTeam.id, ResolveType.TOAST, ResolveType.TOAST);
         break;
     }
   }
 
   render() 
   {
-    console.log("RENDER 1: " + UtilityObject.stringify(this.state));
     if(this.state.user == undefined || this.state.user.teams == undefined)
     {   return null;}
-    console.log("RENDER 2");
-
 
     return (  
       <View style={{height: "100%"}}>  
@@ -192,6 +163,7 @@ class ScreenTeams extends Component
         <DialogTeamJoin title="Join Team" ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
         <DialogTeamCreate title="Create Team" ref={instance => this.dialogCreateTeam = instance} visible={false} onDialogSubmitted={this.onCreateDialogSubmitted} />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />
+        <DialogConfirmation title="Deleting Team" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onDialogActionPressed={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
         {this.state.shouldFabGroupRender && <FAB.Group ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
       </View>
     );
@@ -221,5 +193,4 @@ class ScreenTeams extends Component
   }
 }
 
-
-export default WithReduxListener(mapStateToProps, mapDispatchToProps, ScreenTeams);
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, WithDatabase(ScreenTeams));

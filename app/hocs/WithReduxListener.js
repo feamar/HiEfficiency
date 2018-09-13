@@ -50,8 +50,7 @@ export default withReduxListener = (mapStateToProps, mapDispatchToProps, Wrapped
 
         componentWillReceiveProps = (props) =>
         {
-            if(this.focussed)
-            {   this.onReduxStateChanged(props);}
+            this.onReduxStateChanged(props);
         }
 
         onScreenWillBlur = (payload) =>

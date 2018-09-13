@@ -11,11 +11,12 @@ import {createStore} from "redux";
 import {Provider as ReduxProvider} from "react-redux";
 import ReducerInitial from "./app/redux/reducers/ReducerInitial";
 import firebase from 'react-native-firebase';
-import {onUserLoggedIn, onUserLoggedOut, onUserDataChanged, onUserJoinsTeam, onUserLeftTeam} from "./app/redux/reducers/ReducerUser";
 import { connect } from 'react-redux'
 import ScreenSplash from './app/components/screens/ScreenSplash';
 import UtilityArray from './app/utilities/UtilityArray';
 import FirebaseManager from './app/components/firebase/FirebaseManager';
+import DatabaseProvider from './app/providers/DatabaseProvider';
+import FirestoreFacade from './app/components/firebase/FirestoreFacade';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -74,17 +75,19 @@ export default class App extends React.Component {
     if (this.state.checkedSignIn == false || this.state.shouldSplash) 
     {   return <ScreenSplash />}
 
-    const RouteStack = Router.createInitialStack(this.state.signedIn, this.state.shouldSplash);
+    const RouteStack = Router.createInitialStack(this.state.signedIn);
 
     return(
       <ReduxProvider store={this.store}>
         <ThemeProvider theme={Theme}>
-          <MenuProvider>
-            <StatusBar backgroundColor={Theme.colors.primaryDark}/>
-            <Portal.Host>
-              <RouteStack />
-            </Portal.Host>  
-          </MenuProvider>
+            <MenuProvider>
+              <StatusBar backgroundColor={Theme.colors.primaryDark}/>
+              <Portal.Host>
+                <DatabaseProvider database={FirestoreFacade.Instance}>
+                  <RouteStack />
+                </DatabaseProvider>
+              </Portal.Host>  
+            </MenuProvider>
         </ThemeProvider>
       </ReduxProvider>
     );

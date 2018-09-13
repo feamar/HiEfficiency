@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import AbstractPreference from "./AbstractPreference";
+import PropTypes from "prop-types";
 
 const styles = {
     error:{
@@ -47,12 +48,23 @@ export default class AbstractDialogPreference extends AbstractPreference
         {   this.onDialogHasSubmitted(storageValue);}
     } 
 
+    getEnterMessage = () =>
+    {
+        var message = "Press to enter ";
+
+        if(this.props.plural == false)
+        {   message += "a ";}
+
+        message += this.props.title;
+        return message;
+    }
+
     getDisplayContent = () =>
     {  
         return (
             <View>
                 <Text style={this.styles.title}>{this.props.title}</Text>
-                {this.state.displayValue ? <Text style={this.styles.displayValue}>{this.state.displayValue}</Text> : <Text>Press to enter a {this.props.title}.</Text>}
+                {this.state.displayValue ? <Text style={this.styles.displayValue}>{this.state.displayValue}</Text> : <Text>{this.getEnterMessage()}</Text>}
             </View>
         );
     }
@@ -74,3 +86,12 @@ export default class AbstractDialogPreference extends AbstractPreference
         return this.getDialogComponent(props);
     }
 } 
+
+
+AbstractDialogPreference.defaultProps = {
+    plural: false
+}
+
+AbstractDialogPreference.propTypes = {
+    plural: PropTypes.bool.isRequired
+}

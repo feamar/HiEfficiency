@@ -17,13 +17,7 @@ const styles = {
         paddingLeft: 15,
         paddingRight: 15
     },
-    mid:{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-    },
-    right: {
+        right: {
         paddingLeft: 15,
     },
     title:{ 
@@ -42,6 +36,21 @@ export default class CustomHeader extends React.Component
     constructor(props)
     {   super(props);}
 
+    getMidStyles = () => 
+    {
+        var style = {
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+        };
+
+        if(this.props.left == undefined)
+        {   style.paddingLeft = 15;}
+
+        return style;
+    }
+
     render() 
     {
         return (
@@ -53,7 +62,7 @@ export default class CustomHeader extends React.Component
                     </View>
                 }
 
-                <View style={styles.mid}>
+                <View style={this.getMidStyles()}>
                     <Text numberOfLines={1} style={styles.title}>{this.props.title}</Text>
                     {this.props.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.props.subtitle}</Text>}
                 </View>

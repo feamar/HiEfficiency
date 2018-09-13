@@ -1,6 +1,5 @@
 import React from "react";
 import { View } from "react-native";
-import FirebaseAdapter from "../firebase/FirebaseAdapter";
 
 import {
   Button,
@@ -11,7 +10,7 @@ import {
 } from 'react-native-paper';
 
 import {SCREEN_NAME_AUTH_REGISTER} from '../routing/Router';
-
+import WithDatabase from "../../hocs/WithDatabase";
 import Theme from '../../styles/Theme';
 
 const styles = {
@@ -52,7 +51,7 @@ const styles = {
   }
 }; 
 
-export default class ScreenLogin extends React.Component 
+class ScreenLogin extends React.Component 
 {
   constructor()
   {
@@ -72,7 +71,8 @@ export default class ScreenLogin extends React.Component
   handleLogin = () => 
   {
     this.setState({email: this.state.email.trim()}, () => {
-      FirebaseAdapter.signInWithEmailAndPassword(this.state.email, this.state.password).then(() => 
+
+      this.props.database.adapter.signInWithEmailAndPassword(this.state.email, this.state.password).then(() => 
       {
         
       });
@@ -104,3 +104,5 @@ export default class ScreenLogin extends React.Component
     );
   }
 }
+
+export default WithDatabase(ScreenLogin);

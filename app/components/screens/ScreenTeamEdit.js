@@ -7,8 +7,9 @@ import PreferenceDateTime from '../preferences/fields/PreferenceDateTime';
 import DialogConfirmation from '../dialogs/instances/DialogConfirmation';
 import withBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import ActionType from '../../enums/ActionType';
-import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import update from 'immutability-helper';
+import WithDatabase from "../../hocs/WithDatabase";
+import ResolveType from "../../enums/ResolveType";
 
 class ScreenTeamEdit extends Component
 {
@@ -64,11 +65,8 @@ class ScreenTeamEdit extends Component
 
     onFabPress = () =>
     {
-        FirebaseAdapter.getTeams().doc(this.state.team.id).update(this.state.team.data).then(() => 
-        {
-            ToastAndroid.show("Team successfully updated!", ToastAndroid.LONG);
-            this.props.navigation.goBack();
-        });
+        this.props.database.updateTeam(this.state.team.id, this.state.team.data, ResolveType.TOAST, ResolveType.TOAST).then(() => 
+        {   this.props.navigation.goBack();});
     }
 
     render()
@@ -89,4 +87,4 @@ class ScreenTeamEdit extends Component
     }
 }
 
-export default withBackButtonInterceptor(ScreenTeamEdit);
+export default withBackButtonInterceptor(WithDatabase(ScreenTeamEdit));

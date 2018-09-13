@@ -47,6 +47,9 @@ export default class AbstractDialog extends Component
         });   
     }
 
+    onDismiss = () =>
+    {   this.setVisible(false);}
+
     render()
     { 
         return(

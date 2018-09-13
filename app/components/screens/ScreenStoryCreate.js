@@ -5,7 +5,6 @@ import PreferenceCategory from "../preferences/PreferenceCategory";
 import PreferenceText from "../preferences/fields/PreferenceText";
 import PreferenceSelectSpinner from "../preferences/fields/PreferenceSelectSpinner";
 import StoryType from "../../enums/StoryType";
-import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import WithBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import { FAB, Snackbar } from 'react-native-paper';
 import UtilityObject from "../../utilities/UtilityObject";
@@ -14,6 +13,8 @@ import ActionType from "../../enums/ActionType";
 import Router, { SCREEN_NAME_STORY_DETAILS_INFO } from "../routing/Router";
 import update from "immutability-helper";
 import {connect} from "react-redux";
+import WithDatabase from "../../hocs/WithDatabase";
+import ResolveType from "../../enums/ResolveType";
 
 const styles = {
     scrollView:{
@@ -47,8 +48,6 @@ class ScreenStoryCreate extends Component
         }
 
         const existingStory = props.navigation.getParam("story");
-        console.log("EXISTING STORY: " + UtilityObject.stringify(existingStory));
-        UtilityObject.inspect(props.navigation.dangerouslyGetParent());
         this.mode = MODE_CREATE;
         if(existingStory) 
         {
@@ -126,28 +125,15 @@ class ScreenStoryCreate extends Component
             switch(this.mode)
             { 
                 case MODE_CREATE:
-                    FirebaseAdapter.getStories(teamId).add(this.state.story).then(() => 
-                    {
-                        ToastAndroid.show("Story successfully created!", ToastAndroid.LONG);
-                        this.props.navigation.goBack();
-                    })
-                    .catch(error => 
-                    {
-                        ToastAndroid.show("Something went wrong while saving, please try again.", ToastAndroid.LONG);
-                    });
+                    this.props.database.createStory(teamId, this.state.story, ResolveType.TOAST, ResolveType.TOAST).then(() => 
+                    {   this.props.navigation.goBack();});
                     break;
 
                 case MODE_EDIT:
                     const story = this.props.navigation.getParam("story");
-                    FirebaseAdapter.getStories(teamId).doc(story.id).update(this.state.story).then(() => 
-                    {
-                        this.unsavedChanges = false;
-                        ToastAndroid.show("Story successfully updated!", ToastAndroid.LONG);
-                    })
-                    .catch(error => 
-                    {
-                        ToastAndroid.show("Something went wrong while saving, please try again.", ToastAndroid.LONG);
-                    });;
+                    this.props.database.updateStory(teamId, story.id, this.state.story, ResolveType.TOAST, ResolveType.TOAST).then(() => 
+                    {   this.unsavedChanges = false;});
+
                     break;
             }
         }
@@ -184,7 +170,7 @@ class ScreenStoryCreate extends Component
                         <PreferenceSelectSpinner required ref={c => this.fields.type = c} title="Story Type" storageValue={this.state.story.type} onValueChanged={this.onValueChanged("type")} options={this.getStoryTypeOptions()} getDisplayValueFromItem={storageValue =>StoryType.fromId(storageValue).name}/> 
                     </PreferenceCategory>
                     <PreferenceCategory title="Optional">
-                        <PreferenceText ref={c => this.fields.points = c} title="Story Points" storageValue={this.state.story.points} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
+                        <PreferenceText ref={c => this.fields.points = c} plural={true} title="Story Points" storageValue={this.state.story.points} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
                     </PreferenceCategory>
                 </ScrollView>
                 {this.state.shouldFabGroupRender && <FAB.Group icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
@@ -196,4 +182,4 @@ class ScreenStoryCreate extends Component
 
 
 
-export default connect(mapStateToProps)(WithBackButtonInterceptor(ScreenStoryCreate));
+export default connect(mapStateToProps)(WithBackButtonInterceptor(WithDatabase(ScreenStoryCreate)));

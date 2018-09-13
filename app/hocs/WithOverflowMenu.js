@@ -37,11 +37,9 @@ export default WithOverflowMenu = (WrappedComponent) =>
 
         componentDidUpdate = (prevProps, prevState, snapshot) =>
         {
-            console.log("OVERFLOW DID STATE CHANGES");
             const shouldShow = this.setShowOverflowMenu(this.wrapped.shouldShowOverflowMenu());
             if(shouldShow != this.shouldShowOverflowMenu)
             {
-                console.log("OVERFLOW STATE CHANGE SHOULD TRANSITION");
                 this.shouldShowOverflowMenu = shouldShow;
                 this.setShowOverflowMenu(shouldShow);
             }

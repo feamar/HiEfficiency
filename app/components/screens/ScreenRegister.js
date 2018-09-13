@@ -10,6 +10,7 @@ import {
   Title,
   Text
 } from 'react-native-paper';
+import WithDatabase from "../../hocs/WithDatabase";
 
 const styles = 
 {
@@ -52,7 +53,7 @@ const styles =
   }
 }
 
-export default class ScreenRegister extends React.Component 
+class ScreenRegister extends React.Component 
 {
   constructor() 
   {
@@ -86,7 +87,7 @@ export default class ScreenRegister extends React.Component
 
     this.setState({email: this.state.email.trim()}, () => {
       //State change will automatically navigate to HOME route if successful.
-      FirebaseAdapter.signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
+      this.props.database.adapter.signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
     });
 
   }
@@ -108,3 +109,6 @@ export default class ScreenRegister extends React.Component
     </View>    
   }
 }
+
+
+export default WithDatabase(ScreenRegister);

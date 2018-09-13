@@ -67,6 +67,15 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
     constructor(props)
     {
         super(props);
+
+        this.state = {
+            ...this.state, 
+            storageValue: {
+                start: undefined,
+                end: undefined,
+                type: 0
+            }
+        }
     }
 
     onDateTimeSelected = (field) => (timestamp) =>
@@ -110,10 +119,6 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
             error = "The end of the interruption cannot be after the start of the next interruption in line (" + nextTime + ").";
         }
 
-        UtilityObject.inspect({
-            error: error, 
-            storageValue: storageValue
-        });
 
         return error;
     }
@@ -132,9 +137,6 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
     getDialogContent = () => 
     {
-        if(this.state.visible == false)
-        {   return null;}
-
         return (
             <View style={styles.wrapper}>
                 <Text style={styles.fieldTitle}>Timestamp Start</Text>

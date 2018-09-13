@@ -60,26 +60,4 @@ export default class FirebaseAdapter
     .catch(function (error) 
     {   alert(error.code + ': ' + error.message)});
   }
-
-  static getCurrentUser = (userSignedInSuccesfullyCallback, userNotSignedInCallback) => 
-  {
-    return firebase.auth().onAuthStateChanged((user) => 
-    {
-      if (user) 
-      {   userSignedInSuccesfullyCallback(user);} 
-      else 
-      {   userNotSignedInCallback();}
-    });
-  }
-
-  static getCurrentUserOrThrow = (callback) =>
-  {
-    return firebase.auth().onAuthStateChanged(user => 
-      {
-        if(user)
-        {   callback(user);}
-        else
-        {   FirebaseAdapter.logout();}
-      });
-  }
 }

@@ -2,15 +2,15 @@ import React, {Component} from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
 import PreferenceText from '../preferences/fields/PreferenceText';
 import { View } from "react-native";
-import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import PreferenceMultiSelect from '../preferences/fields/PreferenceMultiSelect';
 import {STACK_NAME_AUTH} from '../routing/Router';
 import PreferenceWeekSchema from '../preferences/fields/PreferenceWeekSchema';
 import PreferenceSelectSpinner from '../preferences/fields/PreferenceSelectSpinner';
-import { Firebase } from 'react-native-firebase';
 import {connect} from "react-redux";
 import WithReduxListener from '../../hocs/WithReduxListener';
 import UtilityObject from '../../utilities/UtilityObject';
+import WithDatabase from "../../hocs/WithDatabase";
+import ResolveType from '../../enums/ResolveType';
 
 const styles ={
   content: {padding: 0, height: "100%"}
@@ -49,7 +49,7 @@ class ScreenProfile extends Component
     if(this.state.user.data.weekSchema == undefined && field != "weekSchema")
     {   data = {...data, weekSchema: this.getDefaultSchema()};}
 
-    FirebaseAdapter.getUsers().doc(this.state.user.uid).update({[field]: value});
+    this.props.database.updateUser(this.state.user.uid, {[field]: value}, ResolveType.NONE, ResolveType.TOAST);
   }
 
   getDefaultSchema = () => {
@@ -85,4 +85,4 @@ class ScreenProfile extends Component
   }
 }
 
-export default WithReduxListener(mapStateToProps, undefined, ScreenProfile);
+export default WithReduxListener(mapStateToProps, undefined, WithDatabase(ScreenProfile));
