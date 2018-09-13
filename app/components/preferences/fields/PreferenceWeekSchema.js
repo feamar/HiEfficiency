@@ -1,8 +1,4 @@
-import React, {Component} from 'react';
-import {View} from 'react-native';
-import AbstractPreference from './AbstractPreference';
-import DialogPreferenceMultiSelect from '../../dialogs/preferences/DialogPreferenceMultiSelect';
-import PropTypes from 'prop-types';
+import React from 'react';
 import DialogPreferenceWeekSchema from '../../dialogs/preferences/DialogPreferenceWeekSchema';
 import AbstractDialogPreference from './AbstractDialogPreference';
 

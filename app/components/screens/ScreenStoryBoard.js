@@ -1,24 +1,12 @@
 import React, {Component} from "react";
 import {View, ToastAndroid, Keyboard} from "react-native";
-import PropTypes from "prop-types";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
 import ListStories from "../lists/instances/stories/ListStories";
 import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO} from "../routing/Router";
 import {FAB} from "react-native-paper";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
-import { MODE_CREATE } from "./ScreenStoryCreate";
-import * as Progress from 'react-native-progress';
-import Theme from "../../styles/Theme";
-import UtilityArray from "../../utilities/UtilityArray";
-import { Firebase } from "react-native-firebase";
-import UtilityScreen from "../../utilities/UtilityScreen";
-import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
 import ActionType from "../../enums/ActionType";
-import ListItemStory from "../lists/instances/stories/ListItemStory";
-import AbstractList from "../lists/abstractions/list/AbstractList";
-import UtilityObject from "../../utilities/UtilityObject";
 import WithReduxListener from "../../hocs/WithReduxListener";
-import update from "immutability-helper";
 import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting";
 
 const styles = {
@@ -72,7 +60,6 @@ class ScreenStoryBoard extends Component
       open: false, 
       shouldFabGroupRender: true
     }
-
   }  
 
   onReduxStateChanged = (props) =>

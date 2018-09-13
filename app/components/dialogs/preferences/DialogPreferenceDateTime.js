@@ -5,7 +5,7 @@ import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from './AbstractPreferenceDialog';
 import PropTypes from 'prop-types';
 import {Text} from "react-native-paper";
-import DateTimePicker from '../../../../node_modules/react-native-modal-datetime-picker';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 import InputDateTimeSeparate from '../../inputs/InputDateTimeSeparate';
 import PreferenceCategory from '../../preferences/PreferenceCategory';
 

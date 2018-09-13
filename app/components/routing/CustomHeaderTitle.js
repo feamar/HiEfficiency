@@ -1,10 +1,7 @@
 import React, {Component} from "react";
-import {  SafeAreaView } from 'react-navigation';
 import Theme from "../../styles/Theme";
-import { View, ScrollView, Image, PixelRatio} from "react-native";
-import {Text, TouchableRipple, Divider} from "react-native-paper";
-import VersionNumber from 'react-native-version-number';
-import FirebaseAdapter from "../firebase/FirebaseAdapter";
+import { View} from "react-native";
+import {Text} from "react-native-paper";
 
 const styles = {
     root:{

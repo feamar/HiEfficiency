@@ -1,7 +1,6 @@
-import React, {Component} from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import {View, ScrollView} from "react-native";
-import { Dropdown } from 'react-native-material-dropdown';
+import {View} from "react-native";
 import {Text} from "react-native-paper";
 import AbstractContainedPreference from "./AbstractContainedPreference";
 import UtilityTime from "../../../utilities/UtilityTime";

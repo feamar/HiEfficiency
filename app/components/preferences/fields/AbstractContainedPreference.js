@@ -1,10 +1,7 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {View} from 'react-native';
-import { Text, TouchableRipple } from 'react-native-paper';
-import PropTypes from 'prop-types';
-import { Divider } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import AbstractPreference from "./AbstractPreference";
-import { Dropdown } from 'react-native-material-dropdown';
 
 const styles = {
 

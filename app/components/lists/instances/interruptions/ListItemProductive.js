@@ -1,6 +1,5 @@
 import React from "react";
 import AbstractListItem from "../../abstractions/list/AbstractListItem";
-import PropTypes from "prop-types";
 import {View} from "react-native";
 import {Text} from "react-native-paper";
 import Icon  from "react-native-vector-icons/MaterialIcons";

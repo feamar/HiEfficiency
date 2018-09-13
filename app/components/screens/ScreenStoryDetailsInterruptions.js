@@ -18,13 +18,10 @@ import ListItemInterruption from "../lists/instances/interruptions/ListItemInter
 import ListItemProductive from "../lists/instances/interruptions/ListItemProductive";
 import ListItemFinish from "../lists/instances/interruptions/ListItemFinish";
 import DialogPreferenceDateTime from "../dialogs/preferences/DialogPreferenceDateTime";
-import UtilityObject from "../../utilities/UtilityObject";
-import UtilityTime from "../../utilities/UtilityTime";
 import WithReduxListener from "../../hocs/WithReduxListener";
 import * as Reducer from "../../redux/reducers/ReducerInspecting";
 import update from "immutability-helper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
-import ScreenTeamEdit from "./ScreenTeamEdit";
 import WithOverflowMenu from "../../hocs/WithOverflowMenu";
 const isEqual = require("react-fast-compare");
 

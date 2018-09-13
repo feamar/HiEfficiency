@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import Icon  from "react-native-vector-icons/MaterialIcons";
 import {Text, TouchableRipple} from "react-native-paper"
 import { Divider } from "react-native-paper";
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 import Theme from "../../../../styles/Theme";
 
 const styles = {

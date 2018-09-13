@@ -1,20 +1,13 @@
 import React, { Component } from "react";
-import { View, ToastAndroid, Keyboard} from "react-native";
+import { View, ToastAndroid} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
 import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
 import FirebaseAdapter from '../firebase/FirebaseAdapter';
-import DialogPreferenceText from "../dialogs/preferences/DialogPreferenceText";
 import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FAB } from "react-native-paper";
-import { NavigationEvents } from 'react-navigation';
-import UtilityScreen from "../../utilities/UtilityScreen";
-import withFloatingActionButton from "../../hocs/WithFloatingActionButton";
 import ActionType from "../../enums/ActionType";
-import { Item } from "native-base";
-import ListItemTeam from "../lists/instances/teams/ListItemTeam";
-import AbstractList from "../lists/abstractions/list/AbstractList";
 import WithReduxListener from "../../hocs/WithReduxListener";
 import update from 'immutability-helper';
 import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting"

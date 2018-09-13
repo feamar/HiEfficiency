@@ -3,7 +3,6 @@ import {View} from "react-native";
 import Svg, {Path} from 'react-native-svg';
 import Router from "../routing/Router";
 import {Text} from "react-native-paper";
-import { NavigationActions } from 'react-navigation';
 import App from "../../../App";
 
 const styles = {

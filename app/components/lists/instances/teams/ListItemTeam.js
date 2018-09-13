@@ -1,13 +1,8 @@
-import React, {Component} from "react";
-import {View} from "react-native";
-import {Text, TouchableRipple} from "react-native-paper"
-import { Divider } from "react-native-paper";
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
+import React from "react";
+import {Text} from "react-native-paper"
 import AbstractListItem from "../../abstractions/list/AbstractListItem";
 import Theme from "../../../../styles/Theme";
 import ActionType from "../../../../enums/ActionType";
-import PropTypes from "prop-types";
-import UtilityObject from "../../../../utilities/UtilityObject";
 
 const styles = {
     teamName: {

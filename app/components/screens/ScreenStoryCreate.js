@@ -8,7 +8,6 @@ import StoryType from "../../enums/StoryType";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import WithBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import { FAB, Snackbar } from 'react-native-paper';
-import UtilityScreen from "../../utilities/UtilityScreen";
 import UtilityObject from "../../utilities/UtilityObject";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import ActionType from "../../enums/ActionType";

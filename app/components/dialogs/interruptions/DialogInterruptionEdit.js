@@ -3,13 +3,13 @@ import {View } from 'react-native';
 import { Button, Paragraph, TextInput } from 'react-native-paper';
 import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from '../preferences/AbstractPreferenceDialog';
-import PropTypes from 'prop-types';
 import {Text} from "react-native-paper";
 import UtilityTime from '../../../utilities/UtilityTime';
 import { Dropdown } from 'react-native-material-dropdown';
 import InterruptionType from '../../../enums/InterruptionType';
 import InputDateTimeSeparate from "../../inputs/InputDateTimeSeparate";
 import UtilityObject from '../../../utilities/UtilityObject';
+import PropTypes from 'prop-types';
 
 const styles = {
     error:{
