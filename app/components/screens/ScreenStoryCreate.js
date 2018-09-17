@@ -104,7 +104,7 @@ class ScreenStoryCreate extends Component
         return undefined;
     }
 
-    onFabPress = () =>
+    onFabPress = async () =>
     {
         var valid = true;
         const keys = Object.keys(this.fields);
@@ -125,15 +125,14 @@ class ScreenStoryCreate extends Component
             switch(this.mode)
             { 
                 case MODE_CREATE:
-                    this.props.database.createStory(teamId, this.state.story, ResolveType.TOAST, ResolveType.TOAST).then(() => 
-                    {   this.props.navigation.goBack();});
+                    await this.props.database.createStory(teamId, this.state.story, ResolveType.TOAST, ResolveType.TOAST);
+                    this.props.navigation.goBack();
                     break;
 
                 case MODE_EDIT:
                     const story = this.props.navigation.getParam("story");
-                    this.props.database.updateStory(teamId, story.id, this.state.story, ResolveType.TOAST, ResolveType.TOAST).then(() => 
-                    {   this.unsavedChanges = false;});
-
+                    await this.props.database.updateStory(teamId, story.id, this.state.story, ResolveType.TOAST, ResolveType.TOAST);
+                    this.unsavedChanges = false;
                     break;
             }
         }

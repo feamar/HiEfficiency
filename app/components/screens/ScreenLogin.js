@@ -72,16 +72,12 @@ class ScreenLogin extends React.Component
   {
     this.setState({email: this.state.email.trim()}, () => {
 
-      this.props.database.adapter.signInWithEmailAndPassword(this.state.email, this.state.password).then(() => 
-      {
-        
-      });
+      this.props.database.adapter.signInWithEmailAndPassword(this.state.email, this.state.password);
     });
   }
 
   handleRegister = () => 
   {
-    //console.log("Handle register clicked: " + SCREEN_NAME_AUTH_REGISTER);
     this.props.navigation.navigate(SCREEN_NAME_AUTH_REGISTER);
   }
 

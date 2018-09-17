@@ -4,10 +4,12 @@ import AbstractList from "../../abstractions/list/AbstractList";
 
 export default class ListStories extends AbstractList
 {
+    getItemKey = (item, index) => 
+    {   return item.id;}
+
     getListItemFor(item, index)
     {
         return <ListItemStory 
-            key={item.id} 
             item={item} 
             index={index} 
             {...this.props} />

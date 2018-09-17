@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, ScrollView} from "react-native";
+import {View, FlatList} from "react-native";
 import PropTypes from "prop-types";
 import AbstractListItemCollapsibleSection from "./AbstractListItemCollapsibleSection";
 
@@ -27,7 +27,7 @@ export default class AbstractListCollapsible extends Component
     {
         return (
 
-            <AbstractListItemCollapsibleSection key={section.title} title={section.title} open={section.open} dividers={true}>
+            <AbstractListItemCollapsibleSection title={section.title} open={section.open} dividers={true}>
                 {section.items.map((item, index) => 
                 {   return this.getListItemFor(item, index);})}
             </AbstractListItemCollapsibleSection>
@@ -39,14 +39,22 @@ export default class AbstractListCollapsible extends Component
         this.setState({sections: props.sections, containerHasFab: props.containerHasFab});
     }
     
+    getItemKey = (item, index) =>
+    {   return item.title;}
+
+    
+    getListFooterComponent = () =>
+    {
+        if(this.state.containerHasFab)
+        {   return <View key={9999999} style={{height:88}}></View>}
+
+        return null;
+    }
+
     render()  
     {
         return (
-            <ScrollView style={styles.scrollView}> 
-                {this.state.sections.map((section, index) => 
-                {   return this.getListSectionFor(section, index);})}
-                {this.state.containerHasFab && <View style={{height:88}}></View>}
-            </ScrollView>  
+            <FlatList data={this.state.sections} keyExtractor={this.getItemKey} renderItem={(data) => this.getListSectionFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
         );
     }
 }

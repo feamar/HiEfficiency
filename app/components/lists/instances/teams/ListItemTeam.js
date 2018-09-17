@@ -3,6 +3,7 @@ import {Text} from "react-native-paper"
 import AbstractListItem from "../../abstractions/list/AbstractListItem";
 import Theme from "../../../../styles/Theme";
 import ActionType from "../../../../enums/ActionType";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 const styles = {
     teamName: {
@@ -21,6 +22,7 @@ export default class ListItemTeam extends AbstractListItem
         this.addContextMenuItem("Inspect", ActionType.INSPECT);
         this.addContextMenuItem("Edit", ActionType.EDIT);
 
+        console.log(UtilityObject.stringify(this.state));
         if(__DEV__)
         {   this.addContextMenuItem("(Development) Delete", ActionType.DELETE);}
     }
@@ -29,6 +31,11 @@ export default class ListItemTeam extends AbstractListItem
     {
         return <Text style={styles.teamName}>{this.state.item.data.name}</Text>
     }
+
+    
+    getItemKey = (item) => 
+    {   return item.id;}
+
 }
 
 ListItemTeam.propTypes = {

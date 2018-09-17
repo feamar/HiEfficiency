@@ -124,30 +124,30 @@ class ScreenTeams extends Component
     }
   }
  
-  onJoinDialogSubmitted = (name, code) => 
-  {   this.props.database.joinTeam(name, code, this.props.user.data.teams, this.props.user.uid, ResolveType.NONE, ResolveType.TOAST);}
+  onJoinDialogSubmitted = async (name, code) => 
+  {   await this.props.database.joinTeam(name, code, this.props.user.data.teams, this.props.user.uid, ResolveType.NONE, ResolveType.TOAST);}
 
-  onCreateDialogSubmitted = (team) =>
+  onCreateDialogSubmitted = async (team) =>
   {
-      this.props.database.createTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid, ResolveType.TOAST, ResolveType.TOAST);
+      await this.props.database.createTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid, ResolveType.TOAST, ResolveType.TOAST);
   }
  
-  onLeaveDialogActionPressed = (action) =>
+  onLeaveDialogActionPressed = async (action) =>
   {
     switch(action)
     {
       case ActionType.POSITIVE:
-        this.props.database.leaveTeam(this.currentlyLeavingTeam.id, this.state.user.data.teams, this.state.user.uid, ResolveType.TOAST, ResolveType.TOAST);
+        await this.props.database.leaveTeam(this.currentlyLeavingTeam.id, this.state.user.data.teams, this.state.user.uid, ResolveType.TOAST, ResolveType.TOAST);
         break;
     }
   }
 
-  onDeleteDialogActionPressed = (action) =>
+  onDeleteDialogActionPressed = async (action) =>
   {
     switch(action)
     {
       case ActionType.POSITIVE:
-        this.props.database.deleteTeam(this.currentlyDeletingTeam.id, ResolveType.TOAST, ResolveType.TOAST);
+        await this.props.database.deleteTeam(this.currentlyDeletingTeam.id, ResolveType.TOAST, ResolveType.TOAST);
         break;
     }
   }

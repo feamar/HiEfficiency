@@ -145,7 +145,7 @@ class ScreenStoryBoard extends Component
     }
   }
 
-  onFabMenuItemSelected = (action) =>
+  onFabMenuItemSelected = async (action) =>
   {
     switch(action)
     {
@@ -163,7 +163,7 @@ class ScreenStoryBoard extends Component
           upvotes: 0,
           createdOn: new Date()
         }
-        this.props.database.createStory(this.team.id, story, ResolveType.TOAST, ResolveType.TOAST);
+        await this.props.database.createStory(this.team.id, story, ResolveType.TOAST, ResolveType.TOAST);
     }
   }
 
@@ -172,7 +172,7 @@ class ScreenStoryBoard extends Component
     switch(action)
     {
       case ActionType.POSITIVE:
-        this.props.database.deleteStory(this.team.id, this.itemToDelete.id, ResolveType.TOAST, ResolveType.TOAST);
+        await this.props.database.deleteStory(this.team.id, this.itemToDelete.id, ResolveType.TOAST, ResolveType.TOAST);
         break;
     }
   }

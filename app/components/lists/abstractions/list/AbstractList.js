@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, ScrollView} from "react-native";
+import {View, ScrollView, FlatList} from "react-native";
 
 import PropTypes from "prop-types";
 import { Item } from "native-base";
@@ -29,15 +29,20 @@ export default class AbstractList extends Component
         this.setState({items: props.items, containerHasFab: props.containerHasFab});
     }
 
+    getListFooterComponent = () =>
+    {
+        if(this.state.containerHasFab)
+        {   return <View key={9999999} style={{height:88}}></View>}
+
+        return null;
+    }
+
+    getItemKey = (item, index) => item.key;
+
     render() 
     {
         return(
-            <ScrollView style={styles.scrollView}> 
-                {this.state.items.map((item, index) => {
-                    return this.getListItemFor(item, index);
-                })}
-                {this.state.containerHasFab && <View style={{height:88}}></View>}
-            </ScrollView>  
+            <FlatList data={this.state.items} keyExtractor={this.getItemKey} renderItem={(data) => this.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
         ); 
     }    
 }

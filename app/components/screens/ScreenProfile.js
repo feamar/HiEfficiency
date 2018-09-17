@@ -43,13 +43,13 @@ class ScreenProfile extends Component
     {   this.setState({user: props.user});}
   }
 
-  onValueChanged = field => value => 
+  onValueChanged = field => async value => 
   {   
     var data = {[field]: value};
     if(this.state.user.data.weekSchema == undefined && field != "weekSchema")
     {   data = {...data, weekSchema: this.getDefaultSchema()};}
 
-    this.props.database.updateUser(this.state.user.uid, {[field]: value}, ResolveType.NONE, ResolveType.TOAST);
+    await this.props.database.updateUser(this.state.user.uid, {[field]: value}, ResolveType.NONE, ResolveType.TOAST);
   }
 
   getDefaultSchema = () => {

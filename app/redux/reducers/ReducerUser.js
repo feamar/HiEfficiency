@@ -81,7 +81,7 @@ export const onStoriesLoaded = (teamId, docChanges) =>
     const docs = docChanges.reduce((prev, current, index) => 
     {   
         const data = current.doc.data();
-        return update(prev, {[current.doc.id]: {$set: {data: data, id: current.doc.id, interruptions: []}}});
+        return update(prev, {[current.doc.id]: {$set: {data: data, id: current.doc.id, interruptions: [], loaded: false}}});
     }, {});
 
     return {

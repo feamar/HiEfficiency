@@ -63,10 +63,10 @@ class ScreenTeamEdit extends Component
         }
     }
 
-    onFabPress = () =>
+    onFabPress = async () =>
     {
-        this.props.database.updateTeam(this.state.team.id, this.state.team.data, ResolveType.TOAST, ResolveType.TOAST).then(() => 
-        {   this.props.navigation.goBack();});
+        await this.props.database.updateTeam(this.state.team.id, this.state.team.data, ResolveType.TOAST, ResolveType.TOAST);
+        this.props.navigation.goBack();
     }
 
     render()
