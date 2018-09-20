@@ -300,7 +300,9 @@ class ScreenStoryDetailsInterruptions extends Component
                                     const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
 
                                     const update =  this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, last, updates);
-                                    await execute(update, true);
+                                    const successful = await execute(update, true);;
+                                    if(successful == false)
+                                    {   return; }
                                 }
                             }
             
