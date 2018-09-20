@@ -36,8 +36,8 @@ export default class TeamLeave extends AbstractCrudOperation
             const newTeams = update(this.currentTeams, {$splice: [[index, 1]]})
             try
             {
-                await this.sendUpdates(dialog, ACTION_TYPE_USER_LEFT_TEAM, () => 
-                {   FirebaseAdapter.getUsers().doc(this.userId).update({ teams: newTeams });});
+                await this.sendUpdates(dialog, ACTION_TYPE_USER_LEFT_TEAM, async () => 
+                {   await FirebaseAdapter.getUsers().doc(this.userId).update({ teams: newTeams });});
 
                 this.onSuccess(dialog, "You have successfully left the team.");
             }

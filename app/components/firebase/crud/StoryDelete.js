@@ -37,8 +37,8 @@ export default class StoryDelete extends AbstractCrudOperation
             const doc = FirebaseAdapter.getStories(this.teamId).doc(this.storyId);
             this.oldStory = await doc.get();
 
-            await this.sendUpdates(dialog, ACTION_TYPE_STORY_DELETED, () => 
-            {   doc.delete();});
+            await this.sendUpdates(dialog, ACTION_TYPE_STORY_DELETED, async () => 
+            {   await doc.delete();});
 
             this.onSuccess(dialog, "Successfully deleted the user story.");
         }

@@ -31,8 +31,8 @@ export default class TeamUpdate extends AbstractCrudOperation
         try 
         {
             const newTeam = update(this.oldTeam, this.updates);
-            await this.sendUpdates(dialog, ACTION_TYPE_TEAM_DATA_CHANGED, () => 
-            {   FirebaseAdapter.getTeams().doc(this.teamId).update(newTeam);});
+            await this.sendUpdates(dialog, ACTION_TYPE_TEAM_DATA_CHANGED, async () => 
+            {   await FirebaseAdapter.getTeams().doc(this.teamId).update(newTeam);});
             
             this.onSuccess(dialog, "Successfully updated the team.");
         }

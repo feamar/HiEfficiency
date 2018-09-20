@@ -31,8 +31,8 @@ export default class UserUpdate extends AbstractCrudOperation
         try 
         {
             const newUser = update(this.oldUser, this.updates);
-            await this.sendUpdates(dialog, ACTION_TYPE_USER_DATA_CHANGED, () => 
-            {   FirebaseAdapter.getUsers().doc(this.userId).update(newUser);});
+            await this.sendUpdates(dialog, ACTION_TYPE_USER_DATA_CHANGED, async () => 
+            {   await FirebaseAdapter.getUsers().doc(this.userId).update(newUser);});
             
             this.onSuccess(dialog, "Successfully updated the profile.");
         }

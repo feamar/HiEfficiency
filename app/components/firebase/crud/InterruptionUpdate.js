@@ -44,8 +44,8 @@ export default class InterruptionUpdate extends AbstractCrudOperation
         const newInterruptions = update(this.currentInterruptions, {$splice: [[index, 1, newInterruption]]});
         try
         {
-            await this.sendUpdates(dialog, ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED, () => 
-            {   FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId).update({interruptions: newInterruptions});});
+            await this.sendUpdates(dialog, ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED, async () => 
+            {   await FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId).update({interruptions: newInterruptions});});
 
             this.onSuccess(dialog, "Successfully updated the interruption.");
         }

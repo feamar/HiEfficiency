@@ -33,8 +33,8 @@ export default class StoryUpdate extends AbstractCrudOperation
         try 
         {
             const newStory = update(this.oldStory, this.updates);
-            await this.sendUpdates(dialog, ACTION_TYPE_STORY_DATA_CHANGED, () => 
-            {   FirebaseAdapter.getStories(this.teamId).doc(this.storyId).update(newStory);});
+            await this.sendUpdates(dialog, ACTION_TYPE_STORY_DATA_CHANGED, async () => 
+            {   await FirebaseAdapter.getStories(this.teamId).doc(this.storyId).update(newStory);});
             this.onSuccess(dialog, "Successfully updated the story.");
         }
         catch(error)

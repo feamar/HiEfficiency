@@ -58,8 +58,8 @@ export default class TeamDelete extends AbstractCrudOperation
             try
             {
                 const newData = update(this.currentTeams, {$splice: [[index, 1]]});
-                await this.sendUpdates(dialog, ACTION_TYPE_USER_LEFT_TEAM, () => 
-                {   FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
+                await this.sendUpdates(dialog, ACTION_TYPE_USER_LEFT_TEAM, async () => 
+                {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
             }
             catch(error)
             {   
@@ -78,8 +78,8 @@ export default class TeamDelete extends AbstractCrudOperation
             this.oldTeam = await doc.get();
 
             console.log("HERE HERE HERE!");
-            await this.sendUpdates(dialog, ACTION_TYPE_TEAM_DELETED, () => 
-            {   FirebaseAdapter.getTeams().doc(this.teamId).delete();});
+            await this.sendUpdates(dialog, ACTION_TYPE_TEAM_DELETED, async () => 
+            {   await FirebaseAdapter.getTeams().doc(this.teamId).delete();});
 
             this.onSuccess(dialog, "You have successfully left and deleted the team.");
         }

@@ -32,13 +32,14 @@ export default class StoryCreate extends AbstractCrudOperation
     perform = async (dialog) => 
     {
         console.log("CREATING STORY: " + UtilityObject.stringify(this.story));
+        await UtilityAsync.sleep(5000);
         try
         {
             console.log("ONE ONE ONE");
-            this.doc = await this.sendUpdates(dialog, ACTION_TYPE_STORY_CREATED, () => 
+            this.doc = await this.sendUpdates(dialog, ACTION_TYPE_STORY_CREATED, async () => 
             {
                 console.log("TWO TWO TWO");
-                return FirebaseAdapter.getStories(this.teamId).add(this.story);
+                return await FirebaseAdapter.getStories(this.teamId).add(this.story);
             });
 
             console.log("THREE THREE THREE");

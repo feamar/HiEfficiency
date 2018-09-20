@@ -45,8 +45,8 @@ export default class TeamCreate extends AbstractCrudOperation
         const newData = update(this.currentTeams, {$push: [this.doc.id]});
         try
         {
-            await this.sendUpdates(dialog, ACTION_TYPE_USER_JOINED_TEAM, () => 
-            {   FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
+            await this.sendUpdates(dialog, ACTION_TYPE_USER_JOINED_TEAM, async () => 
+            {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
 
             this.onSuccess(dialog, "You have successfully created and joined the new team.");
         }

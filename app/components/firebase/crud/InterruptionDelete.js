@@ -40,8 +40,8 @@ export default class InterruptionDelete extends AbstractCrudOperation
 
         try
         {
-            await this.sendUpdates(dialog, ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED, () => 
-            {   document.update({interruptions: newInterruptions});});
+            await this.sendUpdates(dialog, ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED, async  () => 
+            {   await document.update({interruptions: newInterruptions});});
 
             this.onSuccess(dialog, "Successfully deleted the interruption.");
         }
