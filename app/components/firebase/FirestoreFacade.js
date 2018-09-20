@@ -103,13 +103,17 @@ export default class FirestoreFacade
     {
         return new Promise((resolve, reject) => 
         {
-            console.log("Inside promise");
             const execute = (dialog, hasNextOperation) => async (crud) =>
             {   
-                dialog.setMessage(crud.initialMessage);
+                var resolved = false;
+                setTimeout(() => 
+                {
+                    if(resolved == false)
+                    {   dialog.setVisible(true);}
+                }, 1000);
                 await crud.execute(dialog);
+                resolved = true;
 
-                console.log("Has next operation: " + hasNextOperation);
                 if(hasNextOperation == false || hasNextOperation == undefined)
                 {   dialog.setCompleted();}
             }
@@ -127,7 +131,7 @@ export default class FirestoreFacade
                 section={SECTION_CONNECTING}
                 isComplete={false}
                 timeout={30000} 
-                visible={true} 
+                visible={false} 
                 cancelable={false}
                 warning={undefined} 
                 onClose={() => {removeDialogCallback(component); resolve();}} />

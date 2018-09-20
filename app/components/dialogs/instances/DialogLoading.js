@@ -102,8 +102,7 @@ export default class DialogLoading extends AbstractDialog
         {   return false;}
 
         this.setStateInternal({lifecycle: STATE_COMPLETED});
-
-        setTimeout(() => {this.setState({shouldShowButtonOk: true})}, 500);
+        this.setState({shouldShowButtonOk: true});
     }
    
     setMessage = (message) =>
@@ -148,7 +147,6 @@ export default class DialogLoading extends AbstractDialog
 
     onDialogOpen = () =>
     {
-        this.setStateInternal({timeStart: new Date().getTime()});
         this.setTimeoutLeft();
     }
 

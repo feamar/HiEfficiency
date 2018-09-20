@@ -36,6 +36,7 @@ export default class AbstractCrudOperation
         this.state = STATE_EXECUTED;
         this.dialog = dialog;
 
+        this.dialog.setMessage(this.initialMessage);
         this.dialog.onTimeoutListeners.push(this.onDialogTimeOut);
         this.dialog.onDismissListeners.push(this.onDialogDismissed);
         this.dialog.onCloseListeners.push(this.onDialogClosed);
