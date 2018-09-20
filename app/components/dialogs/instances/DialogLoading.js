@@ -69,6 +69,9 @@ export default class DialogLoading extends AbstractDialog
 
         this.onTimeoutListeners = [this.props.onTimeout];
         this.onOpenListeners.push(this.onDialogOpen);
+
+        if(this.state.visible)
+        {   this.onDialogOpen();}
     }
 
     componentWillMount() 
