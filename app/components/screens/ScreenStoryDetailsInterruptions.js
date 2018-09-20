@@ -26,6 +26,7 @@ import {PARAM_NAME_INITIAL_ROUTE_NAME} from "../routing/Router";
 import UtilityObject from "../../utilities/UtilityObject";
 import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
+import WithDialogContainer from "../../hocs/WithDialogContainer";
 
 const isEqual = require("react-fast-compare");
 
@@ -127,7 +128,7 @@ class ScreenStoryDetailsInterruptions extends Component
 
         this.unsubscribers = [];
         this.story = props.user.teams[this.props.inspecting.team].stories[this.props.inspecting.story];
-
+        this.dialogs = [];
 
         console.log("CONSTRUCTOR STORY: " + UtilityObject.stringify(this.story));
         this.state = 
@@ -203,7 +204,11 @@ class ScreenStoryDetailsInterruptions extends Component
                 if(action != ActionType.POSITIVE)
                 {   return;}
 
-                await this.props.database.updateStory(this.props.inspecting.team, this.story.id, {startedOn: new Date()}, ResolveType.NONE, ResolveType.TOAST);
+                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
+                {
+                    const update = this.props.database.updateStory(this.props.inspecting.team, this.story.id, this.story.data, {startedOn: {$set: new Date()}});
+                    await execute(update);
+                });
             });
             this.confirmationDialog.setVisible(true);
         }
@@ -215,9 +220,13 @@ class ScreenStoryDetailsInterruptions extends Component
         {   timestamp = new Date();}
 
         const interruption = this.createInterruptionObject(timestamp, undefined, category.dbId);
-
         const inspecting = this.props.inspecting;
-        await this.props.database.createInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, interruption, ResolveType.TOAST, ResolveType.TOAST);
+        
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Adding Interruption", async (execute) => 
+        {
+            const creation = this.props.database.createInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, interruption);
+            await execute(creation);
+        });
     } 
 
     createInterruptionObject = (timestamp, duration, categoryId) =>
@@ -280,22 +289,25 @@ class ScreenStoryDetailsInterruptions extends Component
                         {   return; }
 
                         var interruptions = this.story.interruptions;
-                        if(interruptions.length > 0)
+                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Finishing Story", async (execute) => 
                         {
-                            var last = interruptions[interruptions.length - 1];
-                            if(last.duration == undefined)
-                            {   
-                                last = update(last, {duration: {$set: new Date().getTime() - last.timestamp.getTime()}});
-                                interruptions = update(interruptions, {$splice: [[interruptions.length - 1, 1, last]]});
-                                
-                                const inspecting = this.props.inspecting;
-                                await this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, {interruptions: interruptions});
+                            if(interruptions.length > 0)
+                            {
+                                var last = interruptions[interruptions.length - 1];
+                                if(last.duration == undefined)
+                                {   
+                                    const inspecting = this.props.inspecting;
+                                    const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
+
+                                    const update =  this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, last, updates);
+                                    await execute(update, true);
+                                }
                             }
-                        }
-        
-                        console.log("FINISHING!");
-                        const inspecting = this.props.inspecting;
-                        await this.props.database.updateStory(inspecting.team, inspecting.story, {finishedOn: new Date()}, ResolveType.NONE, ResolveType.TOAST);
+            
+                            const inspecting = this.props.inspecting;
+                            const finish = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: new Date()}});
+                            await execute(finish);
+                        });
                     }); 
                     this.confirmationDialog.setVisible(true);
                 }
@@ -311,9 +323,12 @@ class ScreenStoryDetailsInterruptions extends Component
                         if(action != ActionType.POSITIVE)
                         {   return;}
     
-                        console.log("POSITIVE BUTTON CLICK");
                         const inspecting = this.props.inspecting;
-                        await this.props.database.updateStory(inspecting.team, inspecting.story, {finishedOn: null}, ResolveType.NONE, ResolveType.TOAST);
+                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Reopening Story", async (execute) => 
+                        {
+                            const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: null}});
+                            await execute(update);
+                        });
                     });
                     this.confirmationDialog.setVisible(true);
                 }
@@ -329,18 +344,20 @@ class ScreenStoryDetailsInterruptions extends Component
     onResumeFromInterruption = async () =>
     {
         var interruptions = this.story.interruptions;
-
         if(interruptions.length > 0)
         {
             var last = interruptions[interruptions.length - 1];
             if(last.duration == undefined)
             {   
-                last = update(last, {duration: {$set: new Date().getTime() - last.timestamp.getTime()}});
-                interruptions = update(interruptions, {$splice: [[interruptions.length - 1, 1, last]]});
+                const inspecting = this.props.inspecting;
+                const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
+                
+                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Resuming Work", async (execute) => 
+                {
+                    const update = this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, last, updates);
+                    await execute(update);
+                });
             }
-
-            const inspecting = this.props.inspecting;
-            await this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, {interruptions: interruptions}, ResolveType.NONE, ResolveType.TOAST);
         }
     }
 
@@ -378,7 +395,12 @@ class ScreenStoryDetailsInterruptions extends Component
         {   return;}
 
         const inspecting = this.props.inspecting;
-        await this.props.database.updateStory(inspecting.team, inspecting.story, {startedOn: storageValue}, ResolveType.NONE, ResolveType.TOAST);
+
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Start Story", async (execute) => 
+        {
+            const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {startedOn: {$set: storageValue}});
+            await execute(update);
+        });
     }
 
     onEditTimeFinish = async (storageValue) =>
@@ -387,7 +409,12 @@ class ScreenStoryDetailsInterruptions extends Component
         {   return;}
 
         const inspecting = this.props.inspecting;
-        await this.props.database.updateStory(inspecting.team, inspecting.story, {finishedOn: storageValue}, ResolveType.NONE, ResolveType.TOAST);
+
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Finish Time", async (execute) => 
+        {
+            const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: storageValue}});
+            await execute(update);
+        });
     }
 
     onOverflowMenuItemSelected = async (action) => 
@@ -396,7 +423,13 @@ class ScreenStoryDetailsInterruptions extends Component
         {
             case ActionType.UNSTART:
                 const inspecting = this.props.inspecting;
-                await this.props.database.updateStory(inspecting.team, inspecting.story, {startedOn: undefined}, ResolveType.NONE, ResolveType.TOAST);
+
+                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Unstarting Story", async (execute) => 
+                {
+                    const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {startedOn: {$set: null}});
+                    await execute(update);
+                });
+
                 break;
         }
     }
@@ -410,14 +443,13 @@ class ScreenStoryDetailsInterruptions extends Component
                 switch(action) 
                 {
                     case ActionType.DELETE:
-                        var interruptions = this.story.interruptions;
-                        interruptions = update(interruptions, {$splice: [[item.id, 1]]});
-
                         const inspecting = this.props.inspecting;
-                        if(interruptions.length == 0)
-                        {   await this.props.database.deleteInterruption(inspecting.team, inspecting.story, this.props.user.uid, ResolveType.NONE, ResolveType.TOAST);}
-                        else
-                        {   await this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, {interruptions: interruptions}, ResolveType.NONE, ResolveType.TOAST);}
+
+                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Deleting Interruption", async (execute) => 
+                        {
+                            const del = this.props.database.deleteInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, item.id);
+                            await execute(del);
+                        });
                         break; 
         
                     case ActionType.EDIT:
@@ -466,14 +498,15 @@ class ScreenStoryDetailsInterruptions extends Component
 
     onInterruptionEdited = async (storageValue) =>
     {
-        var interruptions = this.story.interruptions;
-        var current = interruptions[this.currentlyEditingInterruptionIndex];
-
-        current = update(current, {timestamp: {$set: storageValue.start}, duration: {$set: storageValue.end - storageValue.start}, category: {$set: storageValue.type}});
-        interruptions = update(interruptions, {$splice: [[this.currentlyEditingInterruptionIndex, 1, current]]});
-
+        const current = this.story.interruptions[this.currentlyEditingInterruptionIndex];
         const inspecting = this.props.inspecting;
-        await this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, {interruptions: interruptions}, ResolveType.TOAST, ResolveType.TOAST);
+        const updates = {timestamp: {$set: storageValue.start}, duration: {$set: storageValue.end - storageValue.start}, category: {$set: storageValue.type}};
+        
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Interruption", async (execute) => 
+        {
+            const update = this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, current, updates);
+            await execute(update);
+        });
     }
 
     getListComponent = () => 
@@ -491,6 +524,8 @@ class ScreenStoryDetailsInterruptions extends Component
                 <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={this.story.data.startedOn} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onDialogSubmitted={this.onEditTimeStart}  />
                 <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={this.story.data.finishedOn} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onDialogSubmitted={this.onEditTimeFinish} />
                 <DialogConfirmation ref={i => this.confirmationDialog = i}/>
+
+                {this.dialogs.map((dialog, index) => dialog)}
              </View>
          );
     }
@@ -742,4 +777,6 @@ class ScreenStoryDetailsInterruptions extends Component
 } 
 const hoc1 = WithOverflowMenu(ScreenStoryDetailsInterruptions);
 const hoc2 = WithDatabase(hoc1);
-export default WithReduxListener(mapStateToProps, mapDispatchToProps, hoc2);
+const hoc3 = WithDialogContainer(hoc2);
+
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, hoc3);

@@ -65,7 +65,7 @@ export default class DialogTeamJoin extends AbstractDialog
         this.setState({fields: fields});
     }
 
-    getDialogContent =() =>
+    getDialogContent = () =>
     {
         return (
             <ScrollView>

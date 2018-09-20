@@ -2,23 +2,24 @@ import UtilityObject from "../../utilities/UtilityObject";
 import UtilityArray from "../../utilities/UtilityArray";
 import UtilityDictionary from "../../utilities/UtilityDictionary";
 import update from 'immutability-helper';
+import ReduxManager from "../ReduxManager";
 
-const ACTION_TYPE_USER_LOGGED_IN = "user_logged_in";
-const ACTION_TYPE_USER_LOGGED_OUT = "user_logged_out";
+export const ACTION_TYPE_USER_LOGGED_IN = "user_logged_in";
+export const ACTION_TYPE_USER_LOGGED_OUT = "user_logged_out";
 
-const ACTION_TYPE_USER_LEFT_TEAM = "user_left_team"; 
-const ACTION_TYPE_USER_JOINED_TEAM = "user_joined_team";
+export const ACTION_TYPE_USER_LEFT_TEAM = "user_left_team"; 
+export const ACTION_TYPE_USER_JOINED_TEAM = "user_joined_team";
 
-const ACTION_TYPE_TEAM_DELETED = "team_deleted";
-const ACTION_TYPE_TEAM_DATA_CHANGED = "team_data_changed";
-const ACTION_TYPE_USER_DATA_CHANGED = "user_data_changed";
-const ACTION_TYPE_STORY_DATA_CHANGED = "story_data_changed";
+export const ACTION_TYPE_TEAM_DELETED = "team_deleted";
+export const ACTION_TYPE_TEAM_DATA_CHANGED = "team_data_changed";
+export const ACTION_TYPE_USER_DATA_CHANGED = "user_data_changed";
+export const ACTION_TYPE_STORY_DATA_CHANGED = "story_data_changed";
 
-const ACTION_TYPE_STORY_DELETED = "story_deleted";
-const ACTION_TYPE_STORY_CREATED = "story_created";
-const ACTION_TYPE_STORIES_OF_TEAM_LOADED = "stories_of_team_loaded";
+export const ACTION_TYPE_STORY_DELETED = "story_deleted";
+export const ACTION_TYPE_STORY_CREATED = "story_created";
+export const ACTION_TYPE_STORIES_OF_TEAM_LOADED = "stories_of_team_loaded";
 
-const ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED = "interruptions_of_story_loaded";
+export const ACTION_TYPE_INTERRUPTIONS_OF_STORY_LOADED = "interruptions_of_story_loaded";
 
 export const onUserLoggedIn = (userId, userSnapshot) =>
 {
@@ -133,6 +134,7 @@ export const onInterruptionsLoaded = (teamId, storyId, interruptions) =>
 
 export default (user = {}, action) => 
 {
+    ReduxManager.Instance.notifyListeners(action)
     console.log("REDUCER: " + action.type);
     var copy;
     switch(action.type)

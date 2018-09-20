@@ -19,7 +19,6 @@ export default class ListItemTeam extends AbstractListItem
     {
         super(props);
         this.addContextMenuItem("Leave", ActionType.LEAVE);
-        this.addContextMenuItem("Inspect", ActionType.INSPECT);
         this.addContextMenuItem("Edit", ActionType.EDIT);
 
         console.log(UtilityObject.stringify(this.state));

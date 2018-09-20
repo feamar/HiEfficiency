@@ -5,6 +5,24 @@ import DatabaseActionType from "../../enums/DatabaseActionType";
 import UtilityString from "../../utilities/UtilityString";
 import update from "immutability-helper";
 import UtilityObject from "../../utilities/UtilityObject";
+import ReduxManager from "../../redux/ReduxManager";
+import FirebaseManager from "./FirebaseManager";
+import * as ReducerUser from "../../redux/reducers/ReducerUser";
+import TeamJoin from "./crud/TeamJoin";
+import TeamLeave from "./crud/TeamLeave";
+import TeamCreate from "./crud/TeamCreate";
+import TeamDelete from "./crud/TeamDelete";
+import UserUpdate from "./crud/UserUpdate";
+import TeamUpdate from "./crud/TeamUpdate";
+import StoryUpdate from "./crud/StoryUpdate";
+import StoryCreate from "./crud/StoryCreate";
+import StoryDelete from "./crud/StoryDelete";
+import InterruptionDelete from "./crud/InterruptionDelete";
+import InterruptionUpdate from "./crud/InterruptionUpdate";
+import InterruptionCreate from "./crud/InterruptionCreate";
+import { SECTION_CONNECTING } from "./crud/AbstractCrudOperation";
+import React from "react";
+import DialogLoading from "../dialogs/instances/DialogLoading";
 
 class SingletonEnforcer {}
 const EnforcerInstance = new SingletonEnforcer();
@@ -21,236 +39,100 @@ export default class FirestoreFacade
         this.state = {};
     }
 
-    updateUser = async (userId, updates, resolveSuccess, resolveError) =>
+    updateUser = (userId, oldUser, updates ) =>
     {
-        const promise = FirebaseAdapter.getUsers().doc(userId).update(updates);
-        return this.process(resolveSuccess, resolveError, "profile", DatabaseActionType.Update, promise);
+        return new UserUpdate(userId, oldUser, updates );
     }
 
-    deleteTeam = async (teamId, resolveSuccess, resolveError) =>
+    deleteTeam = (teamId, currentTeams, userId ) =>
     {
-        const promise = FirebaseAdapter.getTeams().doc(teamId).delete();
-        return this.process(resolveSuccess, resolveError, "team", DatabaseActionType.Delete, promise);
+        return new TeamDelete(teamId, currentTeams, userId );
     }
 
-    leaveTeam = async (teamId, currentTeams, userId, resolveSuccess, resolveError) =>
+    leaveTeam = (teamId, currentTeams, userId ) =>
     {
-        var index = currentTeams.indexOf(teamId);
-        if(index > -1)
-        {
-            currentTeams = update(currentTeams, {$splice: [[index, 1]]})
-            const promise = FirebaseAdapter.getUsers().doc(userId).update({ teams: currentTeams });
-            return this.process(resolveSuccess, resolveError, "team", DatabaseActionType.Leave, promise);
-        }
-        else
-        {   this.resolveError(resolveSuccess, resolveError, "team", DatabaseActionType.Leave);}
+        return new TeamLeave(teamId, currentTeams, userId );
     }
 
-    joinTeam = async (name, code, currentTeams, userId, resolveSuccess, resolveError) =>
+    joinTeam = (name, code, currentTeams, userId ) =>
     {
-        const promise = FirebaseAdapter.getTeams().where("name", "==", name.toString()).get().then(teams => 
-        {
-            for(var i = 0 ; i < teams.docs.length ; i ++)
-            { 
-                const team = teams.docs[i];
-                if(team.data().code.toString() == code.toString())
-                {
-                    var newData = currentTeams;
-                    if(newData.indexOf(team.id) > -1)
-                    {   continue;}  
-        
-                    newData = update(newData, {$push: [team.id]});
-                    FirebaseAdapter.getUsers().doc(userId).update({teams: newData});
-        
-                    return null;
-                }
-            }
-    
-            if(teams.docs.length <= 0)
-            {   alert("No team called '" + name + "' could be found.");}
-            else
-            {   alert("A team called '" + name + "' could be found, but the security code was incorrect.");}
-        })
-        .catch(error => 
-        {
-            if(resolveError) 
-            {   this.resolveError(resolvEerror, "team", DatabaseActionType.Join, error);} 
-        });
-
-        return this.process(resolveSuccess, resolveError, "team", DatabaseActionType.Join, promise).then(error => 
-        {
-           //if(error != undefined)
-           //{    this.resolveError(ResolveType.DIALOG, "team", DatabaseActionType.Join, error);} 
-        });
+        return new TeamJoin(name, code, currentTeams, userId );
     }
 
-    createTeam = async (name, code, currentTeams, userId) =>
+    createTeam = (name, code, currentTeams, userId ) =>
     {
-        const promise = FirebaseAdapter.getTeams().add({name: name, code: code});
-        const doc = this.process(ResolveType.TOAST, ResolveType.TOAST, "team", DatabaseActionType.CREATE, promise)
-        .then(async (doc) =>
-        {
-            this.joinTeam(name, code, currentTeams, userId, ResolveType.TOAST);
-            return doc;
-        })
-        .catch(error => 
-        {   this.resolveError(ResolveType.TOAST, "team", DatabaseActionType.Join, error);});
-
-        return resultPromise;
+        return new TeamCreate(name, code, currentTeams, userId );
     }
 
-    updateTeam = async (teamId, updates, resolveSuccess, resolveError) =>
+    updateTeam = (teamId, oldTeam, updates ) =>
     {
-        const promise = FirebaseAdapter.getTeams().doc(teamId).update(updates);
-        return this.process(resolveSuccess, resolveError, "team", DatabaseActionType.Update, promise);
+        return new TeamUpdate(teamId, oldTeam, updates );
     }
 
-    updateStory = async (teamId, storyId, updates, resolveSuccess, resolveError) =>
+    updateStory = (teamId, storyId, oldStory, updates ) =>
     {
-        console.log("UPDATING STORY: " + UtilityObject.stringify(updates));
-        const promise = FirebaseAdapter.getStories(teamId).doc(storyId).update(updates);
-        return this.process(resolveSuccess, resolveError, "story", DatabaseActionType.Update, promise);
+        return new StoryUpdate(teamId, storyId, oldStory, updates );
     }
 
-    createStory = async (teamId, story, resolveSuccess, resolveError) =>
+    createStory = (teamId, story ) =>
     {
-        const promise = FirebaseAdapter.getStories(teamId).add(story);
-        return this.process(resolveSuccess, resolveError, "story", DatabaseActionType.Create, promise);
+        return new StoryCreate(teamId, story );
     }
     
-    deleteStory = async (teamId, storyId, resolveSuccess, resolveError) =>
+    deleteStory = (teamId, storyId ) =>
     {
-        const document = FirebaseAdapter.getStories(teamId).doc(storyId);
+        return new StoryDelete(teamId, storyId );
+    }
 
-        const promise = document.collection("interruptionsPerUser").get()
-        .then(interruptions => 
+    createInterruption = (teamId, storyId, userId, currentInterruptions, newInterruption ) =>
+    {
+        return new InterruptionCreate(teamId, storyId, userId, currentInterruptions, newInterruption );
+    }
+
+    updateInterruption = (teamId, storyId, userId, currentInterruptions, oldInterruption, updates ) =>
+    {
+        return new InterruptionUpdate(teamId, storyId, userId, currentInterruptions, oldInterruption, updates );
+    }
+
+    deleteInterruption = (teamId, storyId, userId, currentInterruptions, indexToDelete ) =>
+    {
+       return new InterruptionDelete(teamId, storyId, userId, currentInterruptions, indexToDelete );
+    }
+
+    inDialog = (addDialogCallback, removeDialogCallback, title, closure) => 
+    {
+        return new Promise((resolve, reject) => 
         {
-          interruptions.docs.forEach(doc => {doc.ref.delete()});
-          document.delete();
-        })
-        .catch(error => 
-        {
-            if(resolveError)
-            {   this.resolveError(resolvEerror, "story", DatabaseActionType.Delete, error);}   
-        });
+            console.log("Inside promise");
+            const execute = (dialog, hasNextOperation) => async (crud) =>
+            {   
+                dialog.setMessage(crud.initialMessage);
+                await crud.execute(dialog);
 
-        return this.process(resolveSuccess, resolveError, "story", DatabaseActionType.Delete, promise);
-    }
-
-    createInterruption = async (teamId, storyId, userId, currentInterruptions, interruption, resolveSuccess, resolveError) =>
-    {
-        const document = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(userId);
-
-        const newInterruptions = update(currentInterruptions, {$push: [interruption]});
-
-        var keys = Object.keys(newInterruptions);
-        var values = keys.map(v => newInterruptions[v]);
-
-
-        var promise = undefined;
-        if(values.length == 1)
-        {   promise = document.set({interruptions: values});}
-        else
-        {   promise = document.update({interruptions: values});}
-
-        return this.process(resolveSuccess, resolveError, "interruption", DatabaseActionType.Create, promise);
-    }
-
-    updateInterruption = async (teamId, storyId, userId, updates, resolveSuccess, resolveError) =>
-    {
-        const document = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(userId);
-        const promise = document.update(updates);
-
-        return this.process(resolveSuccess, resolveError, "interruptions", DatabaseActionType.Update, promise);
-    }
-
-    deleteInterruption = async (teamId, storyId, userId, updates, resolveSuccess, resolveError) =>
-    {
-        const document = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(userId);
-        const promise = document.delete();
-
-        return this.process(resolveSuccess, resolveError, "interruption", DatabaseActionType.Delete, promise);
-    }
-
-    process = async (resolveSuccess, resolveError, entityType, actionType, promise) =>
-    {
-        var resolved = false;
-        const newPromise = promise.then((...args) => {
-            resolved = true;
-            this.resolveSuccess(resolveSuccess, entityType, actionType)
-            console.log("RESOLVE SUCCESSFUL");
-            return args;
-        }, 
-        (...args) => {
-            resolved = true;
-            this.resolveError(resolveError, entityType, actionType, undefined)
-            console.log("RESOLVE WITH ERROR: " + UtilityObject.stringify(args));
-
-            return args;
-        })
-        .catch(error => () => {
-            resolved = true; 
-            this.resolveError(resolveError, entityType, actionType, error)
-            console.log("RESOLVE WITH ERROR 2: " + UtilityObject.stringify(error));
-
-            return error;
-        });
-
-        NetInfo.isConnected.fetch()
-        .then(isConnected => 
-        {
-            console.log("Is connected: " + isConnected);
-            if(isConnected)
-            {
-                setTimeout(() => {
-                    console.log("Is resolved for timeout?: " + resolved);
-                    if(resolved == false)
-                    {
-                        const message = UtilityString.capitalizeFirstLetter(actionType.presentContinuous) + " the " + entityType + " is taking longer than expected, please be patient..";
-                        ToastAndroid.show(message, ToastAndroid.LONG);
-                    }
-                }, 1800);
+                console.log("Has next operation: " + hasNextOperation);
+                if(hasNextOperation == false || hasNextOperation == undefined)
+                {   dialog.setCompleted();}
             }
-            else
+
+            const onReference = (ref) => 
             {
-                const message = "No internet connection available. Execution might not happen successfully.";
-                ToastAndroid.show(message, 8000);
+                if(ref)
+                {   closure(execute(ref));}
             }
+    
+            const component = <DialogLoading 
+                ref = {onReference}
+                title={title}
+                key={title} 
+                section={SECTION_CONNECTING}
+                isComplete={false}
+                timeout={30000} 
+                visible={true} 
+                cancelable={false}
+                warning={undefined} 
+                onClose={() => {removeDialogCallback(component); resolve();}} />
+    
+            addDialogCallback(component);
         });
-
-        return newPromise;
-    }
-
-    resolveSuccess = (resolve, entityName, actionType) => 
-    {
-        const message = "Successfully " + actionType.pastTense + " " + entityName + "!";
-        this.resolveForMessage(resolve, message);
-    }
-
-    resolveError = (resolve, entityName, actionType, error) => 
-    {
-        const message = "Could not " + actionType.presentTense + " " + entityName + ", please try again later.";
-        this.resolveForMessage(resolve, message);
-    }
-
-    resolveForMessage = (resolveType, message) =>
-    {
-        if(resolveType == undefined)
-        {   resolveType = ResolveType.NONE;}
-        
-        switch(resolveType)
-        {
-            case ResolveType.TOAST:
-                ToastAndroid.show(message, ToastAndroid.LONG);
-                break;
-
-            case ResolveType.DIALOG:
-                alert(message);
-                break;
-
-            case ResolveType.NONE:
-                //Do nothing.
-                break;
-        }
-    }
+    } 
 }

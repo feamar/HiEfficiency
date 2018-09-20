@@ -15,6 +15,8 @@ import update from "immutability-helper";
 import {connect} from "react-redux";
 import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
+import WithDialogContainer from "../../hocs/WithDialogContainer";
+import UtilityUpdate from "../../utilities/UtilityUpdate";
 
 const styles = {
     scrollView:{
@@ -125,13 +127,28 @@ class ScreenStoryCreate extends Component
             switch(this.mode)
             { 
                 case MODE_CREATE:
-                    await this.props.database.createStory(teamId, this.state.story, ResolveType.TOAST, ResolveType.TOAST);
-                    this.props.navigation.goBack();
+                    console.log("MODE_CREATE");
+
+                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
+                    {
+                        const crud = this.props.database.createStory(teamId, this.state.story);
+                        crud.setOnDialogClosedListener(() => 
+                        {   this.props.navigation.goBack();});
+                        await execute(crud);
+                    });
+
                     break;
 
                 case MODE_EDIT:
-                    const story = this.props.navigation.getParam("story");
-                    await this.props.database.updateStory(teamId, story.id, this.state.story, ResolveType.TOAST, ResolveType.TOAST);
+                    console.log("EDIT");
+                    const old = this.props.navigation.getParam("story");
+                    const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story);
+                    
+                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
+                    {
+                        const update = this.props.database.updateStory(teamId, old.id, old.data, updates);
+                        await execute(update);
+                    });
                     this.unsavedChanges = false;
                     break;
             }
@@ -180,5 +197,8 @@ class ScreenStoryCreate extends Component
 } 
 
 
+const hoc1 = WithDatabase(ScreenStoryCreate);
+const hoc2 = WithDialogContainer(hoc1);
+const hoc3 = WithBackButtonInterceptor(hoc2);
 
-export default connect(mapStateToProps)(WithBackButtonInterceptor(WithDatabase(ScreenStoryCreate)));
+export default connect(mapStateToProps)(hoc3);

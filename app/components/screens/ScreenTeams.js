@@ -14,6 +14,9 @@ import UtilityObject from "../../utilities/UtilityObject";
 import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
 import FirestoreFacade from "../firebase/FirestoreFacade";
+import DialogLoading from "../dialogs/instances/DialogLoading";
+import WithDialogContainer from "../../hocs/WithDialogContainer";
+import FirebaseAdapter from "../firebase/FirebaseAdapter";
 
 
 const mapStateToProps = (state, props) =>
@@ -89,10 +92,6 @@ class ScreenTeams extends Component
         }
         break;
  
-      case ActionType.INSPECT:
-        this.onItemSelected(item, index);
-        break;
- 
       case ActionType.DELETE:
 
         if(this.dialogConfirmDelete)
@@ -125,11 +124,21 @@ class ScreenTeams extends Component
   }
  
   onJoinDialogSubmitted = async (name, code) => 
-  {   await this.props.database.joinTeam(name, code, this.props.user.data.teams, this.props.user.uid, ResolveType.NONE, ResolveType.TOAST);}
+  {   
+    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Joining Team", async (execute) => 
+    {
+      const join = this.props.database.joinTeam(name, code, this.props.user.data.teams, this.props.user.uid);
+      await execute(join);
+    });
+  }
 
   onCreateDialogSubmitted = async (team) =>
-  {
-      await this.props.database.createTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid, ResolveType.TOAST, ResolveType.TOAST);
+  {   
+    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Team", async (execute) => 
+    {
+      const create = this.props.database.createTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid);
+      await execute(create);
+    });
   }
  
   onLeaveDialogActionPressed = async (action) =>
@@ -137,7 +146,11 @@ class ScreenTeams extends Component
     switch(action)
     {
       case ActionType.POSITIVE:
-        await this.props.database.leaveTeam(this.currentlyLeavingTeam.id, this.state.user.data.teams, this.state.user.uid, ResolveType.TOAST, ResolveType.TOAST);
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Leaving Team", async (execute) => 
+        {
+          const leave = this.props.database.leaveTeam(this.currentlyLeavingTeam.id, this.state.user.data.teams, this.state.user.uid);
+          await execute(leave);
+        });
         break;
     }
   }
@@ -147,7 +160,11 @@ class ScreenTeams extends Component
     switch(action)
     {
       case ActionType.POSITIVE:
-        await this.props.database.deleteTeam(this.currentlyDeletingTeam.id, ResolveType.TOAST, ResolveType.TOAST);
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Leaving Team", async (execute) => 
+        {
+          const del = this.props.database.deleteTeam(this.currentlyDeletingTeam.id, this.props.user.data.teams, this.props.user.uid);
+          await execute(del);
+        });
         break;
     }
   }
@@ -164,6 +181,7 @@ class ScreenTeams extends Component
         <DialogTeamCreate title="Create Team" ref={instance => this.dialogCreateTeam = instance} visible={false} onDialogSubmitted={this.onCreateDialogSubmitted} />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />
         <DialogConfirmation title="Deleting Team" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onDialogActionPressed={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
+
         {this.state.shouldFabGroupRender && <FAB.Group ref={instance => this.fabGroup = instance} color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open) => this.setState(open)} />}
       </View>
     );
@@ -193,4 +211,8 @@ class ScreenTeams extends Component
   }
 }
 
-export default WithReduxListener(mapStateToProps, mapDispatchToProps, WithDatabase(ScreenTeams));
+const hoc1 = WithDatabase(ScreenTeams);
+const hoc2 = WithDialogContainer(hoc1);
+const hoc3 = WithReduxListener(mapStateToProps, mapDispatchToProps, hoc2);
+
+export default hoc3;

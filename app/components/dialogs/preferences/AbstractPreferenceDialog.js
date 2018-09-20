@@ -23,17 +23,20 @@ export default class AbstractPreferenceDialog extends AbstractDialog
             storageValue: this.props.storageValue,
             error: undefined
         }
+
+        this.onCloseListeners.push(this.onDialogClosed);
+        this.onDismissListeners.push(this.onDialogDismiss);
     }
 
-    onDialogClose = () =>
-    {   this.setState({error: undefined});}
+    onDialogClosed = () =>
+    {   setTimeout(() => this.setState({error: undefined}), 500);}
 
-    onDismiss = () =>
+    onDialogDismiss = () =>
     {
-        this.setVisible(false);
-
         if(this.props.onDialogCanceled)
         {   this.props.onDialogCanceled();}
+
+        this.setState({storageValue: this.props.storageValue});
     }
 
     onSave = () =>

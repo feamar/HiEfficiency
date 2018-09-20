@@ -10,6 +10,10 @@ import ActionType from '../../enums/ActionType';
 import update from 'immutability-helper';
 import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
+import UtilityUpdate from '../../utilities/UtilityUpdate';
+import WithDialogContainer from '../../hocs/WithDialogContainer';
+import CrudEvent from '../../enums/CrudEvent';
+import UtilityObject from '../../utilities/UtilityObject';
 
 class ScreenTeamEdit extends Component
 {
@@ -65,8 +69,15 @@ class ScreenTeamEdit extends Component
 
     onFabPress = async () =>
     {
-        await this.props.database.updateTeam(this.state.team.id, this.state.team.data, ResolveType.TOAST, ResolveType.TOAST);
-        this.props.navigation.goBack();
+        const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.team.data);
+        const oldTeam = this.props.navigation.getParam("team").data;
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Team", async (execute) => 
+        {
+            const update = this.props.database.updateTeam(this.state.team.id, oldTeam, updates);
+            update.setOnDialogClosedListener(() => 
+            {   this.props.navigation.goBack();});
+            await execute(update);
+        });
     }
 
     render()
@@ -87,4 +98,8 @@ class ScreenTeamEdit extends Component
     }
 }
 
-export default withBackButtonInterceptor(WithDatabase(ScreenTeamEdit));
+const hoc1 = WithDialogContainer(ScreenTeamEdit);
+const hoc2 = WithDatabase(hoc1);
+const hoc3 = withBackButtonInterceptor(hoc2);
+
+export default hoc3;

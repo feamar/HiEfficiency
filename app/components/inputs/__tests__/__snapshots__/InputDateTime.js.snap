@@ -1,0 +1,282 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`An InputDateTime Renders correctly 1`] = `
+<View
+  testID="root"
+>
+  <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "borderBottomColor": "#CECECE",
+        "borderBottomWidth": 1,
+        "flex": 1,
+        "paddingBottom": 5,
+        "paddingTop": 5,
+      }
+    }
+    testID="touchable"
+  >
+    <Text
+      accessible={true}
+      allowFontScaling={true}
+      ellipsizeMode="tail"
+      style={
+        Array [
+          Object {
+            "color": "#000000",
+            "fontFamily": "Helvetica Neue",
+            "textAlign": "left",
+            "writingDirection": "ltr",
+          },
+          null,
+        ]
+      }
+      testID="text"
+      theme={
+        Object {
+          "colors": Object {
+            "accent": "#03dac4",
+            "backdrop": "rgba(0, 0, 0, 0.5)",
+            "background": "#f6f6f6",
+            "disabled": "rgba(0, 0, 0, 0.26)",
+            "error": "#B00020",
+            "placeholder": "rgba(0, 0, 0, 0.54)",
+            "primary": "#6200ee",
+            "surface": "#ffffff",
+            "text": "#000000",
+          },
+          "dark": false,
+          "fonts": Object {
+            "light": "HelveticaNeue-Light",
+            "medium": "HelveticaNeue-Medium",
+            "regular": "Helvetica Neue",
+            "thin": "HelveticaNeue-Thin",
+          },
+          "roundness": 4,
+        }
+      }
+    >
+      Jan 01 2018 00:00
+    </Text>
+  </View>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onRequestClose={[Function]}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      pointerEvents="box-none"
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "flex-end",
+          "margin": 10,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "backgroundColor": "white",
+              "borderRadius": 13,
+              "marginBottom": 8,
+              "overflow": "hidden",
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "backgroundColor": "transparent",
+              "borderBottomColor": "#d5d5d5",
+              "borderBottomWidth": 0.5,
+              "padding": 14,
+            }
+          }
+        >
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Array [
+                Object {
+                  "color": "#8f8f8f",
+                  "fontSize": 13,
+                  "textAlign": "center",
+                },
+                undefined,
+              ]
+            }
+          >
+            Pick a date
+          </Text>
+        </View>
+        <View
+          onStartShouldSetResponderCapture={[Function]}
+        >
+          <View>
+            <RCTDatePicker
+              date={1514761200000}
+              minuteInterval={1}
+              mode="datetime"
+              onChange={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "height": 216,
+                }
+              }
+            />
+          </View>
+        </View>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "backgroundColor": "transparent",
+              "borderColor": "#d5d5d5",
+              "borderTopWidth": 0.5,
+              "height": 57,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Array [
+                Object {
+                  "backgroundColor": "transparent",
+                  "color": "#007ff9",
+                  "fontSize": 20,
+                  "fontWeight": "normal",
+                  "textAlign": "center",
+                },
+                undefined,
+              ]
+            }
+          >
+            Confirm
+          </Text>
+        </View>
+      </View>
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "backgroundColor": "white",
+            "borderRadius": 13,
+            "height": 57,
+            "justifyContent": "center",
+            "marginBottom": 0,
+          }
+        }
+      >
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Array [
+              Object {
+                "backgroundColor": "transparent",
+                "color": "#007ff9",
+                "fontSize": 20,
+                "fontWeight": "600",
+                "padding": 10,
+                "textAlign": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          Cancel
+        </Text>
+      </View>
+    </View>
+  </Modal>
+</View>
+`;

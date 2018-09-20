@@ -8,6 +8,7 @@ import {Text} from "react-native-paper";
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import InputDateTimeSeparate from '../../inputs/InputDateTimeSeparate';
 import PreferenceCategory from '../../preferences/PreferenceCategory';
+import UtilityObject from '../../../utilities/UtilityObject';
 
 const styles = {
     error:{
@@ -44,14 +45,10 @@ export default class DialogPreferenceDateTime extends AbstractPreferenceDialog
     {   }
 
     onTimePickerConfirmed = (timestamp) =>
-    {
-        this.onValueChange(timestamp);
-    }
+    {   this.onValueChange(timestamp);}
 
     componentWillReceiveProps(props) 
-    {
-        this.onValueChange(props.storageValue);
-    }
+    {   this.onValueChange(props.storageValue);}
 
     getInputComponent = () =>
     {

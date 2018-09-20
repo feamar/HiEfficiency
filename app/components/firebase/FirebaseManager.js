@@ -52,6 +52,7 @@ export default class FirebaseManager
         }
     }
 
+
     attach = async (store) => 
     {
         this.store = store;
@@ -66,7 +67,7 @@ export default class FirebaseManager
                 store.dispatch(ReducerUser.onUserLoggedIn(user.uid, doc));
 
                 //Subscribe to user changes.
-                this.unsubscribers.push(doc.ref.onSnapshot(this.onUserDocumentChanged));
+                this.unsubscribers.push(doc.ref.onSnapshot(this.onUserDocumentChanged, this.onSnapshotError));
 
                 //Join the teams.
                 doc.data().teams.forEach(teamId => this.onUserJoinedTeam(teamId));
@@ -77,11 +78,45 @@ export default class FirebaseManager
         this.unsubscribers.push(unsubscriber);
     }
 
+    reset = async () => 
+    {
+        this.detach();
+
+        const state = this.store.getState();
+
+        const user = FirebaseAdapter.getUsers().doc(state.user.uid);
+        this.unsubscribers.push(user.onSnapshot(this.onUserDocumentChanged, this.onSnapshotError));
+    }
+
+    detach = () =>
+    {
+        //Remove all current snapshot watchers.
+        this.unsubscribers.forEach(unsubscriber => unsubscriber());
+        const keys = Object.keys(this.teamUnsubscribers);
+        for(var i = 0 ;i < keys.length ; i ++)
+        {
+            const key = keys[i];
+            const unsubscriber = this.teamUnsubscribers[key];
+
+            unsubscriber();
+        }
+    }
+
+    onSnapshotError = (...args) =>
+    {
+        console.log("!!!!!!! ON SNAPSHOT ERROR !!!!!!!!");
+        console.log(UtilityObject.stringify(args));
+    }
+
     onUserDocumentChanged = async (snapshot) =>
     {
+        console.log("ON USER DOCUMENT CHANGED!: " + UtilityObject.stringify(snapshot));
         //Get the differences between the snapshot and the state BEFORE dispatching the changed event to the store.
         const original = this.store.getState().user.data.teams;
         const next = snapshot.data().teams;
+
+        console.log("Original: " + UtilityObject.stringify(original));
+        console.log("Next: " + UtilityObject.stringify(next));
 
         //Dispatch the change event to the Redux store.
         this.store.dispatch(ReducerUser.onUserDataChanged(snapshot));
@@ -94,6 +129,7 @@ export default class FirebaseManager
         const added = UtilityArray.getAdded(original, next);
         added.forEach(teamId => this.onUserJoinedTeam(teamId));
     }
+
 
     onTeamDocumentChanged = async (snapshot) =>
     {
@@ -143,7 +179,7 @@ export default class FirebaseManager
         
         if(this.interruptionUnsubscriber)
         {   this.interruptionUnsubscriber();}
-        this.interruptionUnsubscriber = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(state.user.uid).onSnapshot(this.onInterruptionsDocumentChanged(teamId, storyId));
+        this.interruptionUnsubscriber = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(state.user.uid).onSnapshot(this.onInterruptionsDocumentChanged(teamId, storyId), this.onSnapshotError);
     }
 
     onUserInspectingStoryEnd = async () =>
@@ -163,7 +199,7 @@ export default class FirebaseManager
             if(this.storyUnsubscriber)
             {   this.storyUnsubscriber();}
 
-            this.storyUnsubscriber = query.onSnapshot(this.onStoryDocumentsChanged(teamId));
+            this.storyUnsubscriber = query.onSnapshot(this.onStoryDocumentsChanged(teamId), this.onSnapshotError);
         }
     }
 
@@ -193,7 +229,7 @@ export default class FirebaseManager
     {
         const team = await FirebaseAdapter.getTeams().doc(teamId).get();
         this.store.dispatch(ReducerUser.onUserJoinedTeam(team));
-        this.teamUnsubscribers[teamId] = team.ref.onSnapshot(this.onTeamDocumentChanged);
+        this.teamUnsubscribers[teamId] = team.ref.onSnapshot(this.onTeamDocumentChanged, this.onSnapshotError);
     }
 
     onUserLeftTeam = async (teamId) =>
@@ -201,7 +237,4 @@ export default class FirebaseManager
         this.store.dispatch(ReducerUser.onUserLeftTeam(teamId));
         this.teamUnsubscribers[teamId]();
     }
-
-    detach = () =>
-    {   this.unsubscribers.forEach(unsubscriber => unsubscriber());}
 }

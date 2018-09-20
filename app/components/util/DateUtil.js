@@ -4,6 +4,9 @@ export const asTime = (date) => {
 }
 
 export const asDate = (date) => {
+  if(date == undefined)
+  {   return undefined;}
+  
 	return date.toDateString().slice(4, 15);
 }
 

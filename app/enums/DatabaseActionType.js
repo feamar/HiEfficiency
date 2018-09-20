@@ -28,26 +28,11 @@ export default class DatabaseActionType
     ];
   
     static fromPastTense = (pastTense) => 
-    {
-        for(i = 0 ; i < DatabaseActionType.Values.length ; i ++)
-        {
-            let current = DatabaseActionType.Values[i];
-            if(current.pastTense == pastTense)
-            {   return current;}
-        }
-
-        return undefined;
-    }
+    {   return DatabaseActionType.Values.find(e => e.pastTense == pastTense);}
 
     static fromPresentTense = (presentTense) => 
-    {
-        for(i = 0 ; i < DatabaseActionType.Values.length ; i ++)
-        {
-            let current = DatabaseActionType.Values[i];
-            if(current.presentTense == presentTense)
-            {   return current;}
-        }
+    {   return DatabaseActionType.Values.find(e => e.presentTense == presentTense);}
 
-        return undefined;
-    }
+    static fromPresentContinuous = (presentContinuous) => 
+    {   return DatabaseActionType.Values.find(e => e.presentContinuous == presentContinuous);}
 }

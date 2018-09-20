@@ -54,7 +54,6 @@ export default class InputDateTime extends Component
 
     getDisplayValue = (timestamp, mode) =>
     {
-        //console.log("getDisplayValue: " + timestamp);
         const date = new Date(timestamp);
         switch(mode)
         {
@@ -70,12 +69,17 @@ export default class InputDateTime extends Component
         return "Undefined";
     }
 
+    componentDidCatch(error, info)
+    {
+        this.setState({error: error});
+    }
+
     render() 
     {
         return(
-            <View style={this.props.style}>
-                <TouchableRipple disabled={this.state.disabled} style={styles.touchable} onPress={this.open}><Text>{this.getDisplayValue(this.state.timestamp, this.state.mode)}</Text></TouchableRipple>
-                <DateTimePicker datePickerModeAndroid="default" date={new Date(this.state.timestamp)} onCancel={this.onCancel} mode={this.state.mode} isVisible={this.state.open} onConfirm={this.onConfirm} />
+            <View testID="root" style={this.props.style}>
+                <TouchableRipple testID="touchable" disabled={this.state.disabled} style={styles.touchable} onPress={this.open}><Text testID="text">{this.getDisplayValue(this.state.timestamp, this.state.mode)}</Text></TouchableRipple>
+                {this.state.error == undefined && <DateTimePicker testID="picker" datePickerModeAndroid="default" date={new Date(this.state.timestamp)} onCancel={this.onCancel} mode={this.state.mode} isVisible={this.state.open} onConfirm={this.onConfirm} />}
             </View>
         );
     }

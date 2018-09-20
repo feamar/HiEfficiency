@@ -10,6 +10,7 @@ import * as ReducerInspecting from "../../redux/reducers/ReducerInspecting";
 import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
 import UtilityObject from "../../utilities/UtilityObject";
+import WithDialogContainer from "../../hocs/WithDialogContainer";
 
 const styles = {
     loading: {
@@ -66,8 +67,10 @@ class ScreenStoryBoard extends Component
 
   onReduxStateChanged = (props) =>
   {
+    console.log("BOARD DATA CHANGED");
     if(this.state.user != props.user)
     { 
+      console.log("BOARD DATA CHANGED - ENTERED");
       this.setState({user: props.user, storyListItems: this.getStoryListItems(props)});
       this.setLoading(props);
     }
@@ -140,7 +143,13 @@ class ScreenStoryBoard extends Component
         break; 
 
       case ActionType.UPVOTE:
-        this.props.database.updateStory(this.team.id, item.id, {upvotes: item.data.upvotes + 1}, ResolveType.TOAST, ResolveType.TOAST);
+        const old = this.props.user.teams[this.team.id].stories[item.id];
+        
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Upvoting Story", async (execute) => 
+        {
+          const update = this.props.database.updateStory(this.team.id, item.id, old.data, {upvotes: {$set: item.data.upvotes + 1}});
+          await execute(update);
+        });
         break;
     }
   }
@@ -163,7 +172,12 @@ class ScreenStoryBoard extends Component
           upvotes: 0,
           createdOn: new Date()
         }
-        await this.props.database.createStory(this.team.id, story, ResolveType.TOAST, ResolveType.TOAST);
+
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
+        {
+            const create = this.props.database.createStory(this.team.id, story);
+            await execute(create);
+        });
     }
   }
 
@@ -172,7 +186,12 @@ class ScreenStoryBoard extends Component
     switch(action)
     {
       case ActionType.POSITIVE:
-        await this.props.database.deleteStory(this.team.id, this.itemToDelete.id, ResolveType.TOAST, ResolveType.TOAST);
+        
+        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Deleting Story", async (execute) => 
+        {
+          const del = this.props.database.deleteStory(this.team.id, this.itemToDelete.id);
+          await execute(del);
+        });
         break;
     }
   }
@@ -224,4 +243,7 @@ class ScreenStoryBoard extends Component
   } 
 }
 
-export default WithReduxListener(mapStateToProps, mapDispatchToProps, WithDatabase(ScreenStoryBoard));
+const hoc1 = WithDatabase(ScreenStoryBoard);
+const hoc2 = WithDialogContainer(hoc1);
+
+export default WithReduxListener(mapStateToProps, mapDispatchToProps, hoc2);
