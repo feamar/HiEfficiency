@@ -4,6 +4,7 @@ import { Button, Dialog, Text,  Paragraph, TextInput, Portal } from 'react-nativ
 import Theme from '../../styles/Theme';
 import PropTypes from 'prop-types';
 import WithInternalState from '../../hocs/WithInternalState';
+import UtilityObject from '../../utilities/UtilityObject';
 
 const styles ={
     title:{
@@ -53,10 +54,10 @@ export default class AbstractDialog extends Component
     {
         listeners.forEach(listener => 
         {
-            //console.log("For each listener - " + listener);
+            console.log("For each listener - " + listener);
             if(listener != undefined && typeof listener === "function")
             {
-                //console.log("For each listener - in if");
+                console.log("For each listener - in if");
                 listener(...args);
             }
         })

@@ -125,8 +125,11 @@ export default class FirestoreFacade
 
                 if(hasNextOperation == false || hasNextOperation == undefined)
                 {
-                    if(dialog.state.visible == false && successful == false)
-                    {   dialog.setVisible(true);}
+                    if(successful == false)
+                    {   
+                        if(dialog.state.visible == false)
+                        {   dialog.setVisible(true);}
+                    }
 
                     dialog.setCompleted();
                 }

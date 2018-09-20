@@ -120,38 +120,37 @@ class ScreenStoryCreate extends Component
             {   valid = false;}
         }   
 
-        if(valid) 
-        {
-            const teamId = this.props.inspecting.team;
+        if(valid == false) 
+        {   return;}
 
-            switch(this.mode)
-            { 
-                case MODE_CREATE:
-                    //console.log("MODE_CREATE");
+        const teamId = this.props.inspecting.team;
+        switch(this.mode)
+        { 
+            case MODE_CREATE:
+                console.log("MODE_CREATE");
 
-                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
-                    {
-                        const crud = this.props.database.createStory(teamId, this.state.story);
-                        crud.setOnDialogClosedListener(() => 
-                        {   this.props.navigation.goBack();});
-                        await execute(crud);
-                    });
+                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
+                {
+                    const crud = this.props.database.createStory(teamId, this.state.story);
+                    crud.setOnDialogClosedListener(() => 
+                    {   console.log("HERE!!!!!"); this.props.navigation.goBack();});
+                    await execute(crud);
+                });
 
-                    break;
+                break;
 
-                case MODE_EDIT:
-                    //console.log("EDIT");
-                    const old = this.props.navigation.getParam("story");
-                    const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story);
-                    
-                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
-                    {
-                        const update = this.props.database.updateStory(teamId, old.id, old.data, updates);
-                        await execute(update);
-                    });
-                    this.unsavedChanges = false;
-                    break;
-            }
+            case MODE_EDIT:
+                console.log("EDIT");
+                const old = this.props.navigation.getParam("story");
+                const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story);
+                
+                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
+                {
+                    const update = this.props.database.updateStory(teamId, old.id, old.data, updates);
+                    await execute(update);
+                });
+                this.unsavedChanges = false;
+                break;
         }
     }
 

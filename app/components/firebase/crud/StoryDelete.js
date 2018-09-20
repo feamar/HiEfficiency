@@ -34,6 +34,8 @@ export default class StoryDelete extends AbstractCrudOperation
     {
         try
         {
+            
+
             const doc = FirebaseAdapter.getStories(this.teamId).doc(this.storyId);
             this.oldStory = await doc.get();
 

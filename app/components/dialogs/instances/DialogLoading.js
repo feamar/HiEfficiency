@@ -103,6 +103,9 @@ export default class DialogLoading extends AbstractDialog
 
         this.setStateInternal({lifecycle: STATE_COMPLETED});
         this.setState({shouldShowButtonOk: true});
+
+        if(this.state.visible == false)
+        {   this.notifyListeners(this.onCloseListeners, this);}
     }
    
     setMessage = (message) =>
