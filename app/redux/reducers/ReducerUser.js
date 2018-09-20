@@ -135,7 +135,7 @@ export const onInterruptionsLoaded = (teamId, storyId, interruptions) =>
 export default (user = {}, action) => 
 {
     ReduxManager.Instance.notifyListeners(action)
-    console.log("REDUCER: " + action.type);
+    //console.log("REDUCER: " + action.type);
     var copy;
     switch(action.type)
     {

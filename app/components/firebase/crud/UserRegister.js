@@ -46,7 +46,7 @@ export default class UserRegister extends AbstractCrudOperation
         }
         catch(error)
         {  
-            console.log("On error!: " + UtilityObject.stringify(error));
+            //console.log("On error!: " + UtilityObject.stringify(error));
             switch(error.code)
             {
                 case "auth/email-already-in-use":

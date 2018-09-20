@@ -33,8 +33,8 @@ export default class InterruptionCreate extends AbstractCrudOperation
 
     perform = async (dialog) => 
     {
-        console.log("Creating Interruption: " + UtilityObject.stringify(this.newInterruption) + " for team: " + this.teamId + " and story: " + this.storyId + " and user: " + this.userId);
-        console.log("PreviousInterruptions were: " + UtilityObject.stringify(this.currentInterruptions));
+        //console.log("Creating Interruption: " + UtilityObject.stringify(this.newInterruption) + " for team: " + this.teamId + " and story: " + this.storyId + " and user: " + this.userId);
+        //console.log("PreviousInterruptions were: " + UtilityObject.stringify(this.currentInterruptions));
 
         const document = FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId);
         const newInterruptions = update(this.currentInterruptions, {$push: [this.newInterruption]});
@@ -42,7 +42,7 @@ export default class InterruptionCreate extends AbstractCrudOperation
         var keys = Object.keys(newInterruptions);
         var newInterruptionsAsArray = keys.map(v => newInterruptions[v]);
 
-        console.log("NewInterruptions are: " + UtilityObject.stringify(newInterruptionsAsArray));
+        //console.log("NewInterruptions are: " + UtilityObject.stringify(newInterruptionsAsArray));
 
         try
         {

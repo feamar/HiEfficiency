@@ -67,10 +67,10 @@ class ScreenStoryBoard extends Component
 
   onReduxStateChanged = (props) =>
   {
-    console.log("BOARD DATA CHANGED");
+    //console.log("BOARD DATA CHANGED");
     if(this.state.user != props.user)
     { 
-      console.log("BOARD DATA CHANGED - ENTERED");
+      //console.log("BOARD DATA CHANGED - ENTERED");
       this.setState({user: props.user, storyListItems: this.getStoryListItems(props)});
       this.setLoading(props);
     }

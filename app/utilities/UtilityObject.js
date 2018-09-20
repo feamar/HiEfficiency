@@ -7,7 +7,7 @@ export default class UtilityObject
     {
         if(object == undefined || object == null)
         {   
-            console.log("Inspection cannot happen on undefined or null object.");
+            //console.log("Inspection cannot happen on undefined or null object.");
             return;
         }
 
@@ -28,20 +28,20 @@ export default class UtilityObject
 
             if(value instanceof Date)
             {
-                console.log(whitespace + "date " + key + ": " + value);
+                //console.log(whitespace + "date " + key + ": " + value);
             }
             else if(typeof value === 'object')
             {
-                console.log(whitespace + "object " + key + ":");
+                //console.log(whitespace + "object " + key + ":");
                 UtilityObject.inspect(value, indentation + 1);
             }
             else if(typeof value === 'function')
             {
-                console.log(whitespace + "function " + key);
+                //console.log(whitespace + "function " + key);
             }
             else
             {
-                console.log(whitespace + "variable " + key + " = " + value);
+                //console.log(whitespace + "variable " + key + " = " + value);
             }
         }
     }

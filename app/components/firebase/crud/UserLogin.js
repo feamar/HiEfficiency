@@ -43,7 +43,7 @@ export default class UserLogin extends AbstractCrudOperation
         }
         catch(error)
         {  
-            console.log("On error!: " + UtilityObject.stringify(error));
+            //console.log("On error!: " + UtilityObject.stringify(error));
             switch(error.code)
             {
                 case "auth/invalid-email":

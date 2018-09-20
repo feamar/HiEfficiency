@@ -20,27 +20,27 @@ export default WithDialogContainer = (WrappedComponent) =>
 
         addDialog = (dialog) =>
         {   
-            console.log("Adding dialog!: " + this.state.dialogs.length);
+            //console.log("Adding dialog!: " + this.state.dialogs.length);
             if(this.state.dialogs.indexOf(dialog) >= 0)
             {   return false;}
 
             const newDialogs = update(this.state.dialogs, {$push: [dialog]});
-            console.log("New size: " + newDialogs.length);
+            //console.log("New size: " + newDialogs.length);
             this.setState({dialogs: newDialogs});
             return true;
         }
 
         removeDialog = (dialog) =>
         {
-            console.log("Dialog is not undefined: " + (dialog != undefined));
-            console.log("Removing dialog!: " + this.state.dialogs.length + " AND: " + UtilityObject.stringify(dialog));
+            //console.log("Dialog is not undefined: " + (dialog != undefined));
+            //console.log("Removing dialog!: " + this.state.dialogs.length + " AND: " + UtilityObject.stringify(dialog));
             const index = this.state.dialogs.indexOf(dialog);
             if(index < 0)
             {   return false;}
 
 
             const newDialogs = update(this.state.dialogs, {$splice: [[index, 1]]});
-            console.log("New size!: " + newDialogs.length);
+            //console.log("New size!: " + newDialogs.length);
             this.setState({dialogs: newDialogs});
             return true;
         }

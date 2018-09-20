@@ -114,13 +114,13 @@ export default class FirebaseManager
 
     onUserDocumentChanged = async (snapshot) =>
     {
-        console.log("ON USER DOCUMENT CHANGED!: " + UtilityObject.stringify(snapshot));
+        //console.log("ON USER DOCUMENT CHANGED!: " + UtilityObject.stringify(snapshot));
         //Get the differences between the snapshot and the state BEFORE dispatching the changed event to the store.
         const original = this.store.getState().user.data.teams;
         const next = snapshot.data().teams;
 
-        console.log("Original: " + UtilityObject.stringify(original));
-        console.log("Next: " + UtilityObject.stringify(next));
+        //console.log("Original: " + UtilityObject.stringify(original));
+        //console.log("Next: " + UtilityObject.stringify(next));
 
         //Dispatch the change event to the Redux store.
         this.store.dispatch(ReducerUser.onUserDataChanged(snapshot));

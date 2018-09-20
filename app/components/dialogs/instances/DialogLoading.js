@@ -166,7 +166,7 @@ export default class DialogLoading extends AbstractDialog
         else
         {   this.setStateInternal({timeLeft: seconds});}
         
-        console.log("SETTING TIMEOUT LEFT: " + seconds);
+        //console.log("SETTING TIMEOUT LEFT: " + seconds);
 
         if(this.state.lifecycle == STATE_RUNNING)
         {   setTimeout(this.setTimeoutLeft, 1000 - remainder);}

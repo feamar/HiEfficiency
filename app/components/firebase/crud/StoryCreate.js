@@ -21,7 +21,7 @@ export default class StoryCreate extends AbstractCrudOperation
 
     onRollback = async (dialog) =>
     {
-        console.log("STORYC REATE ROLLBACK: " + this.doc);
+        //console.log("STORYC REATE ROLLBACK: " + this.doc);
         if(this.doc)
         {
             this.attemptRollback(0, 10, async () => 
@@ -31,27 +31,16 @@ export default class StoryCreate extends AbstractCrudOperation
 
     perform = async (dialog) => 
     {
-        console.log("CREATING STORY: " + UtilityObject.stringify(this.story));
-        await UtilityAsync.sleep(5000);
+        //console.log("CREATING STORY: " + UtilityObject.stringify(this.story));
         try
         {
-            console.log("ONE ONE ONE");
             this.doc = await this.sendUpdates(dialog, ACTION_TYPE_STORY_CREATED, async () => 
-            {
-                console.log("TWO TWO TWO");
-                return await FirebaseAdapter.getStories(this.teamId).add(this.story);
-            });
-
-            console.log("THREE THREE THREE");
+            {   return await FirebaseAdapter.getStories(this.teamId).add(this.story);});
     
             this.onSuccess(dialog, "Story successfully created!");
-            console.log("FOUR FOUR FOUR");
         }
         catch(error)
-        {
-            console.log("FIVE FIVE FIVE");
-            this.onError(dialog, "Something went wrong while creating the story, please try again later.", error);
-            console.log("SIX SIX SIX");
+        {   this.onError(dialog, "Something went wrong while creating the story, please try again later.", error)
         }
     }
 }

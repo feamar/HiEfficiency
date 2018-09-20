@@ -130,7 +130,7 @@ class ScreenStoryDetailsInterruptions extends Component
         this.story = props.user.teams[this.props.inspecting.team].stories[this.props.inspecting.story];
         this.dialogs = [];
 
-        console.log("CONSTRUCTOR STORY: " + UtilityObject.stringify(this.story));
+        //console.log("CONSTRUCTOR STORY: " + UtilityObject.stringify(this.story));
         this.state = 
         {
             lifecycle: this.story == undefined ? LIFECYCLE_LOADING : this.getLifecycleFromStory(this.story),
@@ -153,7 +153,7 @@ class ScreenStoryDetailsInterruptions extends Component
         
         if(isEqual(this.story, story) == false)
         {
-            console.log(new Date().getTime() + " - ON REDUX STATE CHANGED");
+            //console.log(new Date().getTime() + " - ON REDUX STATE CHANGED");
             if(isEqual(this.story.data.name, story.data.name) == false)
             {   this.props.navigation.setParams({ subtitle: story.data.name })}
 
@@ -169,7 +169,7 @@ class ScreenStoryDetailsInterruptions extends Component
 
     setLoading = (props) =>
     {   
-        console.log("SET LOADING: this.story.loaded: " + this.story.loaded);
+        //console.log("SET LOADING: this.story.loaded: " + this.story.loaded);
         this.props.setLoading(this.story == undefined || this.story.interruptions == undefined || this.story.loaded == false);
     }
 
@@ -605,14 +605,14 @@ class ScreenStoryDetailsInterruptions extends Component
                 break;
  
             case LIFECYCLE_FINISHED:
-                console.log(new Date().getTime() + " - START RENDER");
+                //console.log(new Date().getTime() + " - START RENDER");
                 const v = 
                     <View style={styles.wrapper}>
                         {this.getListComponent()}
                         {this.getDialogComponent()}
                         {this.getFabComponent("lock-open", ActionType.REOPEN)}
                     </View>;
-                    console.log(new Date().getTime() + " - END RENDER");
+                    //console.log(new Date().getTime() + " - END RENDER");
 
                     return v;
                 break;
@@ -645,7 +645,7 @@ class ScreenStoryDetailsInterruptions extends Component
 
     getSectionsFromStory = (story) =>
     {        
-        console.log(new Date().getTime() + " - START GET SECTIONS");
+        //console.log(new Date().getTime() + " - START GET SECTIONS");
 
         const data = story.data;
         const interruptions = story.interruptions;
@@ -771,7 +771,7 @@ class ScreenStoryDetailsInterruptions extends Component
         if(last)
         {   last.open = true;}
 
-        console.log(new Date().getTime() + " - END GET SECTIONS");
+        //console.log(new Date().getTime() + " - END GET SECTIONS");
 
 
         return sections;

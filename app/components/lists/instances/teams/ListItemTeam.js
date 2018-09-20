@@ -21,7 +21,7 @@ export default class ListItemTeam extends AbstractListItem
         this.addContextMenuItem("Leave", ActionType.LEAVE);
         this.addContextMenuItem("Edit", ActionType.EDIT);
 
-        console.log(UtilityObject.stringify(this.state));
+        //console.log(UtilityObject.stringify(this.state));
         if(__DEV__)
         {   this.addContextMenuItem("(Development) Delete", ActionType.DELETE);}
     }

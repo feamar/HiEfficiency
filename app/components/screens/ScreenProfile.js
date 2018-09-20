@@ -78,7 +78,7 @@ class ScreenProfile extends Component
   {
     await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Profile", async (execute) => 
     {
-        console.log("UPDATES: " + UtilityObject.stringify(this.state.newData));
+        //console.log("UPDATES: " + UtilityObject.stringify(this.state.newData));
         const update =this.props.database.updateUser(this.state.user.uid, this.state.user.data, this.state.newData);
         await execute(update);
         this.unsavedChanges = false;

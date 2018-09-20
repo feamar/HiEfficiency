@@ -76,7 +76,7 @@ export default class AbstractCrudOperation
 
     onDialogDismissed = (dialog) =>
     {
-        console.log("On Dialog Dismissed");
+        //console.log("On Dialog Dismissed");
         if(this.state != STATE_FINISHED)
         {   this.onRollback(dialog);}
 
@@ -146,7 +146,7 @@ export default class AbstractCrudOperation
         this.state = STATE_FINISHED;
         this.successful = false;
 
-        console.log("ON CRUD ERROR - " + message + " : " + UtilityObject.stringify(error) )
+        //console.log("ON CRUD ERROR - " + message + " : " + UtilityObject.stringify(error) )
         ReduxManager.Instance.removeListener(this.onReduxAction);
 
         if(error)

@@ -127,7 +127,7 @@ class ScreenStoryCreate extends Component
             switch(this.mode)
             { 
                 case MODE_CREATE:
-                    console.log("MODE_CREATE");
+                    //console.log("MODE_CREATE");
 
                     await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
                     {
@@ -140,7 +140,7 @@ class ScreenStoryCreate extends Component
                     break;
 
                 case MODE_EDIT:
-                    console.log("EDIT");
+                    //console.log("EDIT");
                     const old = this.props.navigation.getParam("story");
                     const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story);
                     

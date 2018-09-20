@@ -23,7 +23,7 @@ export default class TeamDelete extends AbstractCrudOperation
 
     onRollback = async (dialog) =>
     {
-        console.log("ROLLING BACK CHANGES!");
+        //console.log("ROLLING BACK CHANGES!");
         const user = FirebaseAdapter.getUsers().doc(this.userId);
         if(this.oldTeam)
         {
@@ -51,10 +51,9 @@ export default class TeamDelete extends AbstractCrudOperation
     perform = async (dialog) => 
     {
         const index = this.currentTeams.indexOf(this.teamId);
-        console.log("Index; " + index + ", teamId: " + this.teamId + " and currentTeams: " + UtilityObject.stringify(this.currentTeams));
+        //console.log("Index; " + index + ", teamId: " + this.teamId + " and currentTeams: " + UtilityObject.stringify(this.currentTeams));
         if(index >= 0)
         {   
-            console.log("HERE!");
             try
             {
                 const newData = update(this.currentTeams, {$splice: [[index, 1]]});
@@ -71,13 +70,11 @@ export default class TeamDelete extends AbstractCrudOperation
             {   return;}
         }
         
-        console.log("HERE HERE!");
         try
         {
             const doc = FirebaseAdapter.getTeams().doc(this.teamId);
             this.oldTeam = await doc.get();
 
-            console.log("HERE HERE HERE!");
             await this.sendUpdates(dialog, ACTION_TYPE_TEAM_DELETED, async () => 
             {   await FirebaseAdapter.getTeams().doc(this.teamId).delete();});
 

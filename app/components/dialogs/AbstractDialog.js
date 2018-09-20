@@ -53,10 +53,10 @@ export default class AbstractDialog extends Component
     {
         listeners.forEach(listener => 
         {
-            console.log("For each listener - " + listener);
+            //console.log("For each listener - " + listener);
             if(listener != undefined && typeof listener === "function")
             {
-                console.log("For each listener - in if");
+                //console.log("For each listener - in if");
                 listener(...args);
             }
         })
