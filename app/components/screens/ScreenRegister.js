@@ -11,6 +11,7 @@ import {
   Text
 } from 'react-native-paper';
 import WithDatabase from "../../hocs/WithDatabase";
+import WithDialogContainer from "../../hocs/WithDialogContainer";
 
 const styles = 
 {
@@ -85,11 +86,21 @@ class ScreenRegister extends React.Component
       return;
     }
 
-    this.setState({email: this.state.email.trim()}, () => {
+    this.setState({email: this.state.email.trim()}, async () => {
       //State change will automatically navigate to HOME route if successful.
-      this.props.database.adapter.signUpWithEmailAndPassword(this.state.email, this.state.password, this.state.confirmation);
-    });
+      await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Registering Account", async (execute) => 
+      {   
+        const register = this.props.database.registerUser(this.state.email, this.state.password);
+        const successful = await execute(register, true);
 
+        if(successful == false)
+        {   return;}
+
+        const login = this.props.database.loginUser(this.state.email, this.state.password);
+        await execute(login);
+        
+      }, 200);
+    });
   }
 
   render() 
@@ -110,5 +121,7 @@ class ScreenRegister extends React.Component
   }
 }
 
+const hoc1 = WithDatabase(ScreenRegister);
+const hoc2 = WithDialogContainer(hoc1);
 
-export default WithDatabase(ScreenRegister);
+export default hoc2;

@@ -22,6 +22,7 @@ export default class FirebaseManager
         this.teamUnsubscribers = {};
 
         this.state = {};
+        this.loginHasBeenCanceled = false;
     }
 
     onReduxStateChanged = async () =>
@@ -62,15 +63,18 @@ export default class FirebaseManager
         {
             if(user) 
             {
-                const doc = await FirebaseAdapter.getUsers().doc(user.uid).get();
-                //Dispatch onUserLoggedIn.
-                store.dispatch(ReducerUser.onUserLoggedIn(user.uid, doc));
-
-                //Subscribe to user changes.
-                this.unsubscribers.push(doc.ref.onSnapshot(this.onUserDocumentChanged, this.onSnapshotError));
-
-                //Join the teams.
-                doc.data().teams.forEach(teamId => this.onUserJoinedTeam(teamId));
+                if(this.loginHasBeenCanceled == false)
+                {
+                    const doc = await FirebaseAdapter.getUsers().doc(user.uid).get();
+                    //Dispatch onUserLoggedIn.
+                    store.dispatch(ReducerUser.onUserLoggedIn(user.uid, doc));
+    
+                    //Subscribe to user changes.
+                    this.unsubscribers.push(doc.ref.onSnapshot(this.onUserDocumentChanged, this.onSnapshotError));
+    
+                    //Join the teams.
+                    doc.data().teams.forEach(teamId => this.onUserJoinedTeam(teamId));
+                }
             }
             else
             {   store.dispatch(ReducerUser.onUserLoggedOut());}

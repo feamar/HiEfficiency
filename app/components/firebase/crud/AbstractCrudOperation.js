@@ -47,9 +47,15 @@ export default class AbstractCrudOperation
         {   this.dialog.setWarning("No internet connection detected, operation might not synchronize correctly.");}
         
         try
-        {   await this.perform(this.dialog);}
+        {
+            await this.perform(this.dialog);
+            return this.successful;
+        }
         catch(error)
-        {   this.onError(this.dialog, "Something went wrong during the execution of the operation. Please try again.", error);}      
+        {
+            this.onError(this.dialog, "Something went wrong during the execution of the operation. Please try again.", error);
+            return false;
+        }      
     }
 
     onDialogTimeOut = async (dialog, section) =>
@@ -124,7 +130,8 @@ export default class AbstractCrudOperation
     onSuccess = (dialog, message) =>
     {
         this.state = STATE_FINISHED;
-        console.log("onSuccess Start");
+        this.successful = true;
+
         ReduxManager.Instance.removeListener(this.onReduxAction);
         
         if(dialog)
@@ -132,13 +139,13 @@ export default class AbstractCrudOperation
             dialog.setCancelable(true);
             dialog.setMessage(message);
         }
-        
-        console.log("onSuccess End");
     }
 
     onError = async (dialog, message, error) =>
     {
         this.state = STATE_FINISHED;
+        this.successful = false;
+
         console.log("ON CRUD ERROR - " + message + " : " + UtilityObject.stringify(error) )
         ReduxManager.Instance.removeListener(this.onReduxAction);
 

@@ -23,6 +23,8 @@ import InterruptionCreate from "./crud/InterruptionCreate";
 import { SECTION_CONNECTING } from "./crud/AbstractCrudOperation";
 import React from "react";
 import DialogLoading from "../dialogs/instances/DialogLoading";
+import UserLogin from "./crud/UserLogin";
+import UserRegister from "./crud/UserRegister";
 
 class SingletonEnforcer {}
 const EnforcerInstance = new SingletonEnforcer();
@@ -40,9 +42,13 @@ export default class FirestoreFacade
     }
 
     updateUser = (userId, oldUser, updates ) =>
-    {
-        return new UserUpdate(userId, oldUser, updates );
-    }
+    {   return new UserUpdate(userId, oldUser, updates );}
+
+    loginUser = (email, password) =>
+    {   return new UserLogin(email, password);}
+
+    registerUser = (email, password) =>
+    {   return new UserRegister(email, password);}
 
     deleteTeam = (teamId, currentTeams, userId ) =>
     {
@@ -99,8 +105,11 @@ export default class FirestoreFacade
        return new InterruptionDelete(teamId, storyId, userId, currentInterruptions, indexToDelete );
     }
 
-    inDialog = (addDialogCallback, removeDialogCallback, title, closure) => 
+    inDialog = (addDialogCallback, removeDialogCallback, title, closure, showDelay) => 
     {
+        if(showDelay == undefined || typeof showDelay !== "number")
+        {   showDelay = 3000;}
+
         return new Promise((resolve, reject) => 
         {
             const execute = (dialog, hasNextOperation) => async (crud) =>
@@ -110,12 +119,19 @@ export default class FirestoreFacade
                 {
                     if(resolved == false)
                     {   dialog.setVisible(true);}
-                }, 1000);
-                await crud.execute(dialog);
+                }, showDelay);
+                const successful = await crud.execute(dialog);
                 resolved = true;
 
                 if(hasNextOperation == false || hasNextOperation == undefined)
-                {   dialog.setCompleted();}
+                {
+                    if(dialog.state.visible == false)
+                    {   dialog.setVisible(true);}
+
+                    dialog.setCompleted();
+                }
+
+                return successful;
             }
 
             const onReference = (ref) => 

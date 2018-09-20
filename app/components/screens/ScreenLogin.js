@@ -12,6 +12,7 @@ import {
 import {SCREEN_NAME_AUTH_REGISTER} from '../routing/Router';
 import WithDatabase from "../../hocs/WithDatabase";
 import Theme from '../../styles/Theme';
+import WithDialogContainer from "../../hocs/WithDialogContainer";
 
 const styles = {
   wrapper: {
@@ -70,9 +71,13 @@ class ScreenLogin extends React.Component
 
   handleLogin = () => 
   {
-    this.setState({email: this.state.email.trim()}, () => {
-
-      this.props.database.adapter.signInWithEmailAndPassword(this.state.email, this.state.password);
+    this.setState({email: this.state.email.trim()}, async () => 
+    {
+      await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Loging In", async (execute) => 
+      {   
+        const crud = this.props.database.loginUser(this.state.email, this.state.password);
+        await execute(crud);
+      }, 200);
     });
   }
 
@@ -101,4 +106,7 @@ class ScreenLogin extends React.Component
   }
 }
 
-export default WithDatabase(ScreenLogin);
+const hoc1 = WithDatabase(ScreenLogin);
+const hoc2 = WithDialogContainer(hoc1);
+
+export default hoc2;

@@ -36,6 +36,9 @@ export default class FirebaseAdapter
   //Auth
   static logout = () =>
   {   return firebase.auth().signOut();}
+
+  static getAuth = () =>
+  {   return firebase.auth();}
   
   static signUpWithEmailAndPassword = (email, password) => 
   {
@@ -55,9 +58,5 @@ export default class FirebaseAdapter
   }
   
   static signInWithEmailAndPassword = (email, password) => 
-  {
-    return firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password)
-    .catch(function (error) 
-    {   alert(error.code + ': ' + error.message)});
-  }
+  {   return firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password);}
 }
