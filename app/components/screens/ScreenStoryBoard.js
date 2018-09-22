@@ -57,6 +57,7 @@ class ScreenStoryBoard extends Component
 
     this.team = this.props.navigation.getParam("team");
 
+    
     this.state =
     {
       storyListItems: [],

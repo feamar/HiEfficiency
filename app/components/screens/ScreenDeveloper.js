@@ -7,6 +7,13 @@ import InterruptionType from '../../enums/InterruptionType';
 import UtilityObject from '../../utilities/UtilityObject';
 import { onUserLoggedIn } from '../../redux/reducers/ReducerUser';
 
+const styles = {
+    button: {
+        paddingTop: 5,
+        paddingBottom: 5,
+        paddingLeft: 5
+    }
+}
 export default class ScreenDeveloper extends Component
 {
   constructor()
@@ -31,16 +38,13 @@ export default class ScreenDeveloper extends Component
         });
     }
 
-    onUserLoggedInReducer = () =>
-    {
-
-    }
 
     render()
     {
         return (
-        <View style={{height: "100%"}}>
-            <TouchableRipple onPress={this.migrateInterruptions}><Text>Migrate Interruptions</Text></TouchableRipple>
+        <View style={{height: "100%", padding:20}}>
+            {/*<TouchableRipple style={styles.button} onPress={this.migrateInterruptions}><Text>Migrate Interruptions</Text></TouchableRipple>*/}
+            <TouchableRipple style={styles.button} onPress={this.migrateInterruptions}><Text></Text></TouchableRipple>
         </View>
         ); 
     }

@@ -69,7 +69,9 @@ export default class InputDateTimeSeparate extends Component
 
     getDateComponentFrom = (timestamp) =>
     {
-        const ms = timestamp.getTime();
+        var ms = timestamp;
+        if(timestamp instanceof Date)
+        {   ms = timestamp.getTime();}
         const remainder = ms % 86400000;
 
         return ms - remainder;
@@ -77,7 +79,12 @@ export default class InputDateTimeSeparate extends Component
 
     getTimeComponentFrom = (timestamp) =>
     {
-        const ms = timestamp.getTime();
+        console.log("GETTING TIME COMPONENT FROM: " + timestamp);
+
+        var ms = timestamp;
+        if(timestamp instanceof Date)
+        {   ms = timestamp.getTime();}
+        
         const remainder = ms % 86400000;
 
         return remainder;

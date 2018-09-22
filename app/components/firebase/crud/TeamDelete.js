@@ -8,6 +8,7 @@ import UtilityAsync from '../../../utilities/UtilityAsync';
 import {ACTION_TYPE_USER_LEFT_TEAM, ACTION_TYPE_TEAM_DELETED} from "../../../redux/reducers/ReducerUser";
 import UtilityObject from '../../../utilities/UtilityObject';
 import AbstractCrudOperation, { SECTION_CONNECTING, SECTION_WAITING_FOR_CONFIRMATION, TIMEOUT_RESOLVE_NONE, TIMEOUT_RESOLVE_ROLL_BACK } from './AbstractCrudOperation';
+import firebase from 'react-native-firebase';
 
 export default class TeamDelete extends AbstractCrudOperation
 {
@@ -23,7 +24,7 @@ export default class TeamDelete extends AbstractCrudOperation
 
     onRollback = async (dialog) =>
     {
-        //console.log("ROLLING BACK CHANGES!");
+        console.log("ROLLING BACK CHANGES!");
         const user = FirebaseAdapter.getUsers().doc(this.userId);
         if(this.oldTeam)
         {
@@ -50,6 +51,7 @@ export default class TeamDelete extends AbstractCrudOperation
 
     perform = async (dialog) => 
     {
+        
         const index = this.currentTeams.indexOf(this.teamId);
         //console.log("Index; " + index + ", teamId: " + this.teamId + " and currentTeams: " + UtilityObject.stringify(this.currentTeams));
         if(index >= 0)
@@ -69,14 +71,26 @@ export default class TeamDelete extends AbstractCrudOperation
             if(dialog.isTimedOut())
             {   return;}
         }
-        
+
+        const stories = await FirebaseAdapter.getStories(this.teamId).get();
+        const promises = stories.docs.map(async (story) => 
+        {
+            const interruptions = await FirebaseAdapter.getInterruptionsFromStoryRef(story.ref).get();
+            await Promise.all(interruptions.docs.map(interruption => 
+            {   return interruption.ref.delete();}));
+
+            return story.ref.delete();
+        });
+
+        await Promise.all(promises);
+
         try
         {
             const doc = FirebaseAdapter.getTeams().doc(this.teamId);
             this.oldTeam = await doc.get();
 
             await this.sendUpdates(dialog, ACTION_TYPE_TEAM_DELETED, async () => 
-            {   await FirebaseAdapter.getTeams().doc(this.teamId).delete();});
+            {   await doc.delete();});
 
             this.onSuccess(dialog, "You have successfully left and deleted the team.");
         }
