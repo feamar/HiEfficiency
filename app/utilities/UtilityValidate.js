@@ -1,6 +1,6 @@
 export default class UtilityValidate 
 {
-    static DEFAULT_LEGAL_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-=!@#$%^&*()_+€|:\";',./<>?~ ";
+    static DEFAULT_LEGAL_CHARACTERS = "[]{}ÁÉÚÍÓÀÈÌÙÒÄËÜÖÏÂÊÛÎÔçáéúíóàèìòùâêûîôäëüïöABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-=!@#$%^&*()_+€|:\";',./<>?~ ";
 
 
     static getIllegalCharacters = (value, legalCharacters) =>
