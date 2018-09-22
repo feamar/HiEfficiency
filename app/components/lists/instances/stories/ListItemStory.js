@@ -70,7 +70,7 @@ export default class ListItemTeam extends AbstractListItem
             <View style={styles.wrapper}>
                 <View style={this.getItemIndicatorStyle()} />
                 <View style={styles.contentWrapper}>
-                    <Text style={styles.storyName}>{this.state.item.data.name}</Text>
+                    <Text numberOfLines={2} style={styles.storyName}>{this.state.item.data.name}</Text>
                     <Text style={styles.storyUpvotes}>{typeName}: {this.state.item.data.upvotes} votes</Text>
                 </View>
             </View>

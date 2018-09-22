@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, ToastAndroid} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
-import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
+import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT, SCREEN_NAME_STORY_BOARD_DOING, PARAM_NAME_SUBTITLE} from "../routing/Router";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import { FAB } from "react-native-paper";
 import ActionType from "../../enums/ActionType";
@@ -75,7 +75,8 @@ class ScreenTeams extends Component
 
   onItemSelected = (item, index) => 
   { 
-    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item, subtitle: item.name});
+    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item, [PARAM_NAME_SUBTITLE]: item.data.name});
+    this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD_DOING);
   }
 
   onContextMenuItemSelected = (item, index, action) =>

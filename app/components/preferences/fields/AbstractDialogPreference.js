@@ -65,7 +65,7 @@ export default class AbstractDialogPreference extends AbstractPreference
         return (
             <View>
                 <Text style={this.styles.title}>{this.props.title}</Text>
-                {this.state.displayValue ? <Text style={this.styles.displayValue}>{this.state.displayValue}</Text> : <Text>{this.getEnterMessage()}</Text>}
+                {this.state.displayValue ? <Text style={this.styles.displayValue}>{this.state.displayValue}</Text> : <Text style={this.styles.hintValue}>{this.getEnterMessage()}</Text>}
             </View>
         );
     }

@@ -197,7 +197,7 @@ class ScreenStoryCreate extends Component
             <View style={{height: "100%"}}> 
                 <ScrollView style={styles.scrollView}>
                     <PreferenceCategory title="Mandatory">
-                        <PreferenceText required ref={c => this.fields.name = c} title="Name" storageValue={this.state.story.name} onValueChanged={this.onValueChanged("name")} />
+                        <PreferenceText required ref={c => this.fields.name = c} title="Name" storageValue={this.state.story.name} onValueChanged={this.onValueChanged("name")}  multiline={true} numberOfLines={2} />
                         <PreferenceText ref={c => this.fields.description = c} title="Description" storageValue={this.state.story.description} onValueChanged={this.onValueChanged("description")} multiline={true} numberOfLines={5} />
                         <PreferenceSelectSpinner required ref={c => this.fields.type = c} title="Story Type" storageValue={this.state.story.type} onValueChanged={this.onValueChanged("type")} options={this.getStoryTypeOptions()} getDisplayValueFromItem={storageValue =>StoryType.fromId(storageValue).name}/> 
                     </PreferenceCategory>

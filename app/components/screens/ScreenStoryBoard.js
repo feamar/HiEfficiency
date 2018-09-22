@@ -56,7 +56,6 @@ class ScreenStoryBoard extends Component
     super(props);
 
     this.team = this.props.navigation.getParam("team");
-
     
     this.state =
     {
@@ -124,7 +123,7 @@ class ScreenStoryBoard extends Component
   {   
     this.props.onInspectStoryStart(item.id);
     console.log("Setting navigation param story id to: " + item.id);
-    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {storyId: item.id, story: item, subtitle: item.data.name});
+    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {storyId: item.id, story: item, [PARAM_NAME_SUBTITLE]: item.data.name});
 
     if(selectedTabScreenName != undefined)
     {   this.props.navigation.navigate(selectedTabScreenName);}

@@ -39,20 +39,13 @@ export default withReduxListener = (mapStateToProps, mapDispatchToProps, Wrapped
             this.state = {
                 loading: true
             }
-            this.focussed = false;
         }
 
-        componentWillMount()
-        {   this.focussed = true;}
-
-        onScreenWillFocus = (payload) =>
-        {   this.focussed = true;}
-
         componentWillReceiveProps = (props) =>
-        {   this.onReduxStateChanged(props);}
-
-        onScreenWillBlur = (payload) =>
-        {   this.focussed = false;}
+        {
+            console.log("WITH REDUX LISTENER - COMPONENT WILL RECEIVE PROPS");
+            this.onReduxStateChanged(props);
+        }
 
         onReduxStateChanged = (props) =>
         {
@@ -72,8 +65,7 @@ export default withReduxListener = (mapStateToProps, mapDispatchToProps, Wrapped
         }
     }
     
-    const hoc1 = withFocusListener(hoc);
-    const hoc2 = connect(mapStateToProps, mapDispatchToProps)(hoc1);
+    const hoc1 = connect(mapStateToProps, mapDispatchToProps)(hoc);
     
-    return withStaticFields(WrappedComponent, hoc2);
+    return withStaticFields(WrappedComponent, hoc1);
 }

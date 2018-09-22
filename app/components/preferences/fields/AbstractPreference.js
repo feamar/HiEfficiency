@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {View} from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import PropTypes from 'prop-types';
-import { Divider } from 'react-native-paper';
-  
+import { Divider, withTheme} from 'react-native-paper';
+import Theme from "../../../styles/Theme";
+
 export default class AbstractPreference extends Component
 {
     styles = {
@@ -16,8 +17,11 @@ export default class AbstractPreference extends Component
         title:{
             fontWeight: "bold"
         },
-        displayValue:{
-            color: "#919191"
+        displayValue: {
+            color: Theme.colors.typography.title
+        },
+        hintValue: {
+            color: Theme.colors.typography.hint
         },
         error: {
             color: "red",

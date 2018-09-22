@@ -36,9 +36,10 @@ export default class DialogPreferenceText extends AbstractPreferenceDialog
 
     getDialogContent = () => 
     {
+        console.log("Number of lines: " + this.props.numberOfLines);
         return ( 
             <View style={{marginLeft: 25, marginRight: 25}}>
-                <TextInput autoFocus={true} name="value" label={this.props.label} value={this.state.storageValue} onChangeText={this.onValueChange} multiline={this.props.multiline} numberOfLines={this.props.numberOfLines} />
+                <TextInput style={{flex: 1}} autoFocus={true} name="value" label={this.props.label} value={this.state.storageValue} onChangeText={this.onValueChange} multiline={this.props.multiline} numberOfLines={this.props.numberOfLines} />
                 {this.state.error && <Text style={styles.error}>{this.state.error}</Text>}
             </View>
         );

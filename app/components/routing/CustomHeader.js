@@ -3,6 +3,7 @@ import {View, PixelRatio} from "react-native";
 import PropTypes from "prop-types";
 import Theme from "../../styles/Theme";
 import {Text} from "react-native-paper";
+import { PARAM_NAME_SUBTITLE } from "./Router";
 
 const styles = {
     wrapper:{
@@ -41,10 +42,10 @@ export default class CustomHeader extends React.Component
             left: this.props.left,
             right: this.props.right,
             title: this.props.title,
-            subtitle: this.props.subtitle
+            subtitle: this.props[PARAM_NAME_SUBTITLE]
         }
 
-        console.log("CustomHeaderConstructor: " + props.subtitle);
+        console.log("CustomHeaderConstructor: " + props[PARAM_NAME_SUBTITLE]);
     }
 
     getMidStyles = () => 

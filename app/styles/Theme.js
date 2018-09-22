@@ -12,7 +12,9 @@ const Theme = {
         selectedBackground: "#EFEFEF",
         typography:{
             title: "#434343",
-            subtitle: "#A1A1A1"
+            subtitle: "#A1A1A1",
+            hint: "#A1A1A1",
+            subtitleDark: "#616161"
         },
         header: {
             typography:{

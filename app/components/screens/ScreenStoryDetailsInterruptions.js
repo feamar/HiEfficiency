@@ -141,23 +141,32 @@ class ScreenStoryDetailsInterruptions extends Component
             shouldFabGroupRender: true
         }
 
-        if(this.story != undefined)
-        {   this.props.navigation.setParams({ subtitle: this.story.data.name });}
         this.setLoading(props);
     }
 
     onReduxStateChanged = (props) =>
     {
+        console.log("Story Details - onReduxStateChanged: ");
+        console.log("Story Details - onReduxStateChanged - this.state.user: " + UtilityObject.stringify(this.state.user));
+        console.log("Story Details - onReduxStateChanged - props.user: " + UtilityObject.stringify(props.user));
         const team = props.inspecting.team;
         if(isEqual(this.state.user, props.user))
-        {   return;}
+        {   
+            console.log("Story Details - onReduxStateChanged: 1");
+            return;
+        }
 
         const story = props.user.teams[team].stories[this.story.id];
         if(isEqual(this.story, story) == false)
         {
+            console.log("Story Details - onReduxStateChanged: 2");
+
             //console.log(new Date().getTime() + " - ON REDUX STATE CHANGED");
             if((this.story == undefined && story != undefined) || isEqual(this.story.data.name, story.data.name) == false)
-            {   this.props.navigation.setParams({ subtitle: story.data.name })}
+            {
+                console.log("Story Details - onReduxStateChanged: 3");
+                this.props.navigation.setParams({ subtitle: story.data.name });
+            }
 
             const sections = this.getSectionsFromStory(story);
             const lifecycle = this.getLifecycleFromStory(story);
@@ -165,8 +174,9 @@ class ScreenStoryDetailsInterruptions extends Component
             this.setState({sections: sections, lifecycle: lifecycle});
             this.story = story;
         }
-
+        console.log("Story Details - onReduxStateChanged: 4");
         this.setLoading(props);
+        console.log("Story Details - onReduxStateChanged: 5");
     }
 
     setLoading = (props) =>
