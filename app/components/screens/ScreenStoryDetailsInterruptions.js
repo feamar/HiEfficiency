@@ -194,7 +194,7 @@ class ScreenStoryDetailsInterruptions extends Component
     shouldShowOverflowMenu = () =>
     {   return this.state.lifecycle != LIFECYCLE_FINISHED && this.state.lifecycle != LIFECYCLE_UNSTARTED && (this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.length == 0)}
 
-    onStartIssue = async () => 
+    onStartStory = async () => 
     {   
         if(this.story == undefined)
         {   return;}
@@ -550,14 +550,18 @@ class ScreenStoryDetailsInterruptions extends Component
 
     getDialogComponent = () =>
     {  
+        console.log("HERE: " + this.story);
         var start = new Date();
         var end = new Date();
 
         if(this.story != undefined)
         {   
-            start = this.story.startedOn;
-            end = this.story.finishedOn;
+            console.log ("HERE 2");
+            start = this.story.data.startedOn;
+            end = this.story.data.finishedOn;
         }
+
+        console.log("HERE 3: " + start + " and " + end);
 
         return (
              <View>
@@ -596,7 +600,7 @@ class ScreenStoryDetailsInterruptions extends Component
                     <View style={styles.unstarted.wrapper}>
                         {this.getDialogComponent()}
                         <View style={styles.unstarted.backgroundWrapper}>
-                            <TouchableRipple style={styles.unstarted.buttonStart} theme={Theme} onPress={this.onStartIssue} borderless={true}>
+                            <TouchableRipple style={styles.unstarted.buttonStart} theme={Theme} onPress={this.onStartStory} borderless={true}>
                                 <Text style={styles.unstarted.buttonText}>START</Text>
                             </TouchableRipple>
                         </View>
@@ -699,6 +703,7 @@ class ScreenStoryDetailsInterruptions extends Component
             previousDate = asDate(data.startedOn);
            
             //const startItem = <ListItemStart timestamp={data.startedOn} key={-1} />
+            console.log("STORY START TIME: " + data.startedOn);
             const startItem = { timestamp: data.startedOn, id: -1, ListItemType: ListItemStart, duration: 0}
             section = {
                 title: previousDate,

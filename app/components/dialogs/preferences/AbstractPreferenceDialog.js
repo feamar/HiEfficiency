@@ -17,6 +17,7 @@ export default class AbstractPreferenceDialog extends AbstractDialog
     constructor(props) 
     {
         super(props);
+        console.log("PARSED IN STORAGE VALUE: " + UtilityObject.stringify(this.props.storageValue));
 
         this.state = {
             ...this.state,

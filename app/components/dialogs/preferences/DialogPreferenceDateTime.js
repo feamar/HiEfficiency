@@ -37,7 +37,7 @@ export default class DialogPreferenceDateTime extends AbstractPreferenceDialog
         this.state = {
             ...this.state,
             open: false,
-            storageValue: this.state.storageValue == undefined ? new Date().getTime() : this.state.storageValue
+            storageValue: this.state.storageValue == undefined ? new Date() : this.state.storageValue
         }
     }
 
