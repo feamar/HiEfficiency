@@ -34,7 +34,18 @@ const styles = {
 export default class CustomHeader extends React.Component
 {
     constructor(props)
-    {   super(props);}
+    {
+        super(props);
+
+        this.state = {
+            left: this.props.left,
+            right: this.props.right,
+            title: this.props.title,
+            subtitle: this.props.subtitle
+        }
+
+        console.log("CustomHeaderConstructor: " + props.subtitle);
+    }
 
     getMidStyles = () => 
     {
@@ -51,25 +62,31 @@ export default class CustomHeader extends React.Component
         return style;
     }
 
+    componentWillReceiveProps(props) 
+    {   
+        console.log("componentWillReceiveProps: " + props.subtitle);
+        this.setState({left: props.left, right: props.right, title: props.title, subtitle: props.subtitle});
+    }
+
     render() 
     {
         return (
             <View style={styles.wrapper}>
 
-                {this.props.left && 
+                {this.state.left && 
                     <View style={styles.left}>
-                        {this.props.left}
+                        {this.state.left}
                     </View>
                 }
 
                 <View style={this.getMidStyles()}>
-                    <Text numberOfLines={1} style={styles.title}>{this.props.title}</Text>
-                    {this.props.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.props.subtitle}</Text>}
+                    <Text numberOfLines={1} style={styles.title}>{this.state.title}</Text>
+                    {this.state.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.state.subtitle}</Text>}
                 </View>
 
-                {this.props.right && 
+                {this.state.right && 
                     <View style={styles.right}>
-                        {this.props.right}
+                        {this.state.right}
                     </View>
                 }
 

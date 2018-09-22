@@ -121,7 +121,7 @@ export default class DialogPreferenceWeekSchema extends AbstractPreferenceDialog
         }
 
         newStorageValue[index][fromOrTo] = timeString;
-        this.onValueChange(storageValue);
+        this.onValueChange(newStorageValue);
     }
 
     isBefore = (t1, t2) => {

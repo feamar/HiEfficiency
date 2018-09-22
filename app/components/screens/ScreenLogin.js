@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View, ToastAndroid} from "react-native";
 
 import {
   Button,
@@ -71,8 +71,22 @@ class ScreenLogin extends React.Component
 
   handleLogin = () => 
   {
+    if(this.state.email == undefined || this.state.email == "")
+    {   
+      ToastAndroid.show("Please enter an e-mail address first.", ToastAndroid.LONG);
+      return;
+    }
+    
+    if(this.state.password == undefined || this.state.password == "")
+    {
+      ToastAndroid.show("Please enter a password first.", ToastAndroid.LONG);
+      return;
+    }
+
     this.setState({email: this.state.email.trim()}, async () => 
     {
+
+
       await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Loging In", async (execute) => 
       {   
         const crud = this.props.database.loginUser(this.state.email, this.state.password);

@@ -17,6 +17,18 @@ const styles ={
     }
 }
 
+/*interface onDismissListener
+{
+    onDialogDismiss() : void;
+}
+
+class State 
+{
+    visible: boolean;
+    title: string;
+};*/
+
+
 export default class AbstractDialog extends Component
 {
     constructor(props) 
@@ -34,39 +46,48 @@ export default class AbstractDialog extends Component
     }
 
     componentWillMount() 
-    {   this.setVisible(this.props.visible);}
+    {
+        this.setVisible(this.state.visible);
+    }
 
     setTitle = (title) =>
     {   this.setState({title: title});}
 
     setVisible = (visible) =>
     {
+        console.log("SETTINg VISIBLE 1: " + visible);
+
+        console.log("SETTINg VISIBLE 2: " + visible);
+
+
+
+        if(this.state.visible == visible)
+        {   return;}
+        
+        console.log("SETTING VISIBLE 3: " + visible);
         this.setState({visible: visible}, () => 
         {
             if(visible)
-            {   this.notifyListeners(this.onOpenListeners, this);}
+            {   this.notifyListeners(this.onOpenListeners, "onOpenListeners", this);}
             else
-            {   this.notifyListeners(this.onCloseListeners, this);}
+            {   this.notifyListeners(this.onCloseListeners, "onCloseListeners", this);}
         });   
     }
 
-    notifyListeners = (listeners, ...args) =>
+    notifyListeners = (listeners, name, ...args) =>
     {
+        console.log("Notifying listeners: " + name + " - " + args[1]);
         listeners.forEach(listener => 
         {
-            console.log("For each listener - " + listener);
             if(listener != undefined && typeof listener === "function")
-            {
-                console.log("For each listener - in if");
-                listener(...args);
-            }
+            {   listener(...args);}
         })
     }
 
     onDismiss = () =>
     {
         this.setVisible(false);
-        this.notifyListeners(this.onDismissListeners, this);
+        this.notifyListeners(this.onDismissListeners, "onDismissListeners", this);
     }
 
     render()

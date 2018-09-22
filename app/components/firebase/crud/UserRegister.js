@@ -9,6 +9,7 @@ import {ACTION_TYPE_USER_LEFT_TEAM, ACTION_TYPE_USER_DATA_CHANGED} from "../../.
 import UtilityObject from '../../../utilities/UtilityObject';
 import AbstractCrudOperation, { SECTION_CONNECTING, SECTION_CONFIRMING, TIMEOUT_RESOLVE_NONE, TIMEOUT_RESOLVE_ROLL_BACK } from './AbstractCrudOperation';
 import FirebaseManager from '../FirebaseManager';
+import ScreenProfile from "../../screens/ScreenProfile";
 
 export default class UserRegister extends AbstractCrudOperation
 {
@@ -38,9 +39,10 @@ export default class UserRegister extends AbstractCrudOperation
             const user = {
                 name: this.email,
                 teams: [],
+                weekSchema: ScreenProfile.getDefaultSchema()
             };
 
-            await getUsers().doc(userCredential.user.uid).set(user);
+            await FirebaseAdapter.getUsers().doc(credentials.user.uid).set(user);
 
             this.onSuccess(dialog, "You have successfully registered your account.");
         }

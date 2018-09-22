@@ -21,6 +21,7 @@ export default class AbstractDialogPreference extends AbstractPreference
 
     onPreferencePress = () =>
     {
+        console.log("ON PREFERENCE PRESS: " + this.dialog);
         if(this.dialog)
         {   this.dialog.setVisible(true);}
     }

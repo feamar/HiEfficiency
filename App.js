@@ -1,3 +1,6 @@
+if (__DEV__ == false) 
+{   console.log = () => {};}
+
 import React from 'react';
 import FirebaseAdapter from "./app/components/firebase/FirebaseAdapter";
 
@@ -17,6 +20,9 @@ import UtilityArray from './app/utilities/UtilityArray';
 import FirebaseManager from './app/components/firebase/FirebaseManager';
 import DatabaseProvider from './app/providers/DatabaseProvider';
 import FirestoreFacade from './app/components/firebase/FirestoreFacade';
+import update from 'immutability-helper';
+
+const Database = FirestoreFacade.Instance;
 
 export default class App extends React.Component {
   constructor(props) {
@@ -25,7 +31,8 @@ export default class App extends React.Component {
     this.state = {
       signedIn: false,
       checkedSignIn: false,
-      shouldSplash: true
+      shouldSplash: true,
+      dialogs: []
     };
 
     this.initializeCyclicJs();
@@ -39,18 +46,80 @@ export default class App extends React.Component {
     this.unsubscribers.push(unsubscriber);
   }
 
-  onReduxStateChanged = () =>
+  addDialog = (dialog) =>
+  {
+    if(this.state.dialogs.indexOf(dialog) < 0)
+    {
+      const newDialogs = update(this.state.dialogs, {$push: [dialog]});
+      this.setState({dialogs: newDialogs});
+    }
+  }
+
+  removeDialog = (dialog) =>
+  {
+    const index = this.state.dialogs.indexOf(dialog);
+    if(index < 0)
+    {   return false;}
+
+    const newDialogs = update(this.state.dialogs, {$splice: [[index, 1]]});
+    this.setState({dialogs: newDialogs});
+  }
+
+  onReduxStateChanged = async () =>
   {
     const globalState = this.store.getState();
     if(this.state.checkedSignIn == false)
     {   
       this.setState({checkedSignIn: true, signedIn: globalState.user != undefined});
+
+      await this.ensureUserAccount(globalState);
     }
 
     const signedIn = globalState.user != undefined;
     if(signedIn != this.state.signedIn)
     {   this.setState({signedIn: signedIn});}
   }
+
+  ensureUserAccount = async (globalState) =>
+  {
+    console.log("ensuring user account");
+
+    if(globalState == undefined || globalState.user == undefined)
+    {
+      console.log("RETURNING!");
+       this.setState({signedIn: false});
+       return;
+    }
+    console.log("NOT RETURNING!: " + UtilityObject.stringify(globalState.user));
+
+    var updates = undefined;
+    if(globalState.user.data == undefined || (globalState.user.data.teams == undefined && globalState.user.data.name == undefined))
+    {   updates = {teams: {$set: []}, name: {$set: "Unknown"}};}
+    else if(globalState.user.data.teams == undefined)
+    {   updates = {teams: {$set: []}};}
+    else if(globalState.user.data.name == undefined)
+    {   updates = {name: {$set: "Unknown"}};}
+
+    console.log("Updates: " + UtilityObject.stringify(updates));
+
+    if(updates != undefined)
+    {
+      await Database.inDialog(this.addDialog, this.removeDialog, "Creating Profile", async (execute) => 
+      {
+        const crud = Database.updateUser(globalState.user.uid, {}, updates);
+        const result = await execute(crud);
+
+        console.log("Successful: " + result.successful);
+        if(result.successful == false)
+        {   this.setState({signedIn: false});}
+      });
+    }
+
+   
+
+    console.log("done");
+  }
+  
 
   componentDidMount() 
   {
@@ -83,9 +152,10 @@ export default class App extends React.Component {
             <MenuProvider>
               <StatusBar backgroundColor={Theme.colors.primaryDark}/>
               <Portal.Host>
-                <DatabaseProvider database={FirestoreFacade.Instance}>
+                <DatabaseProvider database={Database}>
                   <RouteStack />
                 </DatabaseProvider>
+                {this.state.dialogs.map(dialog => dialog)}
               </Portal.Host>  
             </MenuProvider>
         </ThemeProvider>

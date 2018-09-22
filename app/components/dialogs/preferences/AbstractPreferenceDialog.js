@@ -4,6 +4,7 @@ import { Button, Dialog } from 'react-native-paper';
 import Theme from '../../../styles/Theme';
 import PropTypes from 'prop-types';
 import AbstractDialog from '../AbstractDialog';
+import UtilityObject from "../../../utilities/UtilityObject";
 
 const styles ={
     content:{
@@ -29,19 +30,23 @@ export default class AbstractPreferenceDialog extends AbstractDialog
     }
 
     onDialogClosed = () =>
-    {   setTimeout(() => this.setState({error: undefined}), 500);}
+    {       console.log("AbstractPreferenceDialog.onDialogClosed"); setTimeout(() => this.setState({error: undefined, storageValue: this.getOriginalStorageValue()}), 500);}
 
     onDialogDismiss = () =>
     {
+        console.log("AbstractPreferenceDialog.onDialogDismiss"); 
         if(this.props.onDialogCanceled)
         {   this.props.onDialogCanceled();}
-
-        this.setState({storageValue: this.props.storageValue});
     }
+
+    getOriginalStorageValue = () =>
+    {   console.log("GET ORIGINAL STORAGE VALUE: " + UtilityObject.stringify(this.props.storageValue));
+         return this.props.storageValue;}
 
     onSave = () =>
     {
         const error = this.getInputValidationError(this.state.storageValue);
+        console.log("ON SAVE: " + error);
         if(error !== undefined)
         {
             this.setState({error: error});
@@ -55,20 +60,30 @@ export default class AbstractPreferenceDialog extends AbstractDialog
         if(this.props.onDialogSubmitted)
         {   this.props.onDialogSubmitted(this.state.storageValue);}
 
-        this.setState({error: undefined, visible: false});
+        this.setState({error: undefined});
+        this.setVisible(false);
     }
 
     onValueChange = (storageValue) =>
     {
+        console.log("STROAGEVALE: " + UtilityObject.stringify(storageValue));
+        if(storageValue == undefined)
+        {   return;}
+
         this.setState({storageValue: storageValue});
     }
 
 
     getInputValidationError = (storageValue) =>
     {
+        console.log("GET INPUT VALIDATION ERROR: " + this.props.required  +" AND " + (storageValue == undefined) + " AND " + (storageValue == ""));
+        if(this.props.required && (storageValue == undefined || storageValue == ""))
+        {   return "Please enter a value first.";}
+
         if(this.onValueValidation)
         {
             const error = this.onValueValidation(storageValue);
+            console.log("RECEIVED ERROR: " + error);
             if(error !== undefined)
             {   return error;}
         }
@@ -90,9 +105,14 @@ export default class AbstractPreferenceDialog extends AbstractDialog
     }
 }
 
+AbstractPreferenceDialog.defaultProps = {
+    required: false
+}
+
 AbstractPreferenceDialog.propTypes = {
     onDialogCanceled: PropTypes.func,
     onDialogSubmitted: PropTypes.func.isRequired,
     onValueValidation: PropTypes.func,
-    storageValue: PropTypes.any
+    storageValue: PropTypes.any,
+    required: PropTypes.bool
 }

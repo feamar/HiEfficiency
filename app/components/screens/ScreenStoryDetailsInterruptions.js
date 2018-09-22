@@ -27,6 +27,7 @@ import UtilityObject from "../../utilities/UtilityObject";
 import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
 import WithDialogContainer from "../../hocs/WithDialogContainer";
+import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
 
 const isEqual = require("react-fast-compare");
 
@@ -127,34 +128,35 @@ class ScreenStoryDetailsInterruptions extends Component
         super(props);
 
         this.unsubscribers = [];
-        this.story = props.user.teams[this.props.inspecting.team].stories[this.props.inspecting.story];
+        const storyId = props.navigation.getParam("storyId");
+        this.story = props.user.teams[this.props.inspecting.team].stories[storyId];
         this.dialogs = [];
 
-        //console.log("CONSTRUCTOR STORY: " + UtilityObject.stringify(this.story));
+        UtilityObject.inspect(props.navigation);
         this.state = 
         {
-            lifecycle: this.story == undefined ? LIFECYCLE_LOADING : this.getLifecycleFromStory(this.story),
+            lifecycle: this.getLifecycleFromStory(this.story),
             sections: this.getSectionsFromStory(this.story),
             open: false,
             shouldFabGroupRender: true
         }
 
-        this.props.navigation.setParams({ subtitle: this.story.data.name })
+        if(this.story != undefined)
+        {   this.props.navigation.setParams({ subtitle: this.story.data.name });}
         this.setLoading(props);
     }
 
     onReduxStateChanged = (props) =>
     {
+        const team = props.inspecting.team;
         if(isEqual(this.state.user, props.user))
         {   return;}
 
-        const team = props.inspecting.team;
         const story = props.user.teams[team].stories[this.story.id];
-        
         if(isEqual(this.story, story) == false)
         {
             //console.log(new Date().getTime() + " - ON REDUX STATE CHANGED");
-            if(isEqual(this.story.data.name, story.data.name) == false)
+            if((this.story == undefined && story != undefined) || isEqual(this.story.data.name, story.data.name) == false)
             {   this.props.navigation.setParams({ subtitle: story.data.name })}
 
             const sections = this.getSectionsFromStory(story);
@@ -190,32 +192,28 @@ class ScreenStoryDetailsInterruptions extends Component
     }
 
     shouldShowOverflowMenu = () =>
-    {   return this.state.lifecycle != LIFECYCLE_FINISHED && this.state.lifecycle != LIFECYCLE_UNSTARTED && this.story.interruptions.length == 0}
+    {   return this.state.lifecycle != LIFECYCLE_FINISHED && this.state.lifecycle != LIFECYCLE_UNSTARTED && (this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.length == 0)}
 
     onStartIssue = async () => 
     {   
-        if(this.confirmationDialog)
-        {
-            this.confirmationDialog.setTitle("Start Issue");
-            this.confirmationDialog.setMessage("Are you sure you want to start working on this issue?");
-            this.confirmationDialog.setActionTextPositive("Start");
-            this.confirmationDialog.setOnDialogActionPressedListener(async (action) => 
-            {
-                if(action != ActionType.POSITIVE)
-                {   return;}
+        if(this.story == undefined)
+        {   return;}
 
-                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
-                {
-                    const update = this.props.database.updateStory(this.props.inspecting.team, this.story.id, this.story.data, {startedOn: {$set: new Date()}});
-                    await execute(update);
-                });
+        this.showConfirmationDialog("Start Issue", "Are you sure you want to start working on this issue?", "Start", async() => 
+        {
+            await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
+            {
+                const update = this.props.database.updateStory(this.props.inspecting.team, this.story.id, this.story.data, {startedOn: {$set: new Date()}});
+                await execute(update);
             });
-            this.confirmationDialog.setVisible(true);
-        }
+        });
     }
 
     addInterruption = async (category, timestamp) => 
     {
+        if(this.story == undefined)
+        {   return;}
+
         if(timestamp == undefined)
         {   timestamp = new Date();}
 
@@ -240,7 +238,7 @@ class ScreenStoryDetailsInterruptions extends Component
     
     getFirstInterruption = () =>
     {
-        if(this.story.interruptions.length == 0)
+        if(this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.length == 0)
         {   return undefined;}
 
         return this.story.interruptions[0];
@@ -248,7 +246,7 @@ class ScreenStoryDetailsInterruptions extends Component
 
     getLastInterruption = () =>
     {
-        if(this.story.interruptions.length == 0)
+        if(this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.length == 0)
         {   return undefined;}
 
         return this.story.interruptions[this.story.interruptions.length - 1];
@@ -279,61 +277,48 @@ class ScreenStoryDetailsInterruptions extends Component
         {
             case ActionType.FINISH:
 
-                if(this.confirmationDialog)
+                if(this.story == undefined)
+                {   return;}
+
+                this.showConfirmationDialog("Finish Story", "Are you sure you want to finish this story?", "Finish", async() => 
                 {
-                    this.confirmationDialog.setTitle("Finish Story");
-                    this.confirmationDialog.setMessage("Are you sure you want to finish this story?");
-                    this.confirmationDialog.setOnDialogActionPressedListener(async (action) => 
+                    var interruptions = this.story.interruptions;
+                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Finishing Story", async (execute) => 
                     {
-                        if(action != ActionType.POSITIVE)
-                        {   return; }
-
-                        var interruptions = this.story.interruptions;
-                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Finishing Story", async (execute) => 
+                        if(interruptions.length > 0)
                         {
-                            if(interruptions.length > 0)
-                            {
-                                var last = interruptions[interruptions.length - 1];
-                                if(last.duration == undefined)
-                                {   
-                                    const inspecting = this.props.inspecting;
-                                    const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
+                            var last = interruptions[interruptions.length - 1];
+                            if(last.duration == undefined)
+                            {   
+                                const inspecting = this.props.inspecting;
+                                const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
 
-                                    const update =  this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, last, updates);
-                                    const successful = await execute(update, true);;
-                                    if(successful == false)
-                                    {   return; }
-                                }
+                                const update =  this.props.database.updateInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, last, updates);
+                                const result = await execute(update, true);;
+                                if(result.successful == false)
+                                {   return; }
                             }
-            
-                            const inspecting = this.props.inspecting;
-                            const finish = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: new Date()}});
-                            await execute(finish);
-                        });
-                    }); 
-                    this.confirmationDialog.setVisible(true);
-                }
+                        }
+        
+                        const inspecting = this.props.inspecting;
+                        const finish = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: new Date()}});
+                        await execute(finish);
+                    });
+                });
+
                 break;
 
             case ActionType.REOPEN:
-                if(this.confirmationDialog)
+
+                this.showConfirmationDialog("Reopen Story", "Are you sure you want to re-open this story?", "Reopen", async() => 
                 {
-                    this.confirmationDialog.setTitle("Reopen Story");
-                    this.confirmationDialog.setMessage("Are you sure you want to re-open this story?");
-                    this.confirmationDialog.setOnDialogActionPressedListener(async (action) => 
+                    const inspecting = this.props.inspecting;
+                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Reopening Story", async (execute) => 
                     {
-                        if(action != ActionType.POSITIVE)
-                        {   return;}
-    
-                        const inspecting = this.props.inspecting;
-                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Reopening Story", async (execute) => 
-                        {
-                            const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: null}});
-                            await execute(update);
-                        });
+                        const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {finishedOn: {$set: null}});
+                        await execute(update);
                     });
-                    this.confirmationDialog.setVisible(true);
-                }
+                });
                 break;
         }
     }
@@ -345,6 +330,9 @@ class ScreenStoryDetailsInterruptions extends Component
 
     onResumeFromInterruption = async () =>
     {
+        if(this.story == undefined)
+        {   return;}
+
         var interruptions = this.story.interruptions;
         if(interruptions.length > 0)
         {
@@ -373,6 +361,9 @@ class ScreenStoryDetailsInterruptions extends Component
         }
         else 
         {   
+            if(this.story == undefined)
+            {   return "Something went wrong, please try again.";}
+
             const finishedOn = this.story.data.finishedOn;
             if(finishedOn != undefined && storageValue > finishedOn)
             {   return "The start time of a story can not be after the finish time of the story.";}           
@@ -384,16 +375,19 @@ class ScreenStoryDetailsInterruptions extends Component
         const last = this.getLastInterruption();
         if(last)
         {   
-            if(storageValue < last.timestamp)
-            {   return "The finish time of an story can not be before the end time of the previous interruption.";}
+            const end = new Date(last.timestamp.getTime() + last.duration);
+            if(storageValue < end)
+            {   return "The finish time of a story can not be before the end time of the previous interruption.";}
         }
+        else if(this.story == undefined)
+        {   return "Something went wrong, please try again.";}
         else if(storageValue < this.story.data.startedOn)
         {   return "The finish time of a story can not be before the start time of the story.";}
     }
     
     onEditTimeStart = async (storageValue) =>
     {
-        if(storageValue == this.story.data.startedOn)
+        if(this.story == undefined || storageValue == this.story.data.startedOn)
         {   return;}
 
         const inspecting = this.props.inspecting;
@@ -407,7 +401,7 @@ class ScreenStoryDetailsInterruptions extends Component
 
     onEditTimeFinish = async (storageValue) =>
     {
-        if(storageValue == this.story.data.finishedOn)
+        if(this.story == undefined || storageValue == this.story.data.finishedOn)
         {   return;}
 
         const inspecting = this.props.inspecting;
@@ -424,15 +418,38 @@ class ScreenStoryDetailsInterruptions extends Component
         switch(action)
         {
             case ActionType.UNSTART:
+                if(this.story == undefined)
+                {   return;}
+
                 const inspecting = this.props.inspecting;
 
-                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Unstarting Story", async (execute) => 
+                this.showConfirmationDialog("Unstart Story", "Are you sure you want to unstart this story?", "Unstart", async() => 
                 {
-                    const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {startedOn: {$set: null}});
-                    await execute(update);
+                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Unstarting Story", async (execute) => 
+                    {
+                        const update = this.props.database.updateStory(inspecting.team, inspecting.story, this.story.data, {startedOn: {$set: null}});
+                        await execute(update);
+                    });
                 });
-
                 break;
+        }
+    }
+
+    showConfirmationDialog = (title, message, positiveText, onConfirm) =>
+    {
+        if(this.confirmationDialog)
+        {
+            this.confirmationDialog.setTitle(title);
+            this.confirmationDialog.setMessage(message);
+            this.confirmationDialog.setActionTextPositive(positiveText);
+            this.confirmationDialog.setOnDialogActionPressedListener(async (action) => 
+            {
+                if(action != ActionType.POSITIVE)
+                {   return;}
+
+                onConfirm();
+            });
+            this.confirmationDialog.setVisible(true);
         }
     }
 
@@ -445,16 +462,26 @@ class ScreenStoryDetailsInterruptions extends Component
                 switch(action) 
                 {
                     case ActionType.DELETE:
+                    
+                        if(this.story == undefined)
+                        {   return;}
                         const inspecting = this.props.inspecting;
 
-                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Deleting Interruption", async (execute) => 
+                        this.showConfirmationDialog("Delete Interruption", "Are you sure you want to delete this interruption?", "Delete", async () => 
                         {
-                            const del = this.props.database.deleteInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, item.id);
-                            await execute(del);
+                            await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Deleting Interruption", async (execute) => 
+                            {
+                                const del = this.props.database.deleteInterruption(inspecting.team, inspecting.story, this.props.user.uid, this.story.interruptions, item.id);
+                                await execute(del);
+                            });
                         });
                         break; 
         
                     case ActionType.EDIT:
+                    
+                        if(this.story == undefined)
+                        {   return;}
+
                         if(this.dialogInterruptionEdit)
                         {
                             const interruptions = this.story.interruptions;
@@ -500,6 +527,9 @@ class ScreenStoryDetailsInterruptions extends Component
 
     onInterruptionEdited = async (storageValue) =>
     {
+        if(this.story == undefined)
+        {   return;}
+
         const current = this.story.interruptions[this.currentlyEditingInterruptionIndex];
         const inspecting = this.props.inspecting;
         const updates = {timestamp: {$set: storageValue.start}, duration: {$set: storageValue.end - storageValue.start}, category: {$set: storageValue.type}};
@@ -520,11 +550,20 @@ class ScreenStoryDetailsInterruptions extends Component
 
     getDialogComponent = () =>
     {  
-         return (
+        var start = new Date();
+        var end = new Date();
+
+        if(this.story != undefined)
+        {   
+            start = this.story.startedOn;
+            end = this.story.finishedOn;
+        }
+
+        return (
              <View>
                 <DialogInterruptionEdit title="Edit Interruption" visible={false} onDialogSubmitted={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
-                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={this.story.data.startedOn} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onDialogSubmitted={this.onEditTimeStart}  />
-                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={this.story.data.finishedOn} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onDialogSubmitted={this.onEditTimeFinish} />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={start} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onDialogSubmitted={this.onEditTimeStart}  />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={end} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onDialogSubmitted={this.onEditTimeFinish} />
                 <DialogConfirmation ref={i => this.confirmationDialog = i}/>
 
                 {this.dialogs.map((dialog, index) => dialog)}
@@ -536,16 +575,8 @@ class ScreenStoryDetailsInterruptions extends Component
     {
         if(this.state.shouldFabGroupRender == false)
         {   return null;}
-
-        var style = {};
-        if(shouldHaveBottomMargin)
-        {   
-            style = {
-                marginBottom: 56
-            }
-        }
     
-        return <FAB.Group style={style} color="white" icon={icon} onPress={() => this.onFabMenuItemSelected(action)} open={false} actions={[]} onStateChange={(open) => {}} />
+        return <InputFloatingActionButton shouldHaveBottomMargin={shouldHaveBottomMargin} icon={icon} onPress={() => this.onFabMenuItemSelected(action)} />
     }
 
     render()
@@ -624,6 +655,9 @@ class ScreenStoryDetailsInterruptions extends Component
 
     getLifecycleFromStory = (story) =>
     {
+        if(story == undefined)
+        {   return LIFECYCLE_LOADING;}
+
         const data = story.data;
         if(data.startedOn == undefined)
         {   return LIFECYCLE_UNSTARTED;}
@@ -645,6 +679,10 @@ class ScreenStoryDetailsInterruptions extends Component
 
     getSectionsFromStory = (story) =>
     {        
+        if(story == undefined)
+        {   return [];}
+
+        //console.log("GET SECTIONS FROM STORY: " + UtilityObject.stringify(story));
         //console.log(new Date().getTime() + " - START GET SECTIONS");
 
         const data = story.data;

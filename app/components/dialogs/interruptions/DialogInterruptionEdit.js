@@ -95,6 +95,7 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
     onValueValidation = (storageValue) => 
     {
+        console.log("ON VALUE VALIDATION: " + UtilityObject.stringify(storageValue));
         var error = undefined;
         if(storageValue.start == null || storageValue.start == undefined)
         {   error = "Please select a start time for the interruption.";}
@@ -137,6 +138,13 @@ export default class DialogInterruptionEdit extends AbstractPreferenceDialog
 
     getDialogContent = () => 
     {
+        if(this.state.storageValue == undefined)
+        {  
+            console.log("Storage value is null for DialogInterruptionEdit, thus not rendering.");
+            return null;
+        }
+
+        console.log("STATEMENTATE: " + UtilityObject.stringify(this.state));
         return (
             <View style={styles.wrapper}>
                 <Text style={styles.fieldTitle}>Timestamp Start</Text>

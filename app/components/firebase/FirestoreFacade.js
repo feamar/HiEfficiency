@@ -134,7 +134,7 @@ export default class FirestoreFacade
                     dialog.setCompleted();
                 }
 
-                return successful;
+                return {successful: successful, dialogOpened: dialog.state.visible};
             }
 
             const onReference = (ref) => 

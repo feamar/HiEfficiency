@@ -269,6 +269,7 @@ const getNavigationOptions = (title, actionLeft, hasTabs) =>
 {
     return  (props) =>
     {
+      console.log("getNavigationOptionsCalled: " + UtilityObject.stringify(props.navigation.getParam(PARAM_NAME_SUBTITLE)));
       const navigation = props.navigation;
       var paddingLeft = 15;
 

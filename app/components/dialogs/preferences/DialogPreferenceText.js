@@ -5,6 +5,8 @@ import Theme from '../../../styles/Theme';
 import AbstractPreferenceDialog from './AbstractPreferenceDialog';
 import PropTypes from 'prop-types';
 import {Text} from "react-native-paper";
+import UtilityValidate from "../../../utilities/UtilityValidate"
+import update from "immutability-helper";
 
 const styles = {
     error:{
@@ -22,9 +24,14 @@ export default class DialogPreferenceText extends AbstractPreferenceDialog
         super(props);
     }
 
-    componentDidUpdate = () =>
+    onValueValidation = (storageValue) =>
     {
-        
+        const illegal = UtilityValidate.getIllegalCharacters(storageValue, this.props.legalCharacters);
+
+        if(illegal == undefined || illegal == "")
+        {   return undefined;}
+        else
+        {   return "Please refrain from using the following illegal characters: " + illegal;}
     }
 
     getDialogContent = () => 
@@ -38,8 +45,15 @@ export default class DialogPreferenceText extends AbstractPreferenceDialog
     }
 }  
 
+DialogPreferenceText.defaultProps = {
+    legalCharacters: UtilityValidate.DEFAULT_LEGAL_CHARACTERS
+}
+
 DialogPreferenceText.propTypes = {
     label: PropTypes.string.isRequired,
     multiline: PropTypes.bool,
-    numberOfLines: PropTypes.number
+    numberOfLines: PropTypes.number,
+    legalCharacters: PropTypes.string.isRequired
 }
+
+

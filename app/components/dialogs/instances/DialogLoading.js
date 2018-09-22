@@ -105,7 +105,7 @@ export default class DialogLoading extends AbstractDialog
         this.setState({shouldShowButtonOk: true});
 
         if(this.state.visible == false)
-        {   this.notifyListeners(this.onCloseListeners, this);}
+        {   this.notifyListeners(this.onCloseListeners, "onCloseListeners from DialogLoading", this);}
     }
    
     setMessage = (message) =>
@@ -163,7 +163,7 @@ export default class DialogLoading extends AbstractDialog
 
         if(seconds < 0)
         {
-            this.notifyListeners(this.onTimeoutListeners, this, this.state.section);
+            this.notifyListeners(this.onTimeoutListeners, "onTimeoutListeners from DialogLoading", this, this.state.section);
             this.setStateInternal({lifecycle: STATE_TIMED_OUT, timeLeft: seconds});
         }
         else

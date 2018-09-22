@@ -67,12 +67,17 @@ class ScreenStoryBoard extends Component
 
   onReduxStateChanged = (props) =>
   {
-    //console.log("BOARD DATA CHANGED");
+    console.log("BOARD DATA CHANGED: " + this.props.mode);
     if(this.state.user != props.user)
     { 
-      //console.log("BOARD DATA CHANGED - ENTERED");
-      this.setState({user: props.user, storyListItems: this.getStoryListItems(props)});
+      console.log("BOARD DATA CHANGED - ENTERED: " + this.props.mode);
+      this.setState({user: props.user, storyListItems: this.getStoryListItems(props)}, () =>
+      {
+        console.log("Story: " + UtilityObject.stringify(props.user.teams[this.team.id].stories));
+        console.log("Items: " + UtilityObject.stringify(this.state.storyListItems));
+      });
       this.setLoading(props);
+
     }
   }
 
@@ -116,13 +121,11 @@ class ScreenStoryBoard extends Component
 
   onItemSelected = async (item, index, selectedTabScreenName) =>
   {   
-    if(selectedTabScreenName == undefined)
-    {   selectedTabScreenName = SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS;}
-
     this.props.onInspectStoryStart(item.id);
-    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item, subtitle: item.data.name});
+    console.log("Setting navigation param story id to: " + item.id);
+    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {storyId: item.id, story: item, subtitle: item.data.name});
 
-    if(selectedTabScreenName)
+    if(selectedTabScreenName != undefined)
     {   this.props.navigation.navigate(selectedTabScreenName);}
   } 
 

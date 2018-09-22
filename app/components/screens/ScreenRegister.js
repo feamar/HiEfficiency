@@ -91,9 +91,9 @@ class ScreenRegister extends React.Component
       await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Registering Account", async (execute) => 
       {   
         const register = this.props.database.registerUser(this.state.email, this.state.password);
-        const successful = await execute(register, true);
+        const result = await execute(register, true);
 
-        if(successful == false)
+        if(result.successful == false)
         {   return;}
 
         const login = this.props.database.loginUser(this.state.email, this.state.password);

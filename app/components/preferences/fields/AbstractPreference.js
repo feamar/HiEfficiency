@@ -70,7 +70,7 @@ export default class AbstractPreference extends Component
     render(){
         return(
             <View>
-                 <TouchableRipple onPress={this.onPreferencePress}>
+                 <TouchableRipple disabled={false} onPress={this.onPreferencePress}>
                     <View style={this.styles.root}>
                         {this.getDisplayContent && this.getDisplayContent()}
                         {this.state.error && this.getErrorComponent()}

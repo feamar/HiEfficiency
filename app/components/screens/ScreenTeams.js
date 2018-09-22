@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import { View, ToastAndroid} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
 import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT} from "../routing/Router";
-import DialogTeamJoin from "../dialogs/teams/DialogTeamJoin";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
-import DialogTeamCreate from "../dialogs/teams/DialogTeamCreate";
 import { FAB } from "react-native-paper";
 import ActionType from "../../enums/ActionType";
 import WithReduxListener from "../../hocs/WithReduxListener";
@@ -17,7 +15,7 @@ import FirestoreFacade from "../firebase/FirestoreFacade";
 import DialogLoading from "../dialogs/instances/DialogLoading";
 import WithDialogContainer from "../../hocs/WithDialogContainer";
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
-
+import DialogPreferenceTextMulti, {TextElement} from "../dialogs/preferences/DialogPreferenceTextMulti";
 
 const mapStateToProps = (state, props) =>
 {
@@ -77,7 +75,7 @@ class ScreenTeams extends Component
 
   onItemSelected = (item, index) => 
   { 
-    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item});
+    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item, subtitle: item.name});
   }
 
   onContextMenuItemSelected = (item, index, action) =>
@@ -123,11 +121,11 @@ class ScreenTeams extends Component
     }
   }
  
-  onJoinDialogSubmitted = async (name, code) => 
+  onJoinDialogSubmitted = async (team) => 
   {   
     await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Joining Team", async (execute) => 
     {
-      const join = this.props.database.joinTeam(name, code, this.props.user.data.teams, this.props.user.uid);
+      const join = this.props.database.joinTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid);
       await execute(join);
     });
   }
@@ -177,8 +175,8 @@ class ScreenTeams extends Component
     return (  
       <View style={{height: "100%"}}>  
         <ListTeams containerHasFab={true} items={this.state.teamListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
-        <DialogTeamJoin title="Join Team" ref={instance => this.dialogJoinTeam = instance} visible={false} onDialogSubmitted={this.onJoinDialogSubmitted} />
-        <DialogTeamCreate title="Create Team" ref={instance => this.dialogCreateTeam = instance} visible={false} onDialogSubmitted={this.onCreateDialogSubmitted} />
+        <DialogPreferenceTextMulti title="Join Team" onDialogSubmitted={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
+        <DialogPreferenceTextMulti title="Create Team" onDialogSubmitted={this.onCreateDialogSubmitted}  ref={instance => this.dialogCreateTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]}  />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />
         <DialogConfirmation title="Deleting Team" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onDialogActionPressed={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
 

@@ -17,6 +17,8 @@ import WithDatabase from "../../hocs/WithDatabase";
 import ResolveType from "../../enums/ResolveType";
 import WithDialogContainer from "../../hocs/WithDialogContainer";
 import UtilityUpdate from "../../utilities/UtilityUpdate";
+import UtilityAsync from "../../utilities/UtilityAsync";
+import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
 
 const styles = {
     scrollView:{
@@ -46,7 +48,8 @@ class ScreenStoryCreate extends Component
             upvotes: 0,
             startedOn: null,
             finishedOn: null,
-            createdOn: new Date()
+            createdOn: new Date(),
+            fabEnabled: true
         }
 
         const existingStory = props.navigation.getParam("story");
@@ -108,6 +111,8 @@ class ScreenStoryCreate extends Component
 
     onFabPress = async () =>
     {
+        console.log("FAB pressed!!!!");
+        this.setState({fabEnabled: false});
         var valid = true;
         const keys = Object.keys(this.fields);
 
@@ -121,7 +126,10 @@ class ScreenStoryCreate extends Component
         }   
 
         if(valid == false) 
-        {   return;}
+        {
+            this.setState({fabEnabled: true});
+            return;
+        }
 
         const teamId = this.props.inspecting.team;
         switch(this.mode)
@@ -133,7 +141,7 @@ class ScreenStoryCreate extends Component
                 {
                     const crud = this.props.database.createStory(teamId, this.state.story);
                     crud.setOnDialogClosedListener(() => 
-                    {   console.log("HERE!!!!!"); this.props.navigation.goBack();});
+                    {   this.props.navigation.goBack();});
                     await execute(crud);
                 });
 
@@ -147,11 +155,20 @@ class ScreenStoryCreate extends Component
                 await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
                 {
                     const update = this.props.database.updateStory(teamId, old.id, old.data, updates);
-                    await execute(update);
+                    const result = await execute(update);
+
+                    if(result.successful)
+                    {   
+                        const parent = this.props.navigation.dangerouslyGetParent();
+                        if(parent)
+                        {   parent.setParams({ subtitle: this.state.story.name });}
+                    }
                 });
                 this.unsavedChanges = false;
                 break;
         }
+
+        this.setState({fabEnabled: true});
     }
 
     getStoryTypeOptions = () =>
@@ -188,7 +205,7 @@ class ScreenStoryCreate extends Component
                         <PreferenceText ref={c => this.fields.points = c} plural={true} title="Story Points" storageValue={this.state.story.points} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
                     </PreferenceCategory>
                 </ScrollView>
-                {this.state.shouldFabGroupRender && <FAB.Group icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
+                <InputFloatingActionButton icon="save" open={false} onPress={this.onFabPress} actions={[]} enabled={this.state.fabEnabled}/>
                 <DialogConfirmation ref={i => this.confirmationDialog = i} message="There are unsaved changes to the user story. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onDialogActionPressed={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />
             </View> 
         );

@@ -14,6 +14,8 @@ import UtilityUpdate from '../../utilities/UtilityUpdate';
 import WithDialogContainer from '../../hocs/WithDialogContainer';
 import CrudEvent from '../../enums/CrudEvent';
 import UtilityObject from '../../utilities/UtilityObject';
+import UtilityAsync from '../../utilities/UtilityAsync';
+import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
 
 class ScreenTeamEdit extends Component
 {
@@ -27,24 +29,22 @@ class ScreenTeamEdit extends Component
         this.state =
         {
           team: team,
-          shouldFabGroupRender: true
+          fabEnabled: true
         } 
     }
-
+s
     onHardwareBackPress = () =>
     {   return this.onSoftwareBackPress();}
  
     onSoftwareBackPress = () =>
     {
+        console.log("onSoftwareBackPress: " + this.unsavedChanges + " and  " + this.confirmationDialog);
         if(this.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
 
         this.confirmationDialog.setVisible(true);
         return true;
     }
-
-    setFabVisibility = (visible) =>
-    {   this.setState({shouldFabGroupRender: visible});}
 
     onValueChanged = (field) => (value) =>
     {
@@ -69,6 +69,8 @@ class ScreenTeamEdit extends Component
 
     onFabPress = async () =>
     {
+        this.setState({fabEnabled: false});
+
         const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.team.data);
         const oldTeam = this.props.navigation.getParam("team").data;
         await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Team", async (execute) => 
@@ -78,6 +80,7 @@ class ScreenTeamEdit extends Component
             {   this.props.navigation.goBack();});
             await execute(update);
         });
+
     }
 
     render()
@@ -91,7 +94,7 @@ class ScreenTeamEdit extends Component
                 <PreferenceCategory title="Sprints">
                     <PreferenceDateTime title="Date of first sprint" mode="date" storageValue={this.state.team.data.dateOfFirstSprint} onValueChanged={this.onValueChanged("dateOfFirstSprint")} />
                 </PreferenceCategory>
-                {this.state.shouldFabGroupRender && <FAB.Group icon="save" color="white" open={false} onPress={this.onFabPress} actions={[]} onStateChange={(open) => {} } />}
+                <InputFloatingActionButton enabled={this.state.fabEnabled} icon="save" onPress={this.onFabPress} />
                 <DialogConfirmation ref={i => this.confirmationDialog = i} message="There are unsaved changes to the team. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onDialogActionPressed={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />
             </View>
         );

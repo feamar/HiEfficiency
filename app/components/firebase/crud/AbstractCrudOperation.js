@@ -41,7 +41,7 @@ export default class AbstractCrudOperation
         this.dialog.onDismissListeners.push(this.onDialogDismissed);
         this.dialog.onCloseListeners.push(this.onDialogClosed);
         this.dialog.onOpenListeners.push(this.onDialogOpened);
-
+        
         const isConnected = await NetInfo.isConnected.fetch();
         if(isConnected == false)
         {   this.dialog.setWarning("No internet connection detected, operation might not synchronize correctly.");}
@@ -129,6 +129,7 @@ export default class AbstractCrudOperation
 
     onSuccess = (dialog, message) =>
     {
+        console.log("Succes - Message: " + message)
         this.state = STATE_FINISHED;
         this.successful = true;
 
@@ -143,6 +144,8 @@ export default class AbstractCrudOperation
 
     onError = async (dialog, message, error) =>
     {
+        console.log("Error - Message: " + message);
+
         this.state = STATE_FINISHED;
         this.successful = false;
 
