@@ -1,5 +1,5 @@
 {
-    "presets": ["react-native", "flow"],
+    "presets": ["react-native"],
     "env": {
       "development": {
         "plugins": ["transform-react-jsx-source"]
