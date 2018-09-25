@@ -13,11 +13,7 @@ export type State =
 
 export type Action = AbstractReduxAction;
 
-export default combineReducers<State, Action>(
-    user: ReducerUser = ReducerUser; 
-);
-
-/*export default combineReducers({
+export default combineReducers<State, Action>({
     user: ReducerUser,
     inspecting: ReducerInspecting
-});*/
+});

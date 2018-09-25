@@ -1,6 +1,6 @@
 import AbstractReduxAction from "./AbstractReduxAction";
-import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
-import DocumentTeam from "../../dtos/firebase/firestore/documents/DocumentTeam";
+import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
+import DocumentTeam from "../../../dtos/firebase/firestore/documents/DocumentTeam";
 
 export default class ActionTeamDataChanged extends AbstractReduxAction
 {

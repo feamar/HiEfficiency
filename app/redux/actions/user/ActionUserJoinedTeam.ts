@@ -1,6 +1,6 @@
 import AbstractReduxAction from "./AbstractReduxAction";
-import DocumentTeam from "../../dtos/firebase/firestore/documents/DocumentTeam";
-import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
+import DocumentTeam from "../../../dtos/firebase/firestore/documents/DocumentTeam";
+import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 
 export default class ActionUserJoinedTeam extends AbstractReduxAction
 {
