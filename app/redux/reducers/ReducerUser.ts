@@ -9,6 +9,9 @@ import ActionUserDataChanged from '../actions/ActionUserDataChanged';
 import ActionUserLeftTeam from '../actions/ActionUserLeftTeam';
 import ActionUserJoinedTeam from '../actions/ActionUserJoinedTeam';
 import { Dictionary } from '../../bases/collections/Dictionary';
+import ActionTeamDeleted from '../actions/ActionTeamDeleted';
+import ReduxStory from '../../dtos/redux/ReduxStory';
+import ActionTeamDataChanged from '../actions/ActionTeamDataChanged';
 
 /*
 export const ACTION_TYPE_USER_LOGGED_IN = "user_logged_in";
@@ -149,7 +152,7 @@ export default (user: ReduxUser | undefined, action: AbstractReduxAction) =>
     console.log("REDUCER: " + action.type);
     
     if(action instanceof ActionUserLoggedIn)
-    {   return new ReduxUser(action.document, {}, false);}
+    {   return new ReduxUser(action.document, new Map<string, ReduxTeam>(), false);}
 
     if(action instanceof ActionUserLoggedOut)
     {   return undefined;}
@@ -161,17 +164,29 @@ export default (user: ReduxUser | undefined, action: AbstractReduxAction) =>
     {   return update(user, {document: {$set: action.document}});}
 
     if(action instanceof ActionUserLeftTeam)
-    {   return update(user, {teams: {$unset: [action.leftTeamId]}});}
+    {   return update(user, {teams: {$remove: [action.leftTeamId]}});}
 
     if(action instanceof ActionUserJoinedTeam)
     {
-        const team: ReduxTeam = new ReduxTeam(action.document, {}, false);
-        const dict: Dictionary<ReduxTeam> = {};
-        dict[15] = team; 
-
+        const team: ReduxTeam = new ReduxTeam(action.document, new Map<string, ReduxStory>(), false);
         const id: string = action.document.id!;
-        update(user, {teams: {$merge: [id: team]}});
+
+        return update(user, {teams: {$add: [[id, team]]}});
     }
+
+    if(action instanceof ActionTeamDeleted)
+    {   return update(user, {teams: {$remove: [action.teamId]}});}    
+
+    if(action instanceof ActionTeamDataChanged)
+    {
+        const id: string = action.document.id!;
+        const team: ReduxTeam = user.teams.get(id) || new ReduxTeam(action.document, new Map<string, ReduxStory>(), false);
+
+        return update(user, {teams: {$add: [[id, team]]}})
+    }
+
+    if(action instanceof ActionStoryDataChanged)
+
 
 
     return user;

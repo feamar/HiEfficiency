@@ -11,3 +11,4 @@ export default class ActionUserLeftTeam extends AbstractReduxAction
         super(ActionUserLeftTeam.TYPE);
         this.leftTeamId = leftTeamId;
     }
+}

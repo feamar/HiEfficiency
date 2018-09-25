@@ -1,21 +1,21 @@
 import { RNFirebase } from "react-native-firebase";
 
-export default class EntityTeam 
+export default class DocumentTeam 
 {
     static create(code: string, name: string, dateOfFirstSprint?: Date)
-    {   return new EntityTeam(code, name, dateOfFirstSprint);}
+    {   return new DocumentTeam(code, name, dateOfFirstSprint);}
 
-    static fromSnapshot(snapshot: RNFirebase.firestore.DocumentSnapshot) : EntityTeam | undefined
+    static fromSnapshot(snapshot: RNFirebase.firestore.DocumentSnapshot) : DocumentTeam | undefined
     {
         if(snapshot.exists == false)
         {   return undefined;}
 
-        return snapshot.data() as EntityTeam;
+        return snapshot.data() as DocumentTeam;
     }
 
-    readonly code: string;
-    readonly name: string;
-    readonly dateOfFirstSprint?: Date;
+    public code: string;
+    public name: string;
+    public dateOfFirstSprint?: Date;
 
     private constructor(code: string, name: string, dateOfFirstSprint?: Date)
     {

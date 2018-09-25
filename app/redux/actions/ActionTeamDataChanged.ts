@@ -1,16 +1,16 @@
 import AbstractReduxAction from "./AbstractReduxAction";
-import { RNFirebase } from "react-native-firebase";
+import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
+import DocumentTeam from "../../dtos/firebase/firestore/documents/DocumentTeam";
 
 export default class ActionTeamDataChanged extends AbstractReduxAction
 {
     static readonly TYPE = "action_team_data_change";
 
-    readonly teamSnapshot: RNFirebase.firestore.DocumentSnapshot;
-
-    constructor(teamSnapshot: RNFirebase.firestore.DocumentSnapshot)
+    readonly document: AbstractFirestoreDocument<DocumentTeam>;
+    constructor(document: AbstractFirestoreDocument<DocumentTeam>)
     {
         super(ActionTeamDataChanged.TYPE);
 
-        this.teamSnapshot = teamSnapshot;
+        this.document = document;
     }
 }

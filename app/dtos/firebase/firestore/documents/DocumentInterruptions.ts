@@ -1,35 +1,46 @@
-import EntityInterruption from "./EntityInterruption";
 import update from "immutability-helper";
 import { RNFirebase } from "react-native-firebase";
+import EntityInterruption from "../entities/EntityInterruption";
 
-export default class EntityInterruptions 
+export default class DocumentInterruptions 
 {
-    static create = (interruptions: ReadonlyArray<EntityInterruption> = []) : EntityInterruptions =>
-    {   return new EntityInterruptions(interruptions);}
+    static create = (interruptions: Array<EntityInterruption> = []) : DocumentInterruptions =>
+    {   return new DocumentInterruptions(interruptions);}
 
-    static fromSnapshot = (snapshot: RNFirebase.firestore.DocumentSnapshot) : EntityInterruptions | undefined =>
+    static fromSnapshot = (snapshot: RNFirebase.firestore.DocumentSnapshot) : DocumentInterruptions | undefined =>
     {
         if(snapshot.exists == false)
         {   return undefined;}
 
-        return snapshot.data() as EntityInterruptions;
+        return snapshot.data() as DocumentInterruptions;
     }
 
-    readonly interruptions: ReadonlyArray<EntityInterruption>;
+    private mInterruptions: Array<EntityInterruption>;
 
-    private constructor(interruptions: ReadonlyArray<EntityInterruption>)
+    private constructor(interruptions: Array<EntityInterruption>)
     {
-        this.interruptions = interruptions;
+        this.mInterruptions = interruptions;
     }
 
-    addInterruption = (interruption: EntityInterruption) : EntityInterruptions =>
+    get interruptions () : Array<EntityInterruption>
+    {   return this.mInterruptions;}
+
+    addInterruption = (interruption: EntityInterruption) : boolean =>
     {
         if(this.interruptions.indexOf(interruption) >= 0)
-        {   return this;}
+        {   return false;}
 
-        const updated = update(this.interruptions, {$push: [interruption]});
-        const result: EntityInterruptions = EntityInterruptions.create(updated);
+        this.mInterruptions = update(this.mInterruptions, {$push: [interruption]});
+        return true;
+    }
 
-        return result
+    removeInterruption = (interruption: EntityInterruption) : boolean =>
+    {
+        const index = this.interruptions.indexOf(interruption);
+        if(index < 0)
+        {   return false;}
+
+        this.mInterruptions = update(this.mInterruptions, {$splice: [[index, 1]]});
+        return true;
     }
 }
