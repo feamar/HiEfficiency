@@ -60,11 +60,11 @@ class ScreenStoryCreate extends Component
             this.mode = MODE_EDIT;
         }
 
-        this.unsavedChanges = false;
         this.fields = {};
         this.unsubscribers = []
         this.state =
         {
+            unsavedChanges: false,
             story: story,
             shouldFabGroupRender: true
         }
@@ -75,7 +75,7 @@ class ScreenStoryCreate extends Component
 
     onSoftwareBackPress = () =>
     {
-        if(this.unsavedChanges == false || this.confirmationDialog == undefined)
+        if(this.state.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
 
         this.confirmationDialog.setVisible(true);
@@ -91,9 +91,8 @@ class ScreenStoryCreate extends Component
         if(story[field] == value)
         {   return;}
 
-        this.unsavedChanges = true;
         story = update(story, {[field]: {$set: value}});
-        this.setState({story: story});
+        this.setState({unsavedChanges: true, story: story});
     }
 
     onValueValidation = (field) => (value) =>
@@ -162,9 +161,13 @@ class ScreenStoryCreate extends Component
                         const parent = this.props.navigation.dangerouslyGetParent();
                         if(parent)
                         {   parent.setParams({ subtitle: this.state.story.name });}
+
+                        if(result.dialogOpened == false)
+                        {   ToastAndroid.show("Successfully edited the story.", ToastAndroid.LONG);}
                     }
                 });
-                this.unsavedChanges = false;
+
+                this.setState({unsavedChanges: false});
                 break;
         }
 
@@ -178,7 +181,7 @@ class ScreenStoryCreate extends Component
     {
         if(action == ActionType.POSITIVE)
         {
-            this.unsavedChanges = false; 
+            this.state.unsavedChanges = false; 
 
             //If the screen is encapsulated in a tab navigator, we'll need to perform the navigation event on the parent tab navigator.
             if(this.props.navigation.state.key == SCREEN_NAME_STORY_DETAILS_INFO)

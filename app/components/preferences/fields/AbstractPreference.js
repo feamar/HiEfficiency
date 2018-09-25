@@ -64,8 +64,11 @@ export default class AbstractPreference extends Component
             this.setState({error: "Please enter the " + this.props.title.toLowerCase() + "."});    
             return false;
         }
-
-        return true;
+        else
+        {   
+            this.setState({error: undefined});
+            return true;
+        }
     }
 
     getErrorComponent = () =>

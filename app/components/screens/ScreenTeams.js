@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, ToastAndroid} from "react-native";
 import ListTeams from "../lists/instances/teams/ListTeams";
-import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT, SCREEN_NAME_STORY_BOARD_DOING, PARAM_NAME_SUBTITLE} from "../routing/Router";
+import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT, SCREEN_NAME_STORY_BOARD_DOING, PARAM_NAME_SUBTITLE, PARAM_NAME_TITLE} from "../routing/Router";
 import DialogConfirmation from "../dialogs/instances/DialogConfirmation";
 import { FAB } from "react-native-paper";
 import ActionType from "../../enums/ActionType";
@@ -116,8 +116,7 @@ class ScreenTeams extends Component
         break;
 
       case ActionType.CREATE:
-        if(this.dialogCreateTeam)
-        {   this.dialogCreateTeam.setVisible(true);}
+        this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT, {[PARAM_NAME_TITLE]: "Create Team"});
         break;
     }
   }
@@ -131,15 +130,6 @@ class ScreenTeams extends Component
     });
   }
 
-  onCreateDialogSubmitted = async (team) =>
-  {   
-    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Team", async (execute) => 
-    {
-      const create = this.props.database.createTeam(team.name, team.code, this.props.user.data.teams, this.props.user.uid);
-      await execute(create);
-    });
-  }
- 
   onLeaveDialogActionPressed = async (action) =>
   {
     switch(action)
@@ -177,7 +167,6 @@ class ScreenTeams extends Component
       <View style={{height: "100%"}}>  
         <ListTeams containerHasFab={true} items={this.state.teamListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogPreferenceTextMulti title="Join Team" onDialogSubmitted={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
-        <DialogPreferenceTextMulti title="Create Team" onDialogSubmitted={this.onCreateDialogSubmitted}  ref={instance => this.dialogCreateTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]}  />
         <DialogConfirmation title="Confirmation" ref={instance => this.dialogConfirmLeave = instance}  visible={false} message="Are you sure you want to leave this team?" onDialogActionPressed={this.onLeaveDialogActionPressed} />
         <DialogConfirmation title="Deleting Team" ref={instance => this.dialogConfirmDelete = instance}  visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onDialogActionPressed={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
 

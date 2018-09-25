@@ -56,6 +56,7 @@ export const TAB_NAME_PROFILE = 'Profile';
 export const PARAM_NAME_HEADER_RIGHT_INJECTION = "header_right_injection";
 export const PARAM_NAME_INITIAL_ROUTE_NAME = "initial_route_name";
 export const PARAM_NAME_SUBTITLE = "subtitle";
+export const PARAM_NAME_TITLE = "title";
 
 const ActionBarStyles = {
     backgroundColor: Theme.colors.primary,
@@ -286,37 +287,8 @@ const getNavigationOptions = (title, actionLeft, hasTabs) =>
       {   headerRight = headerRightInjection();}
 
       const options = {
-        header: <CustomHeader left={headerLeft} title={title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
+        header: <CustomHeader left={headerLeft} title={navigation.getParam(PARAM_NAME_TITLE) || title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
       }
-
-
-      /*const options = {
-        title: title,
-        headerStyle: {
-          backgroundColor: Theme.colors.primary,
-        },
-        headerTitleStyle: { flex: 1},
-        headerTintColor: "white",
-        headerLeft: headerLeft,
-        headerRight: headerRight,
-        headerLeftContainerStyle: {
-          paddingLeft: 15
-        },
-        headerTitleContainerStyle:
-        {
-          paddingLeft: paddingLeft
-        },
-        headerTitle: <CustomHeaderTitle title={title} subtitle={navigation.getParam("subtitle")} navigation={navigation} />
-      }
-
-      if(hasTabs)
-      {
-        options.headerStyle.shadowOpacity =  0;
-        options.headerStyle.shadowOffset = {height: 0, width: 0};
-        options.headerStyle.shadowRadius = 0;
-        options.headerStyle.elevation = 0;
-        options.headerStyle.shadowOpacity = 0;
-      }*/
 
       return options;
     };

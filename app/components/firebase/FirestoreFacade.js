@@ -65,9 +65,9 @@ export default class FirestoreFacade
         return new TeamJoin(name, code, currentTeams, userId );
     }
 
-    createTeam = (name, code, currentTeams, userId ) =>
+    createTeam = (name, code, dateOfFirstSprint, currentTeams, userId ) =>
     {
-        return new TeamCreate(name, code, currentTeams, userId );
+        return new TeamCreate(name, code, dateOfFirstSprint, currentTeams, userId );
     }
 
     updateTeam = (teamId, oldTeam, updates ) =>

@@ -11,11 +11,11 @@ import AbstractCrudOperation, { SECTION_CONNECTING, SECTION_WAITING_FOR_CONFIRMA
 
 export default class TeamCreate extends AbstractCrudOperation
 {
-    constructor(name, code, currentTeams, userId)
+    constructor(name, code, dateOfFirstSprint, currentTeams, userId)
     {
         super("Please be patient while we try to create the team..");
 
-        this.team = {name: name, code: code};
+        this.team = {name: name, code: code, dateOfFirstSprint: dateOfFirstSprint};
         this.currentTeams = currentTeams;
         this.userId = userId;
     }
