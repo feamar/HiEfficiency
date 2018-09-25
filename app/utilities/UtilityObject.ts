@@ -1,9 +1,11 @@
+import UtilityJson from "./UtilityJson";
+
 export default class UtilityObject 
 {
-    static stringify = (object) =>
-    {   return JSON.stringify(JSON.decycle(object));}
+    static stringify = (object: object) : string =>
+    {   return JSON.stringify(UtilityJson.decycle(object));}
 
-    static inspect = (object, indentation) =>
+    static inspect = (object: any, indentation?: number) =>
     {
         if(object == undefined || object == null)
         {   
@@ -11,38 +13,32 @@ export default class UtilityObject
             return;
         }
 
-        if(indentation == undefined || indentation == null)
+        if(indentation == undefined)
         {   indentation = 0;}
 
-        object = JSON.decycle(object);
+        object = UtilityJson.decycle(object);
 
-        var whitespace = "";
+        var whitespace: string = "";
         for(var i = 0 ; i < indentation ; i ++)
         {   whitespace += "     ";}
 
-        const keys = Object.keys(object);
+        const keys: string[] = Object.keys(object);
         for(var i = 0 ; i < keys.length ; i ++)
         {
-            const key = keys[i];
-            const value = object[key];
+            const key: string = keys[i];
+            const value: any = object[key];
 
             if(value instanceof Date)
-            {
-                console.log(whitespace + "date " + key + ": " + value);
-            }
+            {   console.log(whitespace + "date " + key + ": " + value);}
             else if(typeof value === 'object')
             {
                 console.log(whitespace + "object " + key + ":");
                 UtilityObject.inspect(value, indentation + 1);
             }
             else if(typeof value === 'function')
-            {
-                console.log(whitespace + "function " + key);
-            }
+            {   console.log(whitespace + "function " + key);}
             else
-            {
-                console.log(whitespace + "variable " + key + " = " + value);
-            }
+            {   console.log(whitespace + "variable " + key + " = " + value);}
         }
     }
 }

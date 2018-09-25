@@ -1,18 +1,18 @@
 export default class UtilityArray 
 {
-    static move = (array, from, count, to) =>
+    static move = <T> (array: T[], from: number, count: number, to: number) =>
     {
         if(from == to)
         {   return array;}
         
-        var args = [from > to ? to : to - count, 0];
+        var args: number[] = [from > to ? to : to - count, 0];
         args.push.apply(args, array.splice(from, count));
         array.splice.apply(array, args);
     
         return array;
     }
 
-    static getRemoved =     (original, next) =>
+    static getRemoved = <T> (original: T[], next: T[]) =>
     {
         const removed = [];
         for(var i = 0 ; i < original.length ; i++)
@@ -25,7 +25,7 @@ export default class UtilityArray
         return removed;
     }
 
-    static getAdded = (original, next) =>
+    static getAdded = <T> (original: T[], next: T[]) =>
     {
         const added = [];
         for(var i = 0 ; i < next.length ; i++)
@@ -38,7 +38,7 @@ export default class UtilityArray
         return added;
     }
 
-    static getUnchanged = (original, next) =>
+    static getUnchanged = <T> (original: T[], next: T[]) =>
     {
         const unchanged = [];
         for(var i = 0 ; i < original.length ; i ++)
@@ -51,7 +51,7 @@ export default class UtilityArray
         return unchanged;
     }
 
-    static clean = (array, deleteValue) =>
+    static clean = <T> (array: T[], deleteValue: T) =>
     {
         for (var i = 0; i < array.length; i++) 
         {

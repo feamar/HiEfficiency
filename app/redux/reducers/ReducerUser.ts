@@ -1,9 +1,16 @@
-import UtilityObject from "../../utilities/UtilityObject";
-import UtilityArray from "../../utilities/UtilityArray";
-import UtilityDictionary from "../../utilities/UtilityDictionary";
 import update from 'immutability-helper';
 import ReduxManager from "../ReduxManager";
+import ReduxUser from '../../dtos/redux/ReduxUser';
+import AbstractReduxAction from '../actions/AbstractReduxAction';
+import ActionUserLoggedIn from '../actions/ActionUserLoggedIn';
+import ReduxTeam from '../../dtos/redux/ReduxTeam';
+import ActionUserLoggedOut from '../actions/ActionUserLoggedOut';
+import ActionUserDataChanged from '../actions/ActionUserDataChanged';
+import ActionUserLeftTeam from '../actions/ActionUserLeftTeam';
+import ActionUserJoinedTeam from '../actions/ActionUserJoinedTeam';
+import { Dictionary } from '../../bases/collections/Dictionary';
 
+/*
 export const ACTION_TYPE_USER_LOGGED_IN = "user_logged_in";
 export const ACTION_TYPE_USER_LOGGED_OUT = "user_logged_out";
 
@@ -30,19 +37,12 @@ export const onUserLoggedIn = (userId, userSnapshot) =>
     }
 }
 
-export const onUserLoggedOut = () =>
-{
-    return {
-        type: ACTION_TYPE_USER_LOGGED_OUT
-    }
-} 
+export const onUserLoggedOut = () : ReduxAction =>
+{   return new ReduxAction(ACTION_TYPE_USER_LOGGED_OUT);} 
 
-export const onUserLeftTeam = (leftTeamId) =>
+export const onUserLeftTeam = (leftTeamId: string) =>
 {
-    return {
-        type: ACTION_TYPE_USER_LEFT_TEAM,
-        leftTeamId: leftTeamId
-    }
+    return new ReduxAction(ACTION_TYPE_USER_LEFT_TEAM, {leftTeamId: leftTeamId});
 }
 
 export const onUserJoinedTeam = (joinedTeamSnapshot) =>
@@ -131,15 +131,58 @@ export const onInterruptionsLoaded = (teamId, storyId, interruptions) =>
     }
 }
 
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 
-export default (user = {}, action) => 
+
+
+
+export default (user: ReduxUser | undefined, action: AbstractReduxAction) => 
 {
     ReduxManager.Instance.notifyListeners(action)
     console.log("REDUCER: " + action.type);
-    var copy;
+    
+    if(action instanceof ActionUserLoggedIn)
+    {   return new ReduxUser(action.document, {}, false);}
+
+    if(action instanceof ActionUserLoggedOut)
+    {   return undefined;}
+
+    if(user == undefined)
+    {   return user;}
+
+    if(action instanceof ActionUserDataChanged)
+    {   return update(user, {document: {$set: action.document}});}
+
+    if(action instanceof ActionUserLeftTeam)
+    {   return update(user, {teams: {$unset: [action.leftTeamId]}});}
+
+    if(action instanceof ActionUserJoinedTeam)
+    {
+        const team: ReduxTeam = new ReduxTeam(action.document, {}, false);
+        const dict: Dictionary<ReduxTeam> = {};
+        dict[15] = team; 
+
+        const id: string = action.document.id!;
+        update(user, {teams: {$merge: [id: team]}});
+    }
+
+
+    return user;
+
+
+
     switch(action.type)
     {
-        case ACTION_TYPE_USER_LOGGED_IN:
+        case ActionUserLoggedIn.TYPE:
+
+            copy = action.pay
             copy = {
                 uid: action.uid, 
                 data: action.snapshot.data(),

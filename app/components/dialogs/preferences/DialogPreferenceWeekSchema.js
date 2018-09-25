@@ -186,7 +186,6 @@ export default class DialogPreferenceWeekSchema extends AbstractPreferenceDialog
     }
 
     getTimespanFor = (item, index) => {
-        //console.log("getTimespanFor: " + JSON.stringify(JSON.decycle(this.state.storageValue)));
 
         //Check whether the current value array contains the current index.
         const enabled = this.isEnabled(index);
