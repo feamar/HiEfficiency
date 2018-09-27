@@ -14,11 +14,13 @@ export default class DocumentUser
     public uid: string;
     public teams: Array<string>;
     public weekSchema: EntitySchemaWeek
+    public name: string;
 
-    private constructor(uid: string, teams: Array<string>, weekSchema: EntitySchemaWeek = EntitySchemaWeek.default())
+    private constructor(uid: string, teams: Array<string>, name: string, weekSchema: EntitySchemaWeek = EntitySchemaWeek.default())
     {
         this.uid = uid;
         this.teams = teams;
         this.weekSchema = weekSchema;
+        this.name = name;
     }
 }

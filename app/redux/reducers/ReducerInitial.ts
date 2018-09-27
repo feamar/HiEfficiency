@@ -1,19 +1,11 @@
 import { combineReducers } from 'redux'
 import ReducerUser from "./ReducerUser";
 import ReducerInspecting from './ReducerInspecting';
-import ReduxUser from '../../dtos/redux/ReduxUser';
-import ReduxInspecting from '../../dtos/redux/ReduxInspecting';
 import AbstractReduxAction from '../actions/AbstractReduxAction';
+import { ReduxState } from '../ReduxState';
 
-export type State =
-{
-    user?: ReduxUser;
-    inspecting: ReduxInspecting;
-}
 
-export type Action = AbstractReduxAction;
-
-export default combineReducers<State, Action>({
+export default combineReducers<ReduxState, AbstractReduxAction>({
     user: ReducerUser,
     inspecting: ReducerInspecting
 });

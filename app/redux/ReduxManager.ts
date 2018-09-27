@@ -3,7 +3,7 @@ import AbstractReduxAction from "./actions/AbstractReduxAction";
 class SingletonEnforcer {}
 const EnforcerInstance = new SingletonEnforcer();
 
-type OnReduxStateChangedListener = (action: AbstractReduxAction) => void;
+export type OnReduxStateChangedListener = (action: AbstractReduxAction) => void;
 
 export default class ReduxManager
 {

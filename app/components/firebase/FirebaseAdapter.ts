@@ -27,7 +27,6 @@ export default class FirebaseAdapter
   static getInterruptionsFromTeam = (teamId: string, storyId: string) : RNFirebase.firestore.CollectionReference =>
   {  
     const story: RNFirebase.firestore.DocumentReference = FirebaseAdapter.getStories(teamId).doc(storyId);
-    var x = story.get();
     return FirebaseAdapter.getInterruptionsFromStoryRef(story);
   }
 

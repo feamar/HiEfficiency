@@ -15,24 +15,24 @@ export default class DocumentInterruptions
         return snapshot.data() as DocumentInterruptions;
     }
 
-    private mInterruptions: Array<EntityInterruption>;
+    public interruptions: Array<EntityInterruption>;
 
     private constructor(interruptions: Array<EntityInterruption>)
     {
-        this.mInterruptions = interruptions;
+        this.interruptions = interruptions;
     }
-
-    get interruptions () : Array<EntityInterruption>
-    {   return this.mInterruptions;}
 
     addInterruption = (interruption: EntityInterruption) : boolean =>
     {
         if(this.interruptions.indexOf(interruption) >= 0)
         {   return false;}
 
-        this.mInterruptions = update(this.mInterruptions, {$push: [interruption]});
+        this.interruptions = update(this.interruptions, {$push: [interruption]});
         return true;
     }
+
+    addInterruptionImmutable = (interruption: EntityInterruption) : DocumentInterruptions =>
+    {   return new DocumentInterruptions([...this.interruptions, interruption]);}
 
     removeInterruption = (interruption: EntityInterruption) : boolean =>
     {
@@ -40,7 +40,31 @@ export default class DocumentInterruptions
         if(index < 0)
         {   return false;}
 
-        this.mInterruptions = update(this.mInterruptions, {$splice: [[index, 1]]});
+        this.interruptions = update(this.interruptions, {$splice: [[index, 1]]});
         return true;
+    }
+
+    removeInterruptionImmutable = (interruption: EntityInterruption) : DocumentInterruptions =>
+    {
+        const updated = new DocumentInterruptions(this.interruptions);
+        updated.removeInterruption(interruption);
+        return updated;
+    }
+
+    replaceInterruption = (oldInterruption: EntityInterruption, newInterruption: EntityInterruption): boolean =>
+    {
+        const index = this.interruptions.indexOf(oldInterruption);
+        if(index < 0)
+        {   return false;}
+
+        this.interruptions = update(this.interruptions, {$splice: [[index, 1, newInterruption]]});
+        return true;
+    }
+
+    replaceInterruptionImmutable = (oldInterruption: EntityInterruption, newInterruption: EntityInterruption): DocumentInterruptions =>
+    {
+        const updated = new DocumentInterruptions(this.interruptions);
+        updated.replaceInterruption(oldInterruption, newInterruption);
+        return updated;
     }
 }

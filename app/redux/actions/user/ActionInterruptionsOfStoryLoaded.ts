@@ -1,6 +1,6 @@
 import AbstractReduxAction from "./AbstractReduxAction";
-import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 import DocumentInterruptions from "../../../dtos/firebase/firestore/documents/DocumentInterruptions";
+import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 
 export default class ActionInterruptionsOfStoryLoaded extends AbstractReduxAction
 {
