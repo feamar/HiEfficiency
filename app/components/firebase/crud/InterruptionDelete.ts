@@ -1,6 +1,5 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentInterruptions from '../../../dtos/firebase/firestore/documents/DocumentInterruptions';
 import ActionInterruptionsOfStoryLoaded from "../../../redux/actions/user/ActionInterruptionsOfStoryLoaded";
 
@@ -23,13 +22,13 @@ export default class InterruptionDelete extends AbstractCrudOperation
         this.indexToDelete = indexToDelete;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         this.attemptRollback(0, 10, async () => 
         {   await FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId).set(this.currentInterruptions);});
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         //console.log("DELETING INTERRUPTION: " + this.teamId + " and " + this.storyId + " and " + this.userId  + " at index: " + this.indexToDelete + " with interruptions: " + UtilityObject.stringify(this.currentInterruptions));
         const document = FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId);
@@ -37,12 +36,12 @@ export default class InterruptionDelete extends AbstractCrudOperation
 
         try
         {
-            await this.sendUpdates(dialog, ActionInterruptionsOfStoryLoaded.TYPE, async  () => 
+            await this.sendUpdates(updatable, ActionInterruptionsOfStoryLoaded.TYPE, async  () => 
             {   await document.update(newInterruptions);});
 
-            this.onSuccess(dialog, "Successfully deleted the interruption.");
+            this.onSuccess(updatable, "Successfully deleted the interruption.");
         }
         catch(error)
-        {   this.onError(dialog, "Something went wrong while deleting the interruption, please try again.", error);}
+        {   this.onError(updatable, "Something went wrong while deleting the interruption, please try again.", error);}
     }
 }

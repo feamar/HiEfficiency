@@ -1,10 +1,10 @@
-import AbstractDialog, { AbstractDialogPropsVirtual } from "../AbstractDialog";
+import AbstractDialog, { AbstractDialog_Props_Virtual } from "../AbstractDialog";
 import React from "react";
 import {StyleSheet} from "react-native";
-import IDialog from "../IDialog";
-import WithActions from "../hocs/WithActions";
+import WithActions, { WithActionPropsInner } from "../hocs/WithActions";
 import {Text, Button, Dialog } from 'react-native-paper';
 import Theme from "../../../styles/Theme";
+import { Baseable, onBaseReference } from "../../../render_props/Baseable";
 
 const styles = StyleSheet.create({
     message:{
@@ -14,34 +14,41 @@ const styles = StyleSheet.create({
     }
 });
 
-interface DialogConfirmationProps extends AbstractDialogPropsVirtual
+type DialogConfirmationProps = AbstractDialog_Props_Virtual & 
 {
-    onActionClicked: (dialog: DialogConfirmation, action: ActionEnumType) => void,
-    message: string
+    message: string,
+    textNegative?: string,
+    textPositive?: string
 }
 
 interface State 
 {
-    message: string
+    message: string,
+    textNegative: string,
+    textPositive: string
 }
 
-type ActionEnumType = "Positive" | "Negative" | "Neutral";
+export type DialogConfirmationActionUnion = "Positive" | "Negative";
 
-class DialogConfirmation extends React.Component<DialogConfirmationProps, State> implements IDialog
+type DialogConfirmationPropsAndInjected = WithActionPropsInner<DialogConfirmationProps, DialogConfirmationActionUnion>; 
+
+
+export class ConcreteDialogConfirmation extends React.Component<DialogConfirmationPropsAndInjected, State> implements Baseable<AbstractDialog>
 {
     private mBase: AbstractDialog | undefined;
-    constructor(props: DialogConfirmationProps)
+    constructor(props: DialogConfirmationPropsAndInjected)
     {
         super(props);
 
         this.state = {
-            message: props.message
+            message: props.message,
+            textNegative: props.textNegative || "Cancel",
+            textPositive: props.textPositive || "OK"
         }
     }
 
     get base () : AbstractDialog | undefined 
     {   return this.mBase;}
-
 
     getDialogContent =() =>
     {
@@ -52,17 +59,29 @@ class DialogConfirmation extends React.Component<DialogConfirmationProps, State>
     {
         return (
             <Dialog.Actions>
-                <Button color={Theme.colors.primary} onPress={this.onActionPressed(ActionType.NEGATIVE)}>{this.state.textNegative}</Button> 
-                <Button color={Theme.colors.primary} onPress={this.onActionPressed(ActionType.POSITIVE)}>{this.state.textPositive}</Button>
+                <Button color={Theme.colors.primary} onPress={this.props.onActionClicked("Negative")}>{this.state.textNegative}</Button> 
+                <Button color={Theme.colors.primary} onPress={this.props.onActionClicked("Positive")}>{this.state.textPositive}</Button>
             </Dialog.Actions>
         );
     }
+
+    setMessage = (message: string) =>
+    {   this.setState({message: message});}
+
+    setActionTextPositive = (text: string) =>
+    {   this.setState({textPositive: text});}
+    
+    setActionTextNegative = (text: string) =>
+    {   this.setState({textNegative: text});}
+
+    setActionText = (positive: string, negative: string)  =>
+    {   this.setState({textPositive: positive, textNegative: negative});}
 
     render()
     {
         return (
             <AbstractDialog 
-                ref={i => i == null ? this.mBase = undefined : this.mBase = i}
+                ref={onBaseReference(this)}
                 content={this.getDialogContent()} 
                 actions={this.getDialogActions()} 
                 {...this.props} />
@@ -70,4 +89,4 @@ class DialogConfirmation extends React.Component<DialogConfirmationProps, State>
     }
 }
 
-export default WithActions<DialogConfirmation, DialogConfirmationProps, ActionEnumType>(DialogConfirmation);
+export default WithActions<ConcreteDialogConfirmation, ConcreteDialogConfirmation, DialogConfirmationActionUnion, DialogConfirmationProps>(ConcreteDialogConfirmation);

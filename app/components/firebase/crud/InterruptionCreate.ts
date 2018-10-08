@@ -1,8 +1,7 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentInterruptions from "../../../dtos/firebase/firestore/documents/DocumentInterruptions";
 import EntityInterruption from "../../../dtos/firebase/firestore/entities/EntityInterruption";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import ActionInterruptionsOfStoryLoaded from "../../../redux/actions/user/ActionInterruptionsOfStoryLoaded";
 
 export default class InterruptionCreate extends AbstractCrudOperation
@@ -24,13 +23,13 @@ export default class InterruptionCreate extends AbstractCrudOperation
         this.newInterruption = newInterruption;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         this.attemptRollback(0, 10, async () => 
         {   await FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId).set(this.currentInterruptions);});   
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         const document = FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId);
         const newInterruptions = this.currentInterruptions.addInterruptionImmutable(this.newInterruption);
@@ -49,11 +48,11 @@ export default class InterruptionCreate extends AbstractCrudOperation
                 {   await document.update(newInterruptions);};
             }
 
-            await this.sendUpdates(dialog, ActionInterruptionsOfStoryLoaded.TYPE, closure);
-            this.onSuccess(dialog, "Successfully created interruption.");
+            await this.sendUpdates(updatable, ActionInterruptionsOfStoryLoaded.TYPE, closure);
+            this.onSuccess(updatable, "Successfully created interruption.");
         }
         catch(error) 
-        {   this.onError(dialog, "Something went wrong while creating the interruption, please try again.", error);}
+        {   this.onError(updatable, "Something went wrong while creating the interruption, please try again.", error);}
     }
 
 }

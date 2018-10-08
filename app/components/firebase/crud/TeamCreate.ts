@@ -1,7 +1,6 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import update from "immutability-helper";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentTeam from '../../../dtos/firebase/firestore/documents/DocumentTeam';
 import { RNFirebase } from 'react-native-firebase';
 import ActionUserJoinedTeam from '../../../redux/actions/user/ActionUserJoinedTeam';
@@ -23,7 +22,7 @@ export default class TeamCreate extends AbstractCrudOperation
         this.userId = userId;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         if(this.newDocument != undefined)
         {
@@ -39,27 +38,27 @@ export default class TeamCreate extends AbstractCrudOperation
         }
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
-        this.newDocument = await this.sendUpdates(dialog, ActionStoriesOfTeamLoaded.TYPE, async () => 
+        this.newDocument = await this.sendUpdates(updatable, ActionStoriesOfTeamLoaded.TYPE, async () => 
         {   return await FirebaseAdapter.getTeams().add(this.team);});
 
-        if(dialog.isTimedOut())
+        if(updatable.isTimedOut())
         {   return;}
 
         if(this.newDocument == undefined)
         {   throw new Error("Fatal stat exception.");}
 
-        dialog.setMessage("Team created, now joining new team.");
+        updatable.setMessage("Team created, now joining new team.");
         const newData = update(this.currentTeams, {$push: [this.newDocument.id!]});
         try
         {
-            await this.sendUpdates(dialog, ActionUserJoinedTeam.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionUserJoinedTeam.TYPE, async () => 
             {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
 
-            this.onSuccess(dialog, "You have successfully created and joined the new team.");
+            this.onSuccess(updatable, "You have successfully created and joined the new team.");
         }
         catch(error)
-        {   this.onError(dialog, "Team could not be created, please try again.", error);}
+        {   this.onError(updatable, "Team could not be created, please try again.", error);}
     }
 }

@@ -18,7 +18,7 @@ export type OnDialogDismissListener = (dialog: AbstractDialog) => void;
 export type OnDialogCloseListener   = (dialog: AbstractDialog) => void;
 export type OnDialogOpenListener    = (dialog: AbstractDialog) => void;
 
-interface AbstractDialogPropsSealed 
+interface AbstractDialog_Props_Sealed 
 {
     visible?: boolean,
     title: string,
@@ -26,16 +26,17 @@ interface AbstractDialogPropsSealed
     actions?: JSX.Element
 }
 
-export interface AbstractDialogPropsVirtual
+export interface AbstractDialog_Props_Virtual
 {
     visible?: boolean,
     title: string
     onDismiss?: OnDialogDismissListener,
     onClose?: OnDialogCloseListener,
     onOpen?: OnDialogOpenListener,
+    onBaseReference?: (reference: AbstractDialog | undefined) => void
 }
 
-type Props = AbstractDialogPropsSealed & AbstractDialogPropsVirtual;
+type Props = AbstractDialog_Props_Sealed & AbstractDialog_Props_Virtual;
 
 export interface AbstractDialogState  
 {
@@ -75,13 +76,22 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
         
         if(this.props.onDismiss != undefined)
         {   this.onDismissListeners.push(this.props.onDismiss);}
+
+        if(this.props.visible === true)
+        {   this.onOpen();}
     }
+
+    onOpen = (): void =>
+    {   this.notifyListeners(this.onOpenListeners, "onOpenListeners");}
 
     onDismiss = (): void => 
     {
         this.notifyListeners(this.onDismissListeners, "onDismissListeners");
         this.setVisible(false);
     }
+
+    onClose = (): void =>
+    {   this.notifyListeners(this.onCloseListeners, "onCloseListeners");}
 
     setVisible = (visible: boolean) =>
     {
@@ -91,9 +101,9 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
         this.setState({visible: visible}, () => 
         {
             if(visible)
-            {   this.notifyListeners(this.onOpenListeners, "onOpenListeners");}
+            {   this.onOpen();}
             else
-            {   this.notifyListeners(this.onCloseListeners, "onCloseListeners");}
+            {   this.onClose();}
         });   
     }
 

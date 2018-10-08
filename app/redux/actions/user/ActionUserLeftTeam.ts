@@ -1,4 +1,4 @@
-import AbstractReduxAction from "./AbstractReduxAction";
+import AbstractReduxAction from "../AbstractReduxAction";
 
 export default class ActionUserLeftTeam extends AbstractReduxAction
 {

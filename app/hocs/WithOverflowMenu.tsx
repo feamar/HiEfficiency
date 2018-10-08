@@ -1,73 +1,97 @@
-import React, { Component } from "react";
-import { PARAM_NAME_HEADER_RIGHT_INJECTION } from "../components/routing/Router";
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
+import React from "react";
+import { Menu, MenuOptions, MenuTrigger, MenuOptionProps } from "react-native-popup-menu";
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {StyleSheet} from "react-native";
+import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
+import WithStaticFields from "./WithStaticFields";
+import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent, ConcreteRef } from "./AbstractHigherOrderComponent";
 
-const styles = StyleSheet.create({
-    optionWrapper:{
-        padding:15,
+const styles = {
+    menuOptions: {
+            optionWrapper:{
+            padding:15,
+        }
     },
-    triggerWrapper:  
-    {
-        padding:6 
+    menuTrigger: {
+        triggerWrapper:  
+        {
+            padding:6 
+        }
     }
-});
+};
 
-interface HocProps
+
+interface RequiredFunctions
 {
+    shouldShowOverflowMenu: () => boolean
+    getOverflowMenuItems: () => Array<MenuOptionProps & {key?: string}> | undefined
+}
 
+type HocProps<B, P> = ConcreteRef<B> & P  & 
+{
+    navigation: HiEfficiencyNavigator
 }
 
 interface HocState 
 {
 }
 
-export default <P extends {}> (WrappedComponent: React.ComponentType<P>) =>
+
+//export default WithOverflowMenu<ScreenProfile, Props>(ScreenProfile);
+
+export default <B extends ConcreteComponent & RequiredFunctions, C extends ConcreteOrHigher<B, C, RequiredFunctions, P>, P> (WrappedComponent: ConcreteOrHigherConstructor<B, C, RequiredFunctions, P>) =>
 {
-    const hoc = class WithOverflowMenu extends React.Component<HocProps, HocState>
+    const hoc = class WithOverflowMenu extends AbstractHigherOrderComponent<B, C, RequiredFunctions, P, HocProps<B, P>, HocState>
     {
         private shouldShowOverflowMenu: boolean = false;
-        constructor(props: HocProps)
+        
+        constructor(props: HocProps<B, P>)
         {   super(props);}
 
         componentDidMount()
         {
-            this.setShowOverflowMenu(this.wrapped.shouldShowOverflowMenu(undefined, undefined));
+            const concrete = this.concrete;
+            if(concrete)
+            {   this.setShowOverflowMenu(concrete.shouldShowOverflowMenu());}
         }
 
-        componentDidUpdate = (prevProps, prevState, snapshot) =>
+        componentDidUpdate = (_1: HocProps<B, P>, _2: HocState) =>
         {
-            const shouldShow = this.setShowOverflowMenu(this.wrapped.shouldShowOverflowMenu());
-            if(shouldShow != this.shouldShowOverflowMenu)
+            const concrete = this.concrete;
+            if(concrete)
             {
-                this.shouldShowOverflowMenu = shouldShow;
-                this.setShowOverflowMenu(shouldShow);
+                const shouldShow = concrete.shouldShowOverflowMenu();
+                if(shouldShow != this.shouldShowOverflowMenu)
+                {   this.setShowOverflowMenu(shouldShow);}
             }
         }
 
-        setShowOverflowMenu = (show) =>
+        setShowOverflowMenu = (shouldShow: boolean) =>
         {
-            const parent = this.props.navigation.dangerouslyGetParent();
-            if(show)
-            {   parent.setParams({[PARAM_NAME_HEADER_RIGHT_INJECTION]: this.getOverflowMenu});}
+            this.shouldShowOverflowMenu = shouldShow;
+
+            if(shouldShow)
+            {   this.props.navigation.setParams({header_right_injection: this.getOverflowMenu});}
             else
-            {   parent.setParams({[PARAM_NAME_HEADER_RIGHT_INJECTION]: undefined});}
+            {   this.props.navigation.setParams({header_right_injection: undefined});}
         }
 
-        getOverflowMenu = () =>
+        getOverflowMenu = (): JSX.Element | undefined =>
         {
-            const items = this.wrapped.getOverflowMenuItems();
+            const concrete = this.concrete;
+            if(concrete == undefined)
+            {   return undefined;}
+
+            const items = concrete.getOverflowMenuItems();
             if(items == undefined || items.length == 0)
-            {   return null;}
+            {   return undefined;}
 
             return (
                 <Menu>
                     <MenuTrigger customStyles={styles.menuTrigger}> 
-                        <Icon style={styles.icon} size={30} name="more-vert" color={"white"} />
+                        <Icon size={30} name="more-vert" color={"white"} />
                     </MenuTrigger>
                     <MenuOptions customStyles={styles.menuOptions}>
-                        {items.map((item, index) => 
+                        {items.map(item => 
                         {   return item;})}
                     </MenuOptions>
                 </Menu>
@@ -75,8 +99,8 @@ export default <P extends {}> (WrappedComponent: React.ComponentType<P>) =>
         }
 
         render()
-        {   return <WrappedComponent ref={instance => this.wrapped = instance} {...this.props} />}
+        {   return <WrappedComponent ref={this.onReference} {...this.props} />}
     }
     
-    return withStaticFields(WrappedComponent, hoc);
+    return WithStaticFields(WrappedComponent, hoc);
 }

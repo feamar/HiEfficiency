@@ -1,8 +1,7 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import update, { Spec } from "immutability-helper";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentUser from '../../../dtos/firebase/firestore/documents/DocumentUser';
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import ActionUserDataChanged from "../../../redux/actions/user/ActionUserDataChanged";
 import { RNFirebase } from "react-native-firebase";
 
@@ -21,13 +20,13 @@ export default class UserUpdate extends AbstractCrudOperation
         this.updates = updates;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         this.attemptRollback(0, 10, async () => 
         {   await FirebaseAdapter.getUsers().doc(this.userId).set(this.oldUser);});
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         try 
         {
@@ -36,10 +35,10 @@ export default class UserUpdate extends AbstractCrudOperation
             const document: RNFirebase.firestore.DocumentReference = FirebaseAdapter.getUsers().doc(this.userId);
             const snapshot: RNFirebase.firestore.DocumentSnapshot = await document.get();
 
-            if(dialog.isTimedOut())
+            if(updatable.isTimedOut())
             {   return;}
 
-            await this.sendUpdates(dialog, ActionUserDataChanged.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionUserDataChanged.TYPE, async () => 
             {
                 if(snapshot.exists)
                 {   await document.update(newUser);}
@@ -47,9 +46,9 @@ export default class UserUpdate extends AbstractCrudOperation
                 {   await document.set(newUser);}
             });
            
-            this.onSuccess(dialog, "Successfully updated the profile.");
+            this.onSuccess(updatable, "Successfully updated the profile.");
         }
         catch(error)
-        {   this.onError(dialog, "Profile could not be updated, please try again.", error);}
+        {   this.onError(updatable, "Profile could not be updated, please try again.", error);}
     }
 }

@@ -1,4 +1,4 @@
-import AbstractReduxAction from "./AbstractReduxAction";
+import AbstractReduxAction from "../AbstractReduxAction";
 import DocumentTeam from "../../../dtos/firebase/firestore/documents/DocumentTeam";
 import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 

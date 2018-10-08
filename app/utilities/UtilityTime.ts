@@ -118,6 +118,19 @@ export default class UtilityTime
         return date.toLocaleDateString("en-US",  options);
     }
 
+    public static HhmmToDate = (hhmm: string, separator: string = ":"): Date =>
+    {
+        const split = hhmm.split(separator);
+        const date = new Date();
+        if(split.length != 2)
+        {   return date;}
+
+        date.setHours(parseInt(split[0]));
+        date.setMinutes(parseInt(split[1]));
+
+        return date;
+    }
+
     /**
      * Determines whether to use a singular or plural form, based on an inserted quantity.
      * @param singular - The string to use for singular cases.

@@ -12,7 +12,6 @@ import InterruptionDelete from "./crud/InterruptionDelete";
 import InterruptionUpdate from "./crud/InterruptionUpdate";
 import InterruptionCreate from "./crud/InterruptionCreate";
 import AbstractCrudOperation, { SECTION_CONNECTING } from "./crud/AbstractCrudOperation";
-import DialogLoading from "../dialog/instances/DialogLoading";
 import UserLogin from "./crud/UserLogin";
 import UserRegister from "./crud/UserRegister";
 import DocumentUser from "../../dtos/firebase/firestore/documents/DocumentUser";
@@ -22,6 +21,7 @@ import DocumentStory from "../../dtos/firebase/firestore/documents/DocumentStory
 import DocumentInterruptions from "../../dtos/firebase/firestore/documents/DocumentInterruptions";
 import EntityInterruption from "../../dtos/firebase/firestore/entities/EntityInterruption";
 import React from "react";
+import DialogLoading, { ConcreteDialogLoading } from "../dialog/instances/DialogLoading";
 
 class SingletonEnforcer {}
 const EnforcerInstance = new SingletonEnforcer();
@@ -92,16 +92,17 @@ export default class FirestoreFacade
 
 
 
-    inDialog = (addDialogCallback: (dialog: DialogLoading) => void, removeDialogCallback: (dialog: DialogLoading) => void, title: string, closure: (execute: InDialogExecutor) => void, showDelay: number = 3000) => 
+    inDialog = (addDialogCallback: (dialog: JSX.Element) => void, removeDialogCallback: (dialog: JSX.Element) => void, title: string, closure: (execute: InDialogExecutor) => void, showDelay: number = 3000) => 
     {
-        const execute = (dialog: DialogLoading, hasNextOperation: boolean = false) => async (crud: AbstractCrudOperation): Promise<InDialogResult> =>
+        const execute = (dialog: ConcreteDialogLoading, hasNextOperation: boolean = false) => async (crud: AbstractCrudOperation): Promise<InDialogResult> =>
         {   
             var resolved: boolean = false;
             setTimeout(() => 
             {
-                if(resolved == false)
-                {   dialog.setVisible(true);}
+                if(resolved == false && dialog.base)
+                {   dialog.base.setVisible(true);}
             }, showDelay);
+
             const successful = await crud.execute(dialog);
             resolved = true;
 
@@ -109,27 +110,29 @@ export default class FirestoreFacade
             {
                 if(successful == false)
                 {   
-                    if(dialog.state.visible == false)
-                    {   dialog.setVisible(true);}
+                    if(dialog.base && dialog.base.state.visible == false)
+                    {   dialog.base.setVisible(true);}
                 }
 
                 dialog.setCompleted();
             }
 
-            return {successful: successful, dialogOpened: dialog.state.visible};
+            return {successful: successful, dialogOpened: dialog.base != undefined && dialog.base.state.visible};
         }
 
-        const onReference = (ref: DialogLoading | null) => 
+        const onReference = (ref: ConcreteDialogLoading | undefined) => 
         {
-            if(ref != null)
+            if(ref != undefined)
             {
                 const executor: InDialogExecutor = execute(ref);
                 closure(executor);
             }
         }
 
-        const component:JSX.Element = <DialogLoading 
-            ref = {x => onReference(x)}
+        return new Promise(resolve => 
+        {
+            const component:JSX.Element = <DialogLoading 
+            concreteRef = {onReference}
             title={title}
             key={title} 
             section={SECTION_CONNECTING}
@@ -138,57 +141,10 @@ export default class FirestoreFacade
             visible={false} 
             cancelable={false}
             warning={undefined} 
+            onTimeout={() => {}}
             onClose={() => {removeDialogCallback(component); resolve();}} />
-    }
-    /*inDialog = (addDialogCallback: (dialog: DialogLoading) => void, removeDialogCallback: (dialog: DialogLoading) => void, title: string, closure: () => void, showDelay: number = 3000) => 
-    {
-        
-        return new Promise((resolve, reject) => 
-        {
-            const execute = (dialog, hasNextOperation) => async (crud) =>
-            {   
-                var resolved = false;
-                setTimeout(() => 
-                {
-                    if(resolved == false)
-                    {   dialog.setVisible(true);}
-                }, showDelay);
-                const successful = await crud.execute(dialog);
-                resolved = true;
 
-                if(hasNextOperation == false || hasNextOperation == undefined)
-                {
-                    if(successful == false)
-                    {   
-                        if(dialog.state.visible == false)
-                        {   dialog.setVisible(true);}
-                    }
-
-                    dialog.setCompleted();
-                }
-
-                return {successful: successful, dialogOpened: dialog.state.visible};
-            }
-
-            const onReference = (ref) => 
-            {
-                if(ref)
-                {   closure(execute(ref));}
-            }
-    
-            const component = <DialogLoading 
-                ref = {onReference}
-                title={title}
-                key={title} 
-                section={SECTION_CONNECTING}
-                isComplete={false}
-                timeout={30000} 
-                visible={false} 
-                cancelable={false}
-                warning={undefined} 
-                onClose={() => {removeDialogCallback(component); resolve();}} />
-    
             addDialogCallback(component);
         });
-    } */
+    }
 }

@@ -1,7 +1,6 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import update from "immutability-helper";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import{ RNFirebase } from 'react-native-firebase';
 import ActionUserLeftTeam from '../../../redux/actions/user/ActionUserLeftTeam';
 import ActionTeamDeleted from '../../../redux/actions/user/ActionTeamDeleted';
@@ -22,7 +21,7 @@ export default class TeamDelete extends AbstractCrudOperation
         this.userId = userId;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         console.log("ROLLING BACK CHANGES!");
         const user = FirebaseAdapter.getUsers().doc(this.userId);
@@ -54,7 +53,7 @@ export default class TeamDelete extends AbstractCrudOperation
         }
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         const index = this.currentTeams.indexOf(this.teamId);
         //console.log("Index; " + index + ", teamId: " + this.teamId + " and currentTeams: " + UtilityObject.stringify(this.currentTeams));
@@ -63,16 +62,16 @@ export default class TeamDelete extends AbstractCrudOperation
             try
             {
                 const newData = update(this.currentTeams, {$splice: [[index, 1]]});
-                await this.sendUpdates(dialog, ActionUserLeftTeam.TYPE, async () => 
+                await this.sendUpdates(updatable, ActionUserLeftTeam.TYPE, async () => 
                 {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
             }
             catch(error)
             {   
-                this.onError(dialog, "Something went wrong while leaving the team.", error);
+                this.onError(updatable, "Something went wrong while leaving the team.", error);
                 return;
             }
 
-            if(dialog.isTimedOut())
+            if(updatable.isTimedOut())
             {   return;}
         }
 
@@ -93,12 +92,12 @@ export default class TeamDelete extends AbstractCrudOperation
             const doc = FirebaseAdapter.getTeams().doc(this.teamId);
             this.oldTeam = await doc.get();
 
-            await this.sendUpdates(dialog, ActionTeamDeleted.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionTeamDeleted.TYPE, async () => 
             {   await doc.delete();});
 
-            this.onSuccess(dialog, "You have successfully left and deleted the team.");
+            this.onSuccess(updatable, "You have successfully left and deleted the team.");
         }
         catch(error)
-        {   this.onError(dialog, "Team could not be deleted, please try again.", error);}
+        {   this.onError(updatable, "Team could not be deleted, please try again.", error);}
     }
 }

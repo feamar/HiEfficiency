@@ -15,7 +15,6 @@ import DatabaseProvider from './app/providers/DatabaseProvider';
 import FirestoreFacade from './app/components/firebase/FirestoreFacade';
 import update from 'immutability-helper';
 import { ReduxState } from './app/redux/ReduxState';
-import AbstractDialog from "./app/components/dialog/AbstractDialog";
 import { Spec } from "immutability-helper";
 import DocumentUser from './app/dtos/firebase/firestore/documents/DocumentUser';
 
@@ -29,7 +28,7 @@ type State =
   signedIn: boolean,
   checkedSignIn: boolean,
   shouldSplash: boolean,
-  dialogs: Array<AbstractDialog>
+  dialogs: Array<JSX.Element>
 }
 
 
@@ -59,7 +58,7 @@ export default class App extends React.Component<any, State>
     this.unsubscribers.push(this.store.subscribe(this.onReduxStateChanged));
   }
 
-  addDialog = (dialog: AbstractDialog) =>
+  addDialog = (dialog: JSX.Element) =>
   {
     if(this.state.dialogs.indexOf(dialog) < 0)
     {
@@ -68,13 +67,13 @@ export default class App extends React.Component<any, State>
     }
   }
 
-  removeDialog = (dialog: AbstractDialog) =>
+  removeDialog = (dialog: JSX.Element) =>
   {
     const index: number = this.state.dialogs.indexOf(dialog);
     if(index < 0)
     {   return false;}
 
-    const newDialogs: Array<AbstractDialog> = update(this.state.dialogs, {$splice: [[index, 1]]});
+    const newDialogs: Array<JSX.Element> = update(this.state.dialogs, {$splice: [[index, 1]]});
     this.setState({dialogs: newDialogs});
     return true;
   }

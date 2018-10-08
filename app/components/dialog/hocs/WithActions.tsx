@@ -1,79 +1,54 @@
 import React from "react";
-import {Subtract} from "utility-types";
+import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent } from "../../../hocs/AbstractHigherOrderComponent";
 
-export type OnActionClickedListener<C, A> = (dialog: C | undefined, action: A) => void;
+export type OnActionClickedListener<B extends ConcreteComponent, A> = (baseComponent: B | undefined, action: A) => void;
 
 interface InjectedProps<A> 
 {   onActionClicked: (action: A) => void;}
 
-interface ExternalProps<C, A>
-{   onActionClickListener?: (component: C | undefined, action: A) => void;}
+interface ExternalProps<B extends ConcreteComponent, A>
+{   onActionClickListener?: OnActionClickedListener<B, A>;}
 
-//type HocProps<C, A, P extends InjectedProps<A>> = P & ExternalProps<C, A>;
+export type WithActionPropsInner<P, A> = P & InjectedProps<A>;
+type WithActionPropsOuter<B extends ConcreteComponent, A, P> = P & ExternalProps<B, A>
 
-type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
-type Subtract<T, K> = Omit<T, keyof K>;
-
-type HocProps<C, A, P extends InjectedProps<A>> = P & ExternalProps<C, A>;
-
-
-export default <C, A, P extends InjectedProps<A>> (WrappedComponent: React.ComponentClass<P>) =>
+export default <B extends ConcreteComponent, 
+                C extends ConcreteOrHigher<B, C, {}, WithActionPropsInner<P, A>>, 
+                A, 
+                P> 
+                (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, WithActionPropsInner<P, A>>) =>
 {
-    const hoc = class WithActions extends React.Component<HocProps<C, A, P>>
+    const hoc = class WithActions extends AbstractHigherOrderComponent<B, C, {}, WithActionPropsInner<P, A>, WithActionPropsOuter<B, A, P>> 
     {
-        public readonly onActionClickedListeners: Array<OnActionClickedListener<C, A>> = [];
-        private mWrapped: C | null;
+        public readonly onActionClickedListeners: Array<OnActionClickedListener<B, A>>;
 
-        constructor(props: HocProps<C, A, P>)
+        constructor(props: WithActionPropsOuter<C, A, P>)
         {
             super(props);
-            this.mWrapped = null;
 
-            if(props.onActionClickListener != undefined)
-            {   this.onActionClickedListeners.push(props.onActionClickListener);}
-        }
+            this.onActionClickedListeners = [];
 
-        public addOnActionClickedListener = (listener: OnActionClickedListener<C, A>) :  boolean =>
-        {   
-            const index = this.onActionClickedListeners.indexOf(listener);
-            if(index >= 0)
-            {   return false;}
-
-            this.onActionClickedListeners.push(listener);
-            return true;
-        }
-
-        public removeOnActionClickedListener = (listener: OnActionClickedListener<C, A>) : boolean =>
-        {
-            const index = this.onActionClickedListeners.indexOf(listener);
-            if(index < 0)
-            {   return false;}
-
-            this.onActionClickedListeners.splice(index, 1);
-            return true;
+            const presetListener: OnActionClickedListener<B, A> | undefined = this.props.onActionClickListener;
+            if(presetListener)
+            {   this.onActionClickedListeners.push(presetListener);}
         }
 
         private onActionClicked = (action: A) =>
         {
             this.onActionClickedListeners.forEach(listener => 
-            {   listener(this.wrapped, action);});
-        }
-
-        get wrapped () : C | undefined
-        {
-            if(this.mWrapped == null)
-            {   return undefined;}
-
-            if(typeof this.mWrapped === typeof WrappedComponent)
-            {   return this.mWrapped as C;}
-
-            throw new Error("This did not work, back to the drawing board.");
+            {   
+                if(this.wrapped != null)
+                {   listener(this.concrete, action);}
+            });
         }
 
         render()
         {
+            let passthroughProps: Readonly<P> = this.props;
+            let innerProps: Readonly<WithActionPropsInner<P, A>> = Object.assign({}, passthroughProps,{onActionClicked: this.onActionClicked});
+
             return (
-                <WrappedComponent ref={i => this.mWrapped = i} onActionClicked={this.onActionClicked} {...this.props} />
+                <WrappedComponent ref={this.onReference} {...innerProps} />
             );
         }
     }

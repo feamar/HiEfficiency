@@ -1,4 +1,5 @@
 import EntitySchemaDay from "./EntitySchemaDay";
+import UtilityType from "../../../../utilities/UtilityType";
 
 export default class EntitySchemaWeek
 {
@@ -35,8 +36,30 @@ export default class EntitySchemaWeek
         this.sunday = sunday;
     }
 
+    getTotalHours = () =>
+    {
+        return this.toArray().reduce((accrued: number, current: EntitySchemaDay) =>
+        {   return accrued + current.getHours();}, 0);
+    }
+
     getByIndex = (i: number) : EntitySchemaDay => 
     {   return this.toArray()[i];}
+
+    static getPropertyByIndex = (i: number) : keyof EntitySchemaWeek | undefined =>
+    {
+        switch(i)
+        {
+            case 0: UtilityType.nameof<EntitySchemaWeek>("monday");
+            case 1: UtilityType.nameof<EntitySchemaWeek>("tuesday");
+            case 2: UtilityType.nameof<EntitySchemaWeek>("wednesday");
+            case 3: UtilityType.nameof<EntitySchemaWeek>("thursday");
+            case 4: UtilityType.nameof<EntitySchemaWeek>("friday");
+            case 5: UtilityType.nameof<EntitySchemaWeek>("saturday");
+            case 6: UtilityType.nameof<EntitySchemaWeek>("sunday");
+
+            default: return undefined;
+        }
+    }
 
     toArray = () : Array<EntitySchemaDay> =>
     {   return [this.monday, this.tuesday, this.wednesday, this.thursday, this.friday, this.saturday, this.sunday];}

@@ -13,6 +13,8 @@ export default class DocumentStory
         return snapshot.data() as DocumentStory;
     }
 
+    static fromDocument(document: RNFirebase.firestore.DocumentReference)
+
     public createdOn: Date;
     public finishedOn?: Date;
     public startedOn?: Date;

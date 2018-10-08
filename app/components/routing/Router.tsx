@@ -6,7 +6,6 @@ import
     createSwitchNavigator,
     createDrawerNavigator,
     NavigationScreenProps,
-    NavigationScreenProp,
     NavigationRoute,
     NavigationContainer,
     NavigationState
@@ -27,7 +26,7 @@ import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import CustomHeader from './CustomHeader';
 import { TouchableRipple } from '../../../node_modules/react-native-paper';
-import {  CustomNavigationParams } from './RoutingTypes';
+import {  CustomNavigationParams, HiEfficiencyNavigator } from './RoutingTypes';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -213,12 +212,12 @@ export default class Router
   {   return navigationState.routes[navigationState.index];}
 }
 
-export const getHamburgerIcon = () => (navigation: NavigationScreenProp<NavigationRoute<CustomNavigationParams>, CustomNavigationParams>): JSX.Element =>
+export const getHamburgerIcon = () => (navigation: HiEfficiencyNavigator): JSX.Element =>
 {
   return <TouchableRipple onPress={() => navigation.openDrawer()}><Icon size={26}   name= "menu" color="white" /></TouchableRipple>
 }
 
-export const getBackIcon = () => (navigation: NavigationScreenProp<NavigationRoute<CustomNavigationParams>, CustomNavigationParams>): JSX.Element =>
+export const getBackIcon = () => (navigation: HiEfficiencyNavigator): JSX.Element =>
 {
   const internal = () =>
   {
@@ -252,7 +251,7 @@ const getTabBarOptions = () =>
 }
 
 
-const getNavigationOptions = (title: string, actionLeft?: (navigation: NavigationScreenProp<NavigationRoute<CustomNavigationParams>, CustomNavigationParams>) => JSX.Element) =>
+const getNavigationOptions = (title: string, actionLeft?: (navigation: HiEfficiencyNavigator) => JSX.Element) =>
 {
     return  (props: NavigationScreenProps<CustomNavigationParams, CustomNavigationParams>) =>
     {

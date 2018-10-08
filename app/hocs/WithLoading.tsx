@@ -3,6 +3,7 @@ import {View, StyleSheet} from "react-native";
 import withStaticFields from "./WithStaticFields";
 import Theme from "../styles/Theme";
 import * as Progress from 'react-native-progress';
+import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent } from "./AbstractHigherOrderComponent";
 
 const styles = StyleSheet.create({
     wrapper:{
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
     }
 });
 
-interface InjectedProps
+export interface WithLoadingProps
 {
     setLoading: (loading: boolean) => void
 }
@@ -32,16 +33,14 @@ interface HocState
     loading: boolean
 }
 
-interface HocProps
-{
+type WithLoadingPropsInner<P> = P & WithLoadingProps;
+type WithLoadingPropsOuter<P> = P;
 
-}
-
-export default <P extends InjectedProps> (WrappedComponent: React.ComponentType<P>) =>
+export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}, WithLoadingPropsInner<P>>, P> (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, WithLoadingPropsInner<P>>) =>
 {
-    const hoc = class WithLoading extends React.Component<HocProps, HocState>
+    const hoc = class WithLoading extends AbstractHigherOrderComponent<B, C, {}, WithLoadingPropsInner<P>, WithLoadingPropsOuter<P>, HocState>
     {
-        constructor(props: HocProps)
+        constructor(props: WithLoadingPropsInner<P>)
         {
             super(props);
 
@@ -49,14 +48,19 @@ export default <P extends InjectedProps> (WrappedComponent: React.ComponentType<
             {   loading: true}
         }
 
+        setLoading = (loading: boolean) => this.setState({loading: loading});
+
         render()
         {
+            let passthroughProps: Readonly<P> = this.props;
+            let innerProps: Readonly<WithLoadingPropsInner<P>> = Object.assign({}, passthroughProps, {setLoading: this.setLoading});
+
             return (
                 <View style={styles.wrapper}>
                     {this.state.loading && <View style={styles.loading_wrapper}>
                         <Progress.Circle color={Theme.colors.primary} size={45} indeterminate={true} style={styles.loader} borderWidth={3} />
                     </View>}
-                    <WrappedComponent setLoading={(loading => this.setState({loading: loading}))} {...this.props} />
+                    <WrappedComponent {...innerProps} />
                 </View>
             );
         }

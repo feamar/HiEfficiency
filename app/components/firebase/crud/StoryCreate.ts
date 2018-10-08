@@ -1,8 +1,7 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentStory from '../../../dtos/firebase/firestore/documents/DocumentStory';
 import ActionStoryCreated from "../../../redux/actions/user/ActionStoryCreated";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import { RNFirebase } from "react-native-firebase";
 
 export default class StoryCreate extends AbstractCrudOperation
@@ -19,7 +18,7 @@ export default class StoryCreate extends AbstractCrudOperation
         this.story = story;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         //console.log("STORYC REATE ROLLBACK: " + this.doc);
         if(this.doc != undefined)
@@ -32,17 +31,17 @@ export default class StoryCreate extends AbstractCrudOperation
         }
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         //console.log("CREATING STORY: " + UtilityObject.stringify(this.story));
         try
         {
-            this.doc = await this.sendUpdates(dialog, ActionStoryCreated.TYPE, async (): Promise<RNFirebase.firestore.DocumentReference> => 
+            this.doc = await this.sendUpdates(updatable, ActionStoryCreated.TYPE, async (): Promise<RNFirebase.firestore.DocumentReference> => 
             {   return await FirebaseAdapter.getStories(this.teamId).add(this.story);});
     
-            this.onSuccess(dialog, "Story successfully created!");
+            this.onSuccess(updatable, "Story successfully created!");
         }
         catch(error)
-        {   this.onError(dialog, "Something went wrong while creating the story, please try again later.", error);}
+        {   this.onError(updatable, "Something went wrong while creating the story, please try again later.", error);}
     }
 }

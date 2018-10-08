@@ -1,7 +1,6 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import update from "immutability-helper";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import ActionUserLeftTeam from '../../../redux/actions/user/ActionUserLeftTeam';
 
 export default class TeamLeave extends AbstractCrudOperation
@@ -19,14 +18,14 @@ export default class TeamLeave extends AbstractCrudOperation
         this.userId = userId;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         const user = FirebaseAdapter.getUsers().doc(this.userId);
         this.attemptRollback(0, 10, async () => 
         {   await user.update({teams: this.currentTeams});});
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         var index: number = this.currentTeams.indexOf(this.teamId);
         if(index > -1)
@@ -34,15 +33,15 @@ export default class TeamLeave extends AbstractCrudOperation
             const newTeams = update(this.currentTeams, {$splice: [[index, 1]]})
             try
             {
-                await this.sendUpdates(dialog, ActionUserLeftTeam.TYPE, async () => 
+                await this.sendUpdates(updatable, ActionUserLeftTeam.TYPE, async () => 
                 {   await FirebaseAdapter.getUsers().doc(this.userId).update({ teams: newTeams });});
 
-                this.onSuccess(dialog, "You have successfully left the team.");
+                this.onSuccess(updatable, "You have successfully left the team.");
             }
             catch(error)
-            {   this.onError(dialog, "Team could not be left, please try again.", error);}
+            {   this.onError(updatable, "Team could not be left, please try again.", error);}
         }
         else
-        {   this.onError(dialog, "It appears you are somehow already not a member of this team.");}
+        {   this.onError(updatable, "It appears you are somehow already not a member of this team.");}
     }
 }

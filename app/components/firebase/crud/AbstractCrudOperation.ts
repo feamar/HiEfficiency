@@ -1,14 +1,31 @@
 import {NetInfo} from 'react-native';
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import ReduxManager, { OnReduxStateChangedListener } from "../../../redux/ReduxManager";
-import { OnDialogDismissListener, OnDialogCloseListener, OnDialogOpenListener } from '../../dialogs/AbstractDialog';
 import AbstractReduxAction from '../../../redux/actions/AbstractReduxAction';
+import { OnDialogDismissListener, OnDialogCloseListener, OnDialogOpenListener } from '../../dialog/AbstractDialog';
+import { ConcreteDialogLoading } from '../../dialog/instances/DialogLoading';
 
 export const TIMEOUT_RESOLVE_NONE = 0;
 export const TIMEOUT_RESOLVE_ROLL_BACK = 1;
 
 export const SECTION_CONNECTING = "Connecting to remote database";
 export const SECTION_WAITING_FOR_CONFIRMATION = "Waiting for confirmation";
+
+interface Messagable 
+{   setMessage: (message: string) => boolean}
+
+interface Sectionable 
+{   setSection: (section: string) => boolean}
+
+interface Warnable
+{   setWarning: (warning: string) => boolean}
+
+interface Cancelable
+{   setCancelable: (cancelable: boolean) => boolean}
+
+interface Timeoutable
+{   isTimedOut: () => boolean}
+
+export type Updatable = Messagable & Sectionable & Warnable & Cancelable & Timeoutable;
 
 export default abstract class AbstractCrudOperation
 {
@@ -28,17 +45,18 @@ export default abstract class AbstractCrudOperation
         this.reduxListeners = [];
     }
 
-    public readonly execute = async (dialog: DialogLoading): Promise<boolean> =>
+    public readonly execute = async (dialog: ConcreteDialogLoading): Promise<boolean> =>
     {
         if(this.state != "Unexecuted")
         {   return Promise.reject(false);}
 
         this.state = "Executed";
         dialog.setMessage(this.initialMessage);
-        dialog.onTimeoutListeners.push(this.onDialogTimeOut);
-        dialog.onDismissListeners.push(this.onDialogDismissed);
+        dialog.onTimeoutListeners.push(this.onDialogTimeout);
+
+        /*dialog.base.onDismissListeners.push(this.onDialogDismissed);
         dialog.onCloseListeners.push(this.onDialogClosed);
-        dialog.onOpenListeners.push(this.onDialogOpened);
+        dialog.onOpenListeners.push(this.onDialogOpened);*/
         
 
         const isConnected = await NetInfo.isConnected.fetch();
@@ -57,7 +75,7 @@ export default abstract class AbstractCrudOperation
         }      
     }
 
-    public readonly onDialogTimeOut = async (dialog: DialogLoading, section: string) =>
+    public readonly onDialogTimeout = async (dialog: ConcreteDialogLoading, section: string) =>
     {
         this.onError(dialog, "The operation has timed out. Please try again later.");
 
@@ -73,6 +91,7 @@ export default abstract class AbstractCrudOperation
         }
     }
 
+    /*
     public readonly onDialogDismissed = (dialog: DialogLoading) =>
     {
         //console.log("On Dialog Dismissed");
@@ -93,12 +112,12 @@ export default abstract class AbstractCrudOperation
     {
         if(this.onDialogOpenListener)
         {   this.onDialogOpenListener(dialog);}
-    }
+    }*/
 
-    protected abstract onRollback (dialog: DialogLoading) : void;
-    protected abstract perform(dialog: DialogLoading) : void;
+    protected abstract onRollback (updatable: Updatable) : void;
+    protected abstract perform(updatable: Updatable) : void;
 
-    protected readonly sendUpdates = async <T> (dialog: DialogLoading, expectedReduxAction: string, closure: () => Promise<T>): Promise<T> =>
+    protected readonly sendUpdates = async <T> (updatable: Updatable, expectedReduxAction: string, closure: () => Promise<T>): Promise<T> =>
     {
         return new Promise<T>(async (resolve, _) => 
         {
@@ -114,8 +133,7 @@ export default abstract class AbstractCrudOperation
 
             this.reduxListeners.push(listener);
 
-            if(dialog)
-            {   dialog.setSection(SECTION_WAITING_FOR_CONFIRMATION);}
+            updatable.setSection(SECTION_WAITING_FOR_CONFIRMATION);
             ReduxManager.Instance.registerListener(listener);
 
             result = await closure();
@@ -124,23 +142,20 @@ export default abstract class AbstractCrudOperation
     }
 
 
-    protected onSuccess = (dialog: DialogLoading, message: string) =>
+    protected onSuccess = (updatable: Updatable, message: string) =>
     {
         console.log("Succes - Message: " + message)
         this.state = "Finished";
         this.successful = true;
 
-        if(dialog)
-        {
-            dialog.setCancelable(true);
-            dialog.setMessage(message);
-        }
+        updatable.setCancelable(true);
+        updatable.setMessage(message);
 
         this.reduxListeners.forEach((listener: OnReduxStateChangedListener) => 
         {   ReduxManager.Instance.removeListener(listener)});
     }
 
-    protected onError = async (dialog: DialogLoading, message: string, error?: Error) =>
+    protected onError = async (updatable: Updatable, message: string, error?: Error) =>
     {
         console.log("Error - Message: " + message);
 
@@ -151,19 +166,16 @@ export default abstract class AbstractCrudOperation
         if(error)
         {   console.trace(error);}
 
-        if(dialog)
-        {
-            dialog.setCancelable(true);
-            dialog.setMessage(message);
-            
-            if(error)
-            {   dialog.setWarning(error.toString());}
-        }
+        updatable.setCancelable(true);
+        updatable.setMessage(message);
+        
+        if(error)
+        {   updatable.setWarning(error.toString());}
 
         this.reduxListeners.forEach((listener: OnReduxStateChangedListener) => 
         {   ReduxManager.Instance.removeListener(listener)});
 
-        await this.onRollback(dialog);
+        await this.onRollback(updatable);
     }
 
     protected attemptRollback = <T> (attempt: number, maximum: number, closure: () => T) : T | undefined =>

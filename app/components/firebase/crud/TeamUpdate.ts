@@ -1,7 +1,6 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import update, { Spec } from "immutability-helper";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentTeam from '../../../dtos/firebase/firestore/documents/DocumentTeam';
 import ActionTeamDataChanged from '../../../redux/actions/user/ActionTeamDataChanged';
 
@@ -20,23 +19,23 @@ export default class TeamUpdate extends AbstractCrudOperation
         this.updates = updates;
     }
 
-    onRollback = async (_:DialogLoading) =>
+    onRollback = async (_:Updatable) =>
     {
         this.attemptRollback(0, 10, async () => 
         {   await FirebaseAdapter.getTeams().doc(this.teamId).set(this.oldTeam);});
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         try 
         {
             const newTeam = update(this.oldTeam, this.updates);
-            await this.sendUpdates(dialog, ActionTeamDataChanged.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionTeamDataChanged.TYPE, async () => 
             {   await FirebaseAdapter.getTeams().doc(this.teamId).update(newTeam);});
             
-            this.onSuccess(dialog, "Successfully updated the team.");
+            this.onSuccess(updatable, "Successfully updated the team.");
         }
         catch(error)
-        {   this.onError(dialog, "Team could not be updated, please try again.", error);}
+        {   this.onError(updatable, "Team could not be updated, please try again.", error);}
     }
 }

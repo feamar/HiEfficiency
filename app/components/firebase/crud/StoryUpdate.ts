@@ -1,8 +1,7 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import update, { Spec } from "immutability-helper";
 import UtilityObject from '../../../utilities/UtilityObject';
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentStory from '../../../dtos/firebase/firestore/documents/DocumentStory';
 import ActionStoryDataChanged from '../../../redux/actions/user/ActionStoryDataChanged';
 
@@ -23,23 +22,23 @@ export default class StoryUpdate extends AbstractCrudOperation
         this.updates = updates;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         this.attemptRollback(0, 10, async () => 
         {   await FirebaseAdapter.getStories(this.teamId).doc(this.storyId).set(this.oldStory);});
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         console.log("Updating story: teamId: " + this.teamId + " and storyId: " + this.storyId + " and oldStory: " + UtilityObject.stringify(this.oldStory) + " and updates: " + UtilityObject.stringify(this.updates));
         try 
         {
             const newStory = update(this.oldStory, this.updates);
-            await this.sendUpdates(dialog, ActionStoryDataChanged.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionStoryDataChanged.TYPE, async () => 
             {   await FirebaseAdapter.getStories(this.teamId).doc(this.storyId).update(newStory);});
-            this.onSuccess(dialog, "Successfully updated the story.");
+            this.onSuccess(updatable, "Successfully updated the story.");
         }
         catch(error)
-        {   this.onError(dialog, "Story could not be updated, please try again.", error);}
+        {   this.onError(updatable, "Story could not be updated, please try again.", error);}
     }
 }

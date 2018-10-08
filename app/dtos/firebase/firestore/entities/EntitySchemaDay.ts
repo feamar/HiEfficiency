@@ -19,4 +19,15 @@ export default class EntitySchemaDay
         this.end = end;
         this.enabled = enabled;
     }
+
+    getHours = () =>
+    {
+        const splitStart = this.start.split(":");
+        const splitEnd = this.end.split(":");
+
+        const endAmount = parseInt(splitEnd[0]);
+        const startAmount = parseInt(splitStart[0]);
+
+        return endAmount - startAmount;
+    }
 }

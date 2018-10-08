@@ -1,13 +1,26 @@
 import React from "react";
-import AbstractHigherOrderComponent from './AbstractHigherOrderComponent';
+import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent } from './AbstractHigherOrderComponent';
 import { View } from "native-base";
 import update from "../../node_modules/immutability-helper";
+import withStaticFields from "./WithStaticFields";
 
-export default WithDialogContainer = (WrappedComponent) =>
+export interface WithDialogContainerProps
 {
-    const hoc = class HOC extends AbstractHigherOrderComponent
+    addDialog: (dialog: JSX.Element) => boolean;
+    removeDialog: (dialog: JSX.Element) => boolean;
+}
+
+interface HocState
+{   dialogs: Array<JSX.Element>;}
+
+interface HocProps
+{   }
+
+export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}, P>, P extends WithDialogContainerProps> (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, P>) =>
+{
+    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, {}, P, HocProps & P, HocState>
     {
-        constructor(props)
+        constructor(props: HocProps & P)
         {
             super(props);
 
@@ -16,29 +29,23 @@ export default WithDialogContainer = (WrappedComponent) =>
             }
         }
 
-        public addDialog = (dialog) =>
+        public addDialog = (dialog: JSX.Element): boolean =>
         {   
-            //console.log("Adding dialog!: " + this.state.dialogs.length);
             if(this.state.dialogs.indexOf(dialog) >= 0)
             {   return false;}
 
             const newDialogs = update(this.state.dialogs, {$push: [dialog]});
-            //console.log("New size: " + newDialogs.length);
             this.setState({dialogs: newDialogs});
             return true;
         }
 
-        public removeDialog = (dialog) =>
+        public removeDialog = (dialog: JSX.Element): boolean =>
         {
-            //console.log("Dialog is not undefined: " + (dialog != undefined));
-            //console.log("Removing dialog!: " + this.state.dialogs.length + " AND: " + UtilityObject.stringify(dialog));
             const index = this.state.dialogs.indexOf(dialog);
             if(index < 0)
             {   return false;}
 
-
             const newDialogs = update(this.state.dialogs, {$splice: [[index, 1]]});
-            //console.log("New size!: " + newDialogs.length);
             this.setState({dialogs: newDialogs});
             return true;
         }
@@ -47,7 +54,7 @@ export default WithDialogContainer = (WrappedComponent) =>
         {   
             return (
                 <View>
-                    <WrappedComponent addDialog={this.addDialog} removeDialog={this.removeDialog} ref={instance => this.wrapped = instance} {...this.props} />
+                    <WrappedComponent addDialog={this.addDialog} removeDialog={this.removeDialog} ref={this.onReference} {...this.props} />
                     {this.state.dialogs.map(dialog => dialog)}
                 </View>
             );

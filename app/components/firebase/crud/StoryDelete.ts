@@ -1,6 +1,5 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import { RNFirebase } from 'react-native-firebase';
 import ActionStoryDeleted from '../../../redux/actions/user/ActionStoryDeleted';
 
@@ -18,7 +17,7 @@ export default class StoryDelete extends AbstractCrudOperation
         this.storyId = storyId;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         if(this.oldStory != undefined)
         {
@@ -31,19 +30,19 @@ export default class StoryDelete extends AbstractCrudOperation
         }
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         try
         {
             const doc = FirebaseAdapter.getStories(this.teamId).doc(this.storyId);
             this.oldStory = await doc.get();
 
-            await this.sendUpdates(dialog, ActionStoryDeleted.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionStoryDeleted.TYPE, async () => 
             {   await doc.delete();});
 
-            this.onSuccess(dialog, "Successfully deleted the user story.");
+            this.onSuccess(updatable, "Successfully deleted the user story.");
         }
         catch(error)
-        {   this.onError(dialog, "Something went wrong while deleting the story, please try again.", error);}
+        {   this.onError(updatable, "Something went wrong while deleting the story, please try again.", error);}
     }
 }

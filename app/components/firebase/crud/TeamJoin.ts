@@ -1,7 +1,6 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
 import update from "immutability-helper";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import { RNFirebase } from 'react-native-firebase';
 import DocumentTeam from '../../../dtos/firebase/firestore/documents/DocumentTeam';
 import AbstractFirestoreDocument from '../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument';
@@ -24,7 +23,7 @@ export default class TeamJoin extends AbstractCrudOperation
         this.userId = userId;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         const user = FirebaseAdapter.getUsers().doc(this.userId);
         this.attemptRollback(0, 10, async () => 
@@ -46,44 +45,44 @@ export default class TeamJoin extends AbstractCrudOperation
     }
 
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         var teams: RNFirebase.firestore.QuerySnapshot;
         try
         {   teams = await FirebaseAdapter.getTeams().where("name", "==", this.name.toString()).get();}
         catch(error)
         {   
-            this.onError(dialog, "Something went wrong while retrieving the teams, please try again later.", error);
+            this.onError(updatable, "Something went wrong while retrieving the teams, please try again later.", error);
             return;
         }
         
-        if(dialog.isTimedOut())
+        if(updatable.isTimedOut())
         {   return;}
 
         const match = this.getMatch(teams, this.code);
         if(match == undefined)
         {
             if(teams.docs.length <= 0)
-            {   this.onError(dialog, "No team called '" + this.name + "' could be found.");}
+            {   this.onError(updatable, "No team called '" + this.name + "' could be found.");}
             else
-            {   this.onError(dialog,  "A team called '" + this.name + "' could be found, but the security code was incorrect.");}
+            {   this.onError(updatable,  "A team called '" + this.name + "' could be found, but the security code was incorrect.");}
         }
         else
         {
             if (this.currentTeams.indexOf(match.id!) >= 0)
-            {   this.onError(dialog, "You are already a member of this team, and you can not join a team twice.");}
+            {   this.onError(updatable, "You are already a member of this team, and you can not join a team twice.");}
             else
             {
                 const newData = update(this.currentTeams, {$push: [match.id!]});
                 try
                 {
-                    await this.sendUpdates(dialog, ActionUserJoinedTeam.TYPE, async () => 
+                    await this.sendUpdates(updatable, ActionUserJoinedTeam.TYPE, async () => 
                     {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
     
-                    this.onSuccess(dialog, "You have successfully joined the team.");
+                    this.onSuccess(updatable, "You have successfully joined the team.");
                 }
                 catch(error)
-                {   this.onError(dialog, "Team could not be joined, please try again.", error);}
+                {   this.onError(updatable, "Team could not be joined, please try again.", error);}
             }
         }
     }

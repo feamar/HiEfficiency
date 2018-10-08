@@ -1,6 +1,5 @@
 import FirebaseAdapter from "../FirebaseAdapter";
-import DialogLoading from "../../dialogs/instances/DialogLoading";
-import AbstractCrudOperation from './AbstractCrudOperation';
+import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import FirebaseManager from '../FirebaseManager';
 
 export default class UserLogin extends AbstractCrudOperation
@@ -16,7 +15,7 @@ export default class UserLogin extends AbstractCrudOperation
         this.password = password;
     }
 
-    onRollback = async (_: DialogLoading) =>
+    onRollback = async (_: Updatable) =>
     {
         FirebaseManager.Instance.loginHasBeenCanceled = true;
         this.attemptRollback(0, 10, async () => 
@@ -29,13 +28,13 @@ export default class UserLogin extends AbstractCrudOperation
         FirebaseManager.Instance.loginHasBeenCanceled = false;
     }
 
-    perform = async (dialog: DialogLoading) => 
+    perform = async (updatable: Updatable) => 
     {
         try 
         {
             const auth = FirebaseAdapter.getAuth();
             await auth.signInAndRetrieveDataWithEmailAndPassword(this.email, this.password);
-            this.onSuccess(dialog, "You have successfully logged in.");
+            this.onSuccess(updatable, "You have successfully logged in.");
         }
         catch(error)
         {  
@@ -43,20 +42,20 @@ export default class UserLogin extends AbstractCrudOperation
             switch(error.code)
             {
                 case "auth/invalid-email":
-                    this.onError(dialog, "The e-mail address you have entered has an invalid syntax, please verify that you have not made any mistakes.");
+                    this.onError(updatable, "The e-mail address you have entered has an invalid syntax, please verify that you have not made any mistakes.");
                     break;
 
                 case "auth/user-disabled":
-                    this.onError(dialog, "This user account has been disabled. Please contact support for more information.");
+                    this.onError(updatable, "This user account has been disabled. Please contact support for more information.");
                     break;
 
                 case "auth/user-not-found":
                 case "auth/wrong-password":
-                    this.onError(dialog, "The e-mail address and password combination you have entered do not match, please try again.");
+                    this.onError(updatable, "The e-mail address and password combination you have entered do not match, please try again.");
                     break;
 
                 default:
-                    this.onError(dialog, "Something went wrong while trying to log in, please try again.", error);
+                    this.onError(updatable, "Something went wrong while trying to log in, please try again.", error);
             }
         }
     }
