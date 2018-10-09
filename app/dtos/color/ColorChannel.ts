@@ -19,6 +19,7 @@ export default class ColorChannel
      */
     static fromHexValue = (hexValue: string) : ColorChannel =>
     {   
+        console.log("From hex value: " + hexValue);
         if(hexValue.charAt(0) == "#")
         {   hexValue = hexValue.slice(1);}
 

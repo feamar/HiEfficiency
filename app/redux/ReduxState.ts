@@ -3,6 +3,6 @@ import ReduxInspecting from "../dtos/redux/ReduxInspecting";
 
 export type ReduxState =
 {
-    user?: ReduxUser;
+    user: ReduxUser | null ;
     inspecting: ReduxInspecting;
 }

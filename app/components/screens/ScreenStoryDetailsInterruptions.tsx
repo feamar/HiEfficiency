@@ -3,12 +3,10 @@ import {View, StyleSheet} from "react-native";
 import { TouchableRipple, Text} from "react-native-paper";
 import * as Progress from 'react-native-progress';
 import Theme from "../../styles/Theme";
-import ListInterruptions from "../lists/instances/interruptions/ListInterruptions";
 import InterruptionType from "../../enums/InterruptionType";
 import {asDate } from "../util/DateUtil";
 import BarActionButtons from "../bars/BarActionButtons";
 import ButtonSquare from "../bars/buttons/ButtonSquare";
-import { MODE_DATETIME_SEPARATE } from "../dialogs/preferences/DialogPreferenceDateTime";
 import ActionType from "../../enums/ActionType";
 import {  MenuOptionProps } from "react-native-popup-menu";
 import WithOverflowMenu, { WithOverflowMenu_RequiredFunctions } from "../../hocs/WithOverflowMenu";
@@ -23,7 +21,7 @@ import ActionStopInspectStory from "../../redux/actions/inspection/ActionStopIns
 import { Dispatch } from "redux";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import ReduxStory from "../../dtos/redux/ReduxStory";
-import { InterruptionModelType } from "../list/instances/interruptions/ListInterruptions";
+import ListInterruptions, { InterruptionModelType } from "../list/instances/interruptions/ListInterruptions";
 import { WithLoadingProps } from "../../hocs/WithLoading";
 import DocumentInterruptions from "../../dtos/firebase/firestore/documents/DocumentInterruptions";
 import EntityInterruption from "../../dtos/firebase/firestore/entities/EntityInterruption";
@@ -624,8 +622,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         return (
              <View>
                 <DialogInterruptionEdit storageValue={null} title="Edit Interruption" visible={false} onSubmit={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
-                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={{timestamp: start}} ref={i => this.dialogEditTimeStart = i}  mode={MODE_DATETIME_SEPARATE} title="Edit Start"  visible={false} onSubmit={this.onEditTimeStart}  />
-                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={{timestamp: end}} ref={i => this.dialogEditTimeFinish = i} mode={MODE_DATETIME_SEPARATE} title="Edit Finish" visible={false} onSubmit={this.onEditTimeFinish} />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={{timestamp: start}} ref={i => this.dialogEditTimeStart = i}  mode={"datetime-separate"} title="Edit Start"  visible={false} onSubmit={this.onEditTimeStart}  />
+                <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={{timestamp: end}} ref={i => this.dialogEditTimeFinish = i} mode={"datetime-separate"} title="Edit Finish" visible={false} onSubmit={this.onEditTimeFinish} />
                 <DialogConfirmation title={""} message={""} concreteRef={i => this.dialogConfirmation = i} onActionClickListener={this.onConfirmationClickListener}/>
                 {this.state.dialogs.map(dialog => dialog)}
              </View>

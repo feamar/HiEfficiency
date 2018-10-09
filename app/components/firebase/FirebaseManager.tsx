@@ -154,8 +154,8 @@ export default class FirebaseManager
         if(this.store == undefined)
         {   return;}
 
-        const user: ReduxUser | undefined = this.store.getState().user;
-        if(user == undefined)
+        const user: ReduxUser | null = this.store.getState().user;
+        if(user == null)
         {   return;}
 
         const original = user.teams;

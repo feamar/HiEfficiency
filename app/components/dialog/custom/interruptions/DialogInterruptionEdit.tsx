@@ -1,16 +1,16 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import Theme from '../../../styles/Theme';
 import {Text} from "react-native-paper";
-import UtilityTime from '../../../utilities/UtilityTime';
 import { Dropdown } from 'react-native-material-dropdown';
-import InputDateTimeSeparate from "../../inputs/InputDateTimeSeparate";
 import AbstractPreferenceDialog, { AbstractPreferenceDialog_Props_Virtual } from '../../preferences/AbstractPreferenceDialog';
 import InterruptionType from '../../../../enums/InterruptionType';
 import EntityInterruption from '../../../../dtos/firebase/firestore/entities/EntityInterruption';
 import InputError from '../../../inputs/InputError';
 import SelectOption from '../../../../dtos/options/SelectOption';
 import { Baseable, onBaseReference } from '../../../../render_props/Baseable';
+import Theme from '../../../../styles/Theme';
+import UtilityTime from '../../../../utilities/UtilityTime';
+import InputDateTimeSeparate from '../../../inputs/InputDateTimeSeparate';
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -157,10 +157,10 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
         return (
             <View style={styles.wrapper}>
                 <Text style={styles.fieldTitle}>Timestamp Start</Text>
-                <InputDateTimeSeparate style={styles.field_start} onSelected={this.onDateTimeSelected("start")} timestamp={value.start} />
+                <InputDateTimeSeparate style={styles.field_start} onSelected={this.onDateTimeSelected("start")} timestamp={value.start || new Date()} />
                 
                 <Text style={styles.fieldTitle2}>Timestamp End</Text>
-                <InputDateTimeSeparate style={styles.field_end} onSelected={this.onDateTimeSelected("end")} timestamp={value.end} />
+                <InputDateTimeSeparate style={styles.field_end} onSelected={this.onDateTimeSelected("end")} timestamp={value.end || new Date()} />
                 {this.getErrorComponent()}
 
                 <Text style={styles.fieldTitle3}>Type</Text>

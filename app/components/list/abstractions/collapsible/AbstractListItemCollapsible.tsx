@@ -33,7 +33,7 @@ export interface AbstractListItemCollapsible_Props_Virtual<ModelType>
     open?: boolean,
     dividers?: boolean,
     title: string,
-    onListItemCollapsed: (section: AbstractListItemCollapsible<ModelType>, open: boolean) => void,
+    onListItemCollapsed?: (section: AbstractListItemCollapsible<ModelType>, open: boolean) => void,
     onItemSelected?: (item: ModelType, index: number) => void,
     onContextMenuItemSelected?: (item: ModelType, index: number, option: ActionOption) => void,
 }

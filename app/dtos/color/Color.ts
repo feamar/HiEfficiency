@@ -49,12 +49,13 @@ export default class Color
      */
     static fromHexadecimal = (hex: string) : Color =>
     {
+        console.log("Hexadecimal: ")
         //^         - Match beginning of string.
         //#?        - Match zero or one hash/pound signs.
         //([a-f\d]) - Matches any character from a to f (a-f), or a digit (\d).
         //$         - Match end of string.
         //i         - Ignore case flag.
-        const shorthandRegex: RegExp = /^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])$/i;
+        const shorthandRegex: RegExp = /^#?([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i;
         
         // Expand possible shorthand form (e.g. "03F") to full form (e.g. "0033FF")
         hex = hex.replace(shorthandRegex, function(_, r, g, b, a) 
@@ -66,11 +67,11 @@ export default class Color
         //{2}       - Match the previous group, denoted by ( and ), exactly 2 times.
         //$         - Match end of string.
         //i         - Ignore case flag.
-        const result: RegExpExecArray | null = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        if(result == undefined)
+        const result: RegExpExecArray | null = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        if(result == null)
         {   throw new Error("Please make sure the input string '" + hex + "' is in a proper hexadecimal format.");}
 
-        return new Color(ColorChannel.fromHexValue(result[1]), ColorChannel.fromHexValue(result[2]), ColorChannel.fromHexValue(result[3]), ColorChannel.fromHexValue(result[4]));
+        return new Color(ColorChannel.fromHexValue(result[1]), ColorChannel.fromHexValue(result[2]), ColorChannel.fromHexValue(result[3]), ColorChannel.fromHexValue(result[4] || "FF"));
     }
 
     private red: ColorChannel;

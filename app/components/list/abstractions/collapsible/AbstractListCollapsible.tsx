@@ -7,7 +7,7 @@ export interface AbstractListCollapsible_Props_Virtual<ModelType, SectionType>
 {
     sections: Array<SectionType>,
     containerHasFab?: boolean, 
-    onListItemCollapsed: (section: AbstractListItemCollapsible<ModelType>, open: boolean) => void,
+    onListItemCollapsed?: (section: AbstractListItemCollapsible<ModelType>, open: boolean) => void,
     onItemSelected?: (item: ModelType, index: number) => void,
     onContextMenuItemSelected?: (item: ModelType, index: number, option: ActionOption) => void,
 }

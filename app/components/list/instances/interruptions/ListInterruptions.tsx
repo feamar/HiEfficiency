@@ -1,17 +1,16 @@
 import React, { Component } from "react";
-import AbstractListCollapsible, { AbstractListCollapsible_Props_Virtual } from "../../abstractions/collapsible/AbstractListCollapsible";
-import { AbstractListItemCollapsible_Props_Virtual } from "../../abstractions/collapsible/AbstractListItemCollapsible";
+import AbstractListCollapsible, { AbstractListCollapsible_Props_Virtual, AbstractListCollapsible_SectionType } from "../../abstractions/collapsible/AbstractListCollapsible";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ModelFinish from "./models/ModelFinish";
 import ModelInterruption from "./models/ModelInterruption";
 import ListItemFinish from "./ListItemFinish";
-import ListItemInterruption from "../../../lists/instances/interruptions/ListItemInterruption";
+import ListItemInterruption from "./ListItemInterruption";
 import { StyleSheet } from "react-native";
 import Theme from "../../../../styles/Theme";
 import ModelStart from "./models/ModelStart";
 import ModelProductive from "./models/ModelProductive";
 import ListItemStart from "./ListItemStart";
-import ListItemProductive from "../../../lists/instances/interruptions/ListItemProductive";
+import ListItemProductive from "./ListItemProductive";
 
 
 export const InterruptionListStyles = StyleSheet.create({
@@ -45,7 +44,7 @@ export const InterruptionListStyles = StyleSheet.create({
 
 
 export type InterruptionModelType = ModelFinish | ModelInterruption | ModelStart | ModelProductive;
-type SectionType = AbstractListItemCollapsible_Props_Virtual<InterruptionModelType>;
+type SectionType = AbstractListCollapsible_SectionType<InterruptionModelType>;
 
 type Props = AbstractListCollapsible_Props_Virtual<InterruptionModelType, SectionType> & 
 {
@@ -60,25 +59,25 @@ export default class ListInterruptions extends Component<Props, State> implement
 {
     private mBase?: AbstractListCollapsible<InterruptionModelType, SectionType>;
 
-    getListItemFor = (section: SectionType, item: InterruptionModelType, index: number): JSX.Element =>
+    getListItemFor = (_section: SectionType, item: InterruptionModelType, index: number): JSX.Element =>
     {
         if(this.isStart(item))
-        {   return <ListItemStart {...this.createProps(section, item, index)} />;}
+        {   return <ListItemStart {...this.createProps(item, index)} />;}
         else if(this.isInterruption(item))
-        {   return <ListItemInterruption {...this.createProps(section, item, index)} />;}
+        {   return <ListItemInterruption {...this.createProps(item, index)} />;}
         else if(this.isProductive(item))
-        {   return <ListItemProductive {...this.createProps(section, item, index)} />;}
+        {   return <ListItemProductive {...this.createProps(item, index)} />;}
         else 
-        {   return <ListItemFinish {...this.createProps(section, item, index)} />}
+        {   return <ListItemFinish {...this.createProps(item, index)} />}
     }
 
-    public createProps = <Type extends {}> (section: SectionType, item: Type, index: number) =>
+    public createProps = <Type extends {}> (item: Type, index: number) =>
     {
         return {
             item: item,
             index: index, 
-            onContextMenuItemSelected: section.onContextMenuItemSelected,
-            onItemSelected: section.onItemSelected
+            onContextMenuItemSelected: this.props.onContextMenuItemSelected,
+            onItemSelected: this.props.onItemSelected
         }
     } 
 

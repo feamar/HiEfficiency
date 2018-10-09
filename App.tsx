@@ -6,7 +6,7 @@ import {Provider as ThemeProvider, Portal} from 'react-native-paper';
 import { MenuProvider } from 'react-native-popup-menu';
 import Router from './app/components/routing/Router'
 import {StatusBar} from "react-native";
-import {createStore, Store} from "redux";
+import {createStore, Store, applyMiddleware} from "redux";
 import {Provider as ReduxProvider} from "react-redux";
 import ReducerInitial from "./app/redux/reducers/ReducerInitial";
 import ScreenSplash from './app/components/screens/ScreenSplash';
@@ -17,6 +17,7 @@ import update from 'immutability-helper';
 import { ReduxState } from './app/redux/ReduxState';
 import { Spec } from "immutability-helper";
 import DocumentUser from './app/dtos/firebase/firestore/documents/DocumentUser';
+import MiddlewareClassConversion from './app/redux/middleware/MiddlewareClassConversion';
 
 if (__DEV__ == false) 
 {   console.log = () => {};}
@@ -51,7 +52,7 @@ export default class App extends React.Component<any, State>
       dialogs: []
     };
 
-    this.store = createStore(ReducerInitial);
+    this.store = createStore(ReducerInitial, applyMiddleware(MiddlewareClassConversion));
     this.unsubscribers = [];
     this.timerIsSet = false;
 

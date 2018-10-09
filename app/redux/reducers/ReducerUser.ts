@@ -18,7 +18,7 @@ import ActionStoryDeleted from '../actions/user/ActionStoryDeleted';
 import ActionStoriesOfTeamLoaded from '../actions/user/ActionStoriesOfTeamLoaded';
 import ActionInterruptionsOfStoryLoaded from '../actions/user/ActionInterruptionsOfStoryLoaded';
 
-export default (user: ReduxUser | undefined, action: AbstractReduxAction): ReduxUser | undefined => 
+export default (user: ReduxUser | undefined | null, action: AbstractReduxAction): ReduxUser | null => 
 {
     ReduxManager.Instance.notifyListeners(action)
     console.log("REDUCER: " + action.type);
@@ -27,10 +27,10 @@ export default (user: ReduxUser | undefined, action: AbstractReduxAction): Redux
     {   return new ReduxUser(action.document, new Map<string, ReduxTeam>(), false);}
 
     if(action instanceof ActionUserLoggedOut)
-    {   return undefined;}
+    {   return null;}
 
-    if(user == undefined)
-    {   return user;}
+    if(user == null || user == undefined)
+    {   return null;}
 
     if(action instanceof ActionUserDataChanged)
     {   return update(user, {document: {$set: action.document}});}
