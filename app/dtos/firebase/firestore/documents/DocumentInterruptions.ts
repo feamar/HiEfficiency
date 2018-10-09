@@ -1,6 +1,7 @@
 import update from "immutability-helper";
 import { RNFirebase } from "react-native-firebase";
 import EntityInterruption from "../entities/EntityInterruption";
+import ReduxInterruptions from "../../../redux/ReduxInterruptions";
 
 export default class DocumentInterruptions 
 {
@@ -13,6 +14,15 @@ export default class DocumentInterruptions
         {   return undefined;}
 
         return snapshot.data() as DocumentInterruptions;
+    }
+
+    static fromReduxInterruptions = (reduxInterruptions: Map<string, ReduxInterruptions>, userId: string): DocumentInterruptions =>
+    {
+        const ofUser = reduxInterruptions.get(userId);
+        if(ofUser == undefined)
+        {   return DocumentInterruptions.create();}
+
+        return ofUser.document.data;
     }
 
     public interruptions: Array<EntityInterruption>;
@@ -29,6 +39,22 @@ export default class DocumentInterruptions
 
         this.interruptions = update(this.interruptions, {$push: [interruption]});
         return true;
+    }
+
+    getLastInterruption = (): EntityInterruption | undefined =>
+    {
+        if(this.interruptions.length == 0)
+        {   return undefined;}
+
+        return this.interruptions[this.interruptions.length - 1];
+    }
+
+    getFirstInterruption = (): EntityInterruption | undefined =>
+    {
+        if(this.interruptions.length == 0)
+        {   return undefined;}
+
+        return this.interruptions[0];
     }
 
     addInterruptionImmutable = (interruption: EntityInterruption) : DocumentInterruptions =>

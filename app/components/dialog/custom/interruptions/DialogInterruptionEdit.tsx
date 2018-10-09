@@ -64,11 +64,12 @@ interface State
 {
 }
 
-interface StorageValue
+type StorageValue = DialogInterruptionEdit_StorageValue;
+export interface DialogInterruptionEdit_StorageValue
 {
     start?: Date,
     end?: Date,
-    type: number,
+    type: InterruptionType,
     previous?: EntityInterruption,
     next?: EntityInterruption
 }
@@ -100,7 +101,8 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
         if(this.base)
         {
             const id = options[index].id;
-            this.base.onValueChange({type: {$set: id}});
+            const type = InterruptionType.fromDatabaseId(id)!;
+            this.base.onValueChange({type: {$set: type}});
         }
     }
 
@@ -135,15 +137,6 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
     getSpinnerOptions = (): Array<SelectOption> =>
     {   return InterruptionType.Values.map(type  => {return {value: type.title, id: type.dbId}});}
 
-    getTypeDisplayValue = (id: number) =>
-    {
-        var type = InterruptionType.fromDatabaseId(id);
-        if(type == InterruptionType.None)
-        {   type = InterruptionType.Values[0];}
-        
-        return type.title;
-    }
-
     getErrorComponent = () =>
     {
         if(this.base == undefined)
@@ -158,6 +151,9 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
         {   return <View></View>;}
         
         const value = this.base.getCurrentStorageValue();
+        if(value == null)
+        {   return <View></View>;}
+
         return (
             <View style={styles.wrapper}>
                 <Text style={styles.fieldTitle}>Timestamp Start</Text>
@@ -168,7 +164,7 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
                 {this.getErrorComponent()}
 
                 <Text style={styles.fieldTitle3}>Type</Text>
-                <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={this.getTypeDisplayValue(value.type)} />
+                <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={value.type.title} />
             </View>
         );
     }

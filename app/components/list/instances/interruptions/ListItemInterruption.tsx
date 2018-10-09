@@ -20,7 +20,7 @@ interface State
     index: number
 }
 
-export default class ListItemFinish extends Component<Props, State> implements Baseable<AbstractListItem<ModelInterruption>>
+export default class ListItemInterruption extends Component<Props, State> implements Baseable<AbstractListItem<ModelInterruption>>
 {
     private mBase?: AbstractListItem<ModelInterruption>;
 

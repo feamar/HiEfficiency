@@ -1,9 +1,12 @@
-export default class ModelProductive 
-{
-    public duration: number;
+import AbstractInterruptionModel from "./AbstractInterruptionModel";
 
-    constructor(duration: number)
+export default class ModelProductive extends AbstractInterruptionModel
+{
+    static is = (obj: any): obj is ModelProductive =>
+    {   return obj.constructor == ModelProductive;}
+
+    constructor(timestamp: Date, duration: number)
     {   
-        this.duration = duration;
+        super(timestamp, duration);
     }
 }

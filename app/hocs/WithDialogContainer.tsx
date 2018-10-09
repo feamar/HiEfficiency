@@ -10,7 +10,7 @@ export interface WithDialogContainerProps
     removeDialog: (dialog: JSX.Element) => boolean;
 }
 
-interface HocState
+export interface WithDialogContainerState
 {   dialogs: Array<JSX.Element>;}
 
 interface HocProps
@@ -18,7 +18,7 @@ interface HocProps
 
 export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}, P>, P extends WithDialogContainerProps> (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, P>) =>
 {
-    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, {}, P, HocProps & P, HocState>
+    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, {}, P, HocProps & P, WithDialogContainerState>
     {
         constructor(props: HocProps & P)
         {

@@ -13,14 +13,14 @@ export default class DocumentStory
         return snapshot.data() as DocumentStory;
     }
 
-    static fromDocument(document: RNFirebase.firestore.DocumentReference)
-
     public createdOn: Date;
     public finishedOn?: Date;
     public startedOn?: Date;
     public name: string;
     public type: number;
     public upvotes: number;
+    public description?: string;
+    public points?: number;
 
     private constructor(name: string, type: number, createdOn: Date, upvotes: number = 0)
     {

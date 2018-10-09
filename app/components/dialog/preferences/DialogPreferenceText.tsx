@@ -8,7 +8,7 @@ import { Baseable, onBaseReference } from '../../../render_props/Baseable';
 
 export interface DialogPreferenceText_StorageValue
 {
-    text: string
+    text?: string
 }
 
 type StorageValue = DialogPreferenceText_StorageValue
@@ -51,7 +51,7 @@ export default class DialogPreferenceText extends React.Component<Props, State> 
 
     onValueValidation = (storageValue: StorageValue): string | undefined =>
     {
-        const illegal = UtilityValidate.getIllegalCharacters(storageValue.text, this.state.legalCharacters);
+        const illegal = UtilityValidate.getIllegalCharacters(storageValue.text || "", this.state.legalCharacters);
 
         if(illegal == undefined || illegal == "")
         {   return undefined;}

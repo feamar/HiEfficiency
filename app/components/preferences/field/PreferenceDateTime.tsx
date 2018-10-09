@@ -40,7 +40,12 @@ export default class PreferenceDateTime extends React.Component<Props, State> im
     }
 
     toDisplayValue = (storage: StorageValue) =>
-    {   return UtilityTime.dateToString(storage.timestamp, undefined);}
+    {   
+        if(storage.timestamp == undefined)
+        {   return "";}
+        
+        return UtilityTime.dateToString(storage.timestamp, undefined);
+    }
 
     render ()
     {

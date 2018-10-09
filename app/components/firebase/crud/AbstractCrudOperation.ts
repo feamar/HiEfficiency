@@ -1,7 +1,6 @@
 import {NetInfo} from 'react-native';
 import ReduxManager, { OnReduxStateChangedListener } from "../../../redux/ReduxManager";
 import AbstractReduxAction from '../../../redux/actions/AbstractReduxAction';
-import { OnDialogDismissListener, OnDialogCloseListener, OnDialogOpenListener } from '../../dialog/AbstractDialog';
 import { ConcreteDialogLoading } from '../../dialog/instances/DialogLoading';
 
 export const TIMEOUT_RESOLVE_NONE = 0;
@@ -25,6 +24,7 @@ interface Cancelable
 interface Timeoutable
 {   isTimedOut: () => boolean}
 
+export type OnCompleteListener = (successful: boolean) => void;
 export type Updatable = Messagable & Sectionable & Warnable & Cancelable & Timeoutable;
 
 export default abstract class AbstractCrudOperation
@@ -33,10 +33,7 @@ export default abstract class AbstractCrudOperation
     private state: "Unexecuted" | "Executed" | "Shown" | "Finished";
     private successful?: boolean;
     private readonly reduxListeners: Array<OnReduxStateChangedListener>;
-
-    public onDialogDismissListener?: OnDialogDismissListener;
-    public onDialogCloseListener?: OnDialogCloseListener;
-    public onDialogOpenListener?: OnDialogOpenListener;
+    public onCompleteListener?: OnCompleteListener;
 
     constructor(initialMessage: string)
     {
@@ -53,11 +50,6 @@ export default abstract class AbstractCrudOperation
         this.state = "Executed";
         dialog.setMessage(this.initialMessage);
         dialog.onTimeoutListeners.push(this.onDialogTimeout);
-
-        /*dialog.base.onDismissListeners.push(this.onDialogDismissed);
-        dialog.onCloseListeners.push(this.onDialogClosed);
-        dialog.onOpenListeners.push(this.onDialogOpened);*/
-        
 
         const isConnected = await NetInfo.isConnected.fetch();
         if(isConnected == false)
@@ -90,29 +82,6 @@ export default abstract class AbstractCrudOperation
                 break;
         }
     }
-
-    /*
-    public readonly onDialogDismissed = (dialog: DialogLoading) =>
-    {
-        //console.log("On Dialog Dismissed");
-        if(this.state != "Finished")
-        {   this.onRollback(dialog);}
-
-        if(this.onDialogDismissListener)
-        {   this.onDialogDismissListener(dialog);}
-    }
-
-    public readonly onDialogClosed = (dialog: DialogLoading) =>
-    {
-        if(this.onDialogCloseListener)
-        {   this.onDialogCloseListener(dialog);}
-    }
-
-    public readonly onDialogOpened = (dialog: DialogLoading) =>
-    {
-        if(this.onDialogOpenListener)
-        {   this.onDialogOpenListener(dialog);}
-    }*/
 
     protected abstract onRollback (updatable: Updatable) : void;
     protected abstract perform(updatable: Updatable) : void;
@@ -153,6 +122,9 @@ export default abstract class AbstractCrudOperation
 
         this.reduxListeners.forEach((listener: OnReduxStateChangedListener) => 
         {   ReduxManager.Instance.removeListener(listener)});
+
+        if(this.onCompleteListener)
+        {   this.onCompleteListener(true);}
     }
 
     protected onError = async (updatable: Updatable, message: string, error?: Error) =>
@@ -176,6 +148,9 @@ export default abstract class AbstractCrudOperation
         {   ReduxManager.Instance.removeListener(listener)});
 
         await this.onRollback(updatable);
+
+        if(this.onCompleteListener)
+        {   this.onCompleteListener(false);}
     }
 
     protected attemptRollback = <T> (attempt: number, maximum: number, closure: () => T) : T | undefined =>

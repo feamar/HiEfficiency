@@ -12,7 +12,7 @@ export type DialogPreferenceDateTime_DateTimeMode = "time" | "date" | "datetime"
 
 export interface DialogPreferenceDateTime_StorageValue
 {
-    timestamp: Date
+    timestamp?: Date
 }
 
 type StorageValue = DialogPreferenceDateTime_StorageValue;
@@ -64,7 +64,7 @@ export default class DialogPreferenceDateTime extends React.Component<Props, Sta
                     return <DateTimePicker datePickerModeAndroid="spinner" date={value.timestamp} onCancel={this.onTimePickerCancel} mode={this.props.mode} isVisible={false} onConfirm={this.onTimePickerConfirmed} />
                 
                 case "datetime-separate":
-                    return <InputDateTimeSeparate onSelected={this.onTimePickerConfirmed} timestamp={value.timestamp} />
+                    return <InputDateTimeSeparate onSelected={this.onTimePickerConfirmed} timestamp={value.timestamp || new Date()} />
             }
         }
 

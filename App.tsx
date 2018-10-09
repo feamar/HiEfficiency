@@ -117,7 +117,7 @@ export default class App extends React.Component<any, State>
         if(updates != undefined)
         {
           const crud = Database.updateUser(globalState.user!.document.id!, globalState.user!.document.data, updates);
-          const result = await execute(crud);
+          const result = await execute(crud, false);
   
           console.log("Successful: " + result.successful);
           if(result.successful == false)

@@ -51,7 +51,7 @@ export default class AbstractDialogPreference<StorageValue> extends React.Compon
         }
     }
 
-    onDialogSubmit = (storageValue: StorageValue) =>
+    onDialogSubmit = (storageValue: StorageValue | null) =>
     {
         if(this.mBase)
         {   this.mBase.onValueChanged(storageValue);}

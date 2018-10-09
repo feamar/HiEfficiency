@@ -38,7 +38,12 @@ export default class PreferenceText extends React.Component<Props, State> implem
     }
 
     toDisplayValue = (storage: StorageValue) =>
-    {   return storage.text;}
+    {
+        if(storage.text == undefined)
+        {   return "";}
+        
+        return storage.text;
+    }
 
     render ()
     {

@@ -32,7 +32,7 @@ export type InDialogResult =
     dialogOpened: boolean
 }
 
-export type InDialogExecutor = (crud: AbstractCrudOperation) => Promise<InDialogResult>;
+export type InDialogExecutor = (crud: AbstractCrudOperation, hasNextOperation: boolean) => Promise<InDialogResult>;
 
 export default class FirestoreFacade
 {
@@ -94,7 +94,7 @@ export default class FirestoreFacade
 
     inDialog = (addDialogCallback: (dialog: JSX.Element) => void, removeDialogCallback: (dialog: JSX.Element) => void, title: string, closure: (execute: InDialogExecutor) => void, showDelay: number = 3000) => 
     {
-        const execute = (dialog: ConcreteDialogLoading, hasNextOperation: boolean = false) => async (crud: AbstractCrudOperation): Promise<InDialogResult> =>
+        const execute = (dialog: ConcreteDialogLoading) => async (crud: AbstractCrudOperation, hasNextOperation: boolean = false): Promise<InDialogResult> =>
         {   
             var resolved: boolean = false;
             setTimeout(() => 
@@ -124,7 +124,7 @@ export default class FirestoreFacade
         {
             if(ref != undefined)
             {
-                const executor: InDialogExecutor = execute(ref);
+                const executor = execute(ref);
                 closure(executor);
             }
         }

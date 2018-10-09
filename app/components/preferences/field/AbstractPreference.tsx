@@ -28,7 +28,7 @@ export const AbstractPreferenceStyles = StyleSheet.create({
 
 export interface AbstractPreferencePropsVirtual<StorageValue>
 {
-    storageValue: StorageValue,
+    storageValue: StorageValue | null,
     title: string
     onValueChanged: (value: StorageValue) => void,
     onValueValidation?: (value: StorageValue) => string | undefined,
@@ -51,7 +51,7 @@ export interface AbstractPreferenceState<StorageValue>
 {
     required: boolean,
     title: string,
-    storageValue: StorageValue,
+    storageValue: StorageValue | null,
     displayValue: string,
     error?: string
 }
@@ -67,16 +67,16 @@ export default class AbstractPreference<StorageValue> extends Component<Props<St
             storageValue: props.storageValue,
             title: props.title,
             required: props.required || false,
-            displayValue: props.toDisplayValue(props.storageValue)
+            displayValue: props.storageValue == null ? "" : props.toDisplayValue(props.storageValue)
         }
     }  
 
     componentWillMount = () =>
     {   this.onValueChanged(this.state.storageValue);}
 
-    onValueChanged = (storage: StorageValue) =>
+    onValueChanged = (storage: StorageValue | null) =>
     {
-        const display = this.props.toDisplayValue(storage);
+        const display = storage == null ? "" : this.props.toDisplayValue(storage);
         this.setState({storageValue: storage, displayValue: display});
     }
 

@@ -1,11 +1,8 @@
 import React, {Component} from "react";
-import {View} from "react-native";
+import {View, StyleSheet} from "react-native";
 import Svg, {Path} from 'react-native-svg';
-import Router from "../routing/Router";
-import {Text} from "react-native-paper";
-import App from "../../../App";
 
-const styles = {
+const styles = StyleSheet.create({
     root:
     {
         backgroundColor: "#607d8b",
@@ -19,7 +16,7 @@ const styles = {
     {
 
     }
-}
+});
 
 export default class ScreenSplash extends Component
 {
@@ -27,7 +24,7 @@ export default class ScreenSplash extends Component
     {
         return(
             <View style={styles.root}>
-                <Svg x="0" y="0" width="600" height="600" viewBox="0 0 1024 1024">
+                <Svg width="600" height="600" viewBox="0 0 1024 1024">
                     <Path fill="#3C6E71" d="M26.543,427.799l-12.604-38.977c27.284-8.824,71.55-20.141,127.593-34.469
                         c149.22-38.151,374.725-95.804,474.449-159.522C713.338,132.623,767.06,13.506,802.607-65.316
                         c13.929-30.884,24.93-55.278,35.963-71.573l33.919,22.967c-9.059,13.378-19.939,37.507-32.541,65.446

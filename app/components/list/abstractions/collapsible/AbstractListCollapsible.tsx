@@ -1,19 +1,26 @@
 import React, {Component} from "react";
-import AbstractListItemCollapsible, { AbstractListItemCollapsiblePropsVirtual } from "./AbstractListItemCollapsible";
+import AbstractListItemCollapsible from "./AbstractListItemCollapsible";
 import { View, FlatList } from "react-native";
+import ActionOption from "../../../../dtos/options/ActionOption";
 
-export interface AbstractListCollapsiblePropsVirtual<SectionType>
+export interface AbstractListCollapsible_Props_Virtual<ModelType, SectionType>
 {
     sections: Array<SectionType>,
-    containerHasFab?: boolean,
+    containerHasFab?: boolean, 
+    onListItemCollapsed: (section: AbstractListItemCollapsible<ModelType>, open: boolean) => void,
+    onItemSelected?: (item: ModelType, index: number) => void,
+    onContextMenuItemSelected?: (item: ModelType, index: number, option: ActionOption) => void,
 }
 
-interface AbstractListCollapsiblePropsSealed<ModelType, SectionType>
+interface AbstractListCollapsible_Props_Sealed<ModelType, SectionType>
 {
     getListItemFor: (section: SectionType, item: ModelType, index: number) => JSX.Element,
 }
 
-type Props<ModelType, SectionType> = AbstractListCollapsiblePropsVirtual<SectionType> & AbstractListCollapsiblePropsSealed<ModelType, SectionType>;
+type Props<ModelType, SectionType> = AbstractListCollapsible_Props_Virtual<ModelType, SectionType> & AbstractListCollapsible_Props_Sealed<ModelType, SectionType> & 
+{
+   
+};
 
 interface State<SectionType>
 {    
@@ -21,7 +28,15 @@ interface State<SectionType>
     containerHasFab: boolean
 }
 
-export default class AbstractListCollapsible<ModelType, SectionType extends AbstractListItemCollapsiblePropsVirtual<ModelType>> extends Component<Props<ModelType, SectionType>, State<SectionType>>
+export type AbstractListCollapsible_SectionType <ModelType> = 
+{
+    items: Array<ModelType>,
+    open?: boolean,
+    dividers?: boolean,
+    title: string,
+}
+
+export default class AbstractListCollapsible<ModelType, SectionType extends AbstractListCollapsible_SectionType<ModelType>> extends Component<Props<ModelType, SectionType>, State<SectionType>>
 {
     constructor(props: Props<ModelType, SectionType>)
     {
@@ -37,7 +52,7 @@ export default class AbstractListCollapsible<ModelType, SectionType extends Abst
     getListSectionFor = (section: SectionType, _: number) => 
     {
         return (
-            <AbstractListItemCollapsible {...section} content={() => this.getListItemsForSection(section)} />
+            <AbstractListItemCollapsible {...this.props} {...section} content={() => this.getListItemsForSection(section)} />
         );
     } 
 

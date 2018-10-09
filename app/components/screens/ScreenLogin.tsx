@@ -1,20 +1,14 @@
 import React from "react";
-import { View, ToastAndroid} from "react-native";
-
-import {
-  Button,
-  Card,
-  TextInput,
-  Title,
-  Text
-} from 'react-native-paper';
+import { View, ToastAndroid, StyleSheet} from "react-native";
+import {Button,  Card, TextInput, Text} from 'react-native-paper';
 
 import {SCREEN_NAME_AUTH_REGISTER} from '../routing/Router';
-import WithDatabase from "../../hocs/WithDatabase";
+import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import Theme from '../../styles/Theme';
-import WithDialogContainer from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 
-const styles = {
+const styles = StyleSheet.create({
   wrapper: {
     width: "100%",
     height: "100%",
@@ -25,17 +19,16 @@ const styles = {
     marginLeft: 20,
     marginRight:20
   },
-
   input:{ 
     marginLeft: 5,
     marginRight: 5
   } ,
-  buttons:
-  { 
-    login:{
-        marginTop: 30
-    }, 
-    register:{}
+  button_login:{
+      marginTop: 30
+  }, 
+  button_register:
+  {
+
   },
   header:
   {
@@ -50,24 +43,37 @@ const styles = {
     fontSize: 25,   
     textAlign: "center" 
   }
-}; 
+}); 
 
-class ScreenLogin extends React.Component 
+type Props = WithDatabaseProps & WithDialogContainerProps & 
 {
-  constructor()
+  navigation: HiEfficiencyNavigator
+}
+
+type State = WithDialogContainerState & 
+{
+  email: string,
+  password: string
+}
+
+class ScreenLogin extends React.Component<Props, State>
+{
+  constructor(props: Props)
   {
-    super();
+    super(props);
     this.state =
     {
       email: '', 
       password: '',
+      dialogs: []
     }
   } 
 
-  handleInputChange = name => value =>
-  {
-    this.setState({[name]: value});
-  } 
+  onEmailChange = (value: string) =>
+  {   this.setState({email: value});}
+
+  onPasswordChange = (value: string) =>
+  {   this.setState({password: value});}
 
   handleLogin = () => 
   {
@@ -90,7 +96,7 @@ class ScreenLogin extends React.Component
       await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Loging In", async (execute) => 
       {   
         const crud = this.props.database.loginUser(this.state.email, this.state.password);
-        await execute(crud);
+        await execute(crud, false);
       }, 200);
     });
   }
@@ -109,12 +115,13 @@ class ScreenLogin extends React.Component
             <Text style={styles.title}>Login</Text>
           </View> 
           <Card.Content>  
-            <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.handleInputChange("email")} />
-            <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.handleInputChange("password")} />
-            <Button style={styles.buttons.login} dark mode="contained" onPress={this.handleLogin}>Login</Button>
-            <Button style={styles.buttons.register} flat primary onPress={this.handleRegister}>Register</Button>
+            <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.onEmailChange} />
+            <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.onPasswordChange} />
+            <Button style={styles.button_login} dark mode="contained" onPress={this.handleLogin}>Login</Button>
+            <Button style={styles.button_register} flat primary onPress={this.handleRegister}>Register</Button>
           </Card.Content>     
         </Card> 
+        {this.state.dialogs.map(dialog => dialog)}
       </View>     
     );
   }

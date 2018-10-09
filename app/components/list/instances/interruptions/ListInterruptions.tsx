@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import AbstractListCollapsible, { AbstractListCollapsiblePropsVirtual } from "../../abstractions/collapsible/AbstractListCollapsible";
-import { AbstractListItemCollapsiblePropsVirtual } from "../../abstractions/collapsible/AbstractListItemCollapsible";
+import AbstractListCollapsible, { AbstractListCollapsible_Props_Virtual } from "../../abstractions/collapsible/AbstractListCollapsible";
+import { AbstractListItemCollapsible_Props_Virtual } from "../../abstractions/collapsible/AbstractListItemCollapsible";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ModelFinish from "./models/ModelFinish";
 import ModelInterruption from "./models/ModelInterruption";
@@ -44,10 +44,10 @@ export const InterruptionListStyles = StyleSheet.create({
 
 
 
-type ModelType = ModelFinish | ModelInterruption | ModelStart | ModelProductive;
-type SectionType = AbstractListItemCollapsiblePropsVirtual<ModelType>;
+export type InterruptionModelType = ModelFinish | ModelInterruption | ModelStart | ModelProductive;
+type SectionType = AbstractListItemCollapsible_Props_Virtual<InterruptionModelType>;
 
-type Props = AbstractListCollapsiblePropsVirtual<SectionType> & 
+type Props = AbstractListCollapsible_Props_Virtual<InterruptionModelType, SectionType> & 
 {
 
 }
@@ -56,11 +56,11 @@ interface State
 {
 }
 
-export default class ListInterruptions extends Component<Props, State> implements Baseable<AbstractListCollapsible<ModelType, SectionType>>
+export default class ListInterruptions extends Component<Props, State> implements Baseable<AbstractListCollapsible<InterruptionModelType, SectionType>>
 {
-    private mBase?: AbstractListCollapsible<ModelType, SectionType>;
+    private mBase?: AbstractListCollapsible<InterruptionModelType, SectionType>;
 
-    getListItemFor = (section: SectionType, item: ModelType, index: number): JSX.Element =>
+    getListItemFor = (section: SectionType, item: InterruptionModelType, index: number): JSX.Element =>
     {
         if(this.isStart(item))
         {   return <ListItemStart {...this.createProps(section, item, index)} />;}
@@ -82,16 +82,16 @@ export default class ListInterruptions extends Component<Props, State> implement
         }
     } 
 
-    public isStart = (item: ModelType) : item is ModelStart =>
+    public isStart = (item: InterruptionModelType) : item is ModelStart =>
     {   return item.constructor == ModelStart;}
 
-    public isInterruption = (item: ModelType) : item is ModelInterruption =>
+    public isInterruption = (item: InterruptionModelType) : item is ModelInterruption =>
     {   return item.constructor == ModelInterruption;}
 
-    public isProductive = (item: ModelType) : item is ModelProductive =>
+    public isProductive = (item: InterruptionModelType) : item is ModelProductive =>
     {   return item.constructor == ModelProductive;}
 
-    public isFinish = (item: ModelType) : item is ModelFinish =>
+    public isFinish = (item: InterruptionModelType) : item is ModelFinish =>
     {   return item.constructor == ModelFinish;}
 
 
@@ -101,7 +101,7 @@ export default class ListInterruptions extends Component<Props, State> implement
     render()
     {
         return (
-            <AbstractListCollapsible<ModelType, SectionType> ref={onBaseReference(this)} {...this.props} getListItemFor={this.getListItemFor}/>
+            <AbstractListCollapsible<InterruptionModelType, SectionType> ref={onBaseReference(this)} {...this.props} getListItemFor={this.getListItemFor}/>
         );
     }
 }

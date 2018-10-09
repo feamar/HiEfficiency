@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     }
 });
  
-export interface AbstractListItemCollapsiblePropsVirtual<ModelType>
+export interface AbstractListItemCollapsible_Props_Virtual<ModelType>
 {
     items: Array<ModelType>,
     open?: boolean,
@@ -38,12 +38,12 @@ export interface AbstractListItemCollapsiblePropsVirtual<ModelType>
     onContextMenuItemSelected?: (item: ModelType, index: number, option: ActionOption) => void,
 }
 
-interface AbstractListItemCollapsiblePropsSealed<ModelType>
+interface AbstractListItemCollapsible_Props_Sealed<ModelType>
 {
     content: (items: Array<ModelType>) => Array<JSX.Element>
 }
 
-type Props<ModelType> = AbstractListItemCollapsiblePropsSealed<ModelType> & AbstractListItemCollapsiblePropsVirtual<ModelType>;
+type Props<ModelType> = AbstractListItemCollapsible_Props_Sealed<ModelType> & AbstractListItemCollapsible_Props_Virtual<ModelType>;
 
 interface State<ModelType>
 {

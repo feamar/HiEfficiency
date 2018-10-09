@@ -20,7 +20,8 @@ const styles = {
 };
 
 
-interface RequiredFunctions
+type RequiredFunctions = WithOverflowMenu_RequiredFunctions;
+export interface WithOverflowMenu_RequiredFunctions
 {
     shouldShowOverflowMenu: () => boolean
     getOverflowMenuItems: () => Array<MenuOptionProps & {key?: string}> | undefined

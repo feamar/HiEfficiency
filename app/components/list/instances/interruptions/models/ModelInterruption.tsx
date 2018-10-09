@@ -1,23 +1,26 @@
-import AbstractModel from "./AbstractModel";
 import Color from "../../../../../dtos/color/Color";
-import ListItemInterruption from "../../../../lists/instances/interruptions/ListItemInterruption";
+import InterruptionType from "../../../../../enums/InterruptionType";
+import AbstractInterruptionModel from "./AbstractInterruptionModel";
 
-export default class ModelInterruption extends AbstractModel
+export default class ModelInterruption extends AbstractInterruptionModel
 {
-    public timestamp: Date;
-    public duration: number;
+    static is = (obj: any): obj is ModelInterruption =>
+    {   return obj.constructor == ModelInterruption;}
+
     public title: string;
     public iconName: string;
     public iconColor: Color;
+    public index: number;
+    public type: InterruptionType;
 
-    constructor(timestamp: Date, duration: number, title: string, iconName: string, iconColor: Color)
+    constructor(timestamp: Date, duration: number | undefined, title: string, iconName: string, index: number, type: InterruptionType, iconColor: Color = Color.fromHexadecimal("#919191"))
     {   
-        super(ListItemInterruption);
-
+        super(timestamp, duration);
+        this.type = type;
         this.timestamp = timestamp;
-        this.duration = duration;
         this.title = title;
         this.iconName = iconName;
         this.iconColor = iconColor;
+        this.index = index;
     }
 }

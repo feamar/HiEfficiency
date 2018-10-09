@@ -4,7 +4,7 @@ import { ToastAndroid, View } from "react-native";
 import {STACK_NAME_TEAMS} from '../routing/Router';
 import UtilityObject from '../../utilities/UtilityObject';
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import WithDialogContainer, { WithDialogContainerProps } from '../../hocs/WithDialogContainer';
+import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from '../../hocs/WithDialogContainer';
 import update, { Spec } from '../../../node_modules/immutability-helper';
 import WithBackButtonInterceptor, { WithBackButtonInterceptorProps } from '../../hocs/WithBackButtonInterceptor';
 import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
@@ -25,11 +25,12 @@ const styles = {
   content: {padding: 0, height: "100%"}
 }
 
-interface State 
+type State = WithDialogContainerState & 
 {
     user: ReduxUser,
     newData: Spec<DocumentUser, never>,
-    fabEnabled: boolean
+    fabEnabled: boolean,
+    
 }
 
 type Props = WithDatabaseProps & WithDialogContainerProps & WithBackButtonInterceptorProps & WithLoadingProps & 
@@ -70,6 +71,7 @@ class ScreenProfile extends React.Component<Props, State>
       user: user,
       newData: {weekSchema: {$set: weekSchema}},
       fabEnabled: true,
+      dialogs: []
     }
 
     this.props.setLoading(false);
@@ -104,7 +106,7 @@ class ScreenProfile extends React.Component<Props, State>
     await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Profile", async (execute) => 
     {
         const update: UserUpdate = this.props.database.updateUser(this.state.user.document.id!, this.state.user.document.data, this.state.newData);
-        const result = await execute(update);
+        const result = await execute(update, false);
 
         console.log("RESULT: " + UtilityObject.stringify(result));
         if(result.successful && result.dialogOpened == false)
@@ -161,6 +163,7 @@ class ScreenProfile extends React.Component<Props, State>
         </View>
         <InputFloatingActionButton enabled={this.state.fabEnabled} icon="save" onPress={this.onFabPress}  />
         <DialogConfirmation concreteRef={i => this.dialogConfirmation = i} title="Unsaved Changes" onActionClickListener={this.onDialogConfirmed} textPositive="Discard" message="There are unsaved changes to the profile. Are you sure you want to go back and discard your unsaved changes?"  />
+        {this.state.dialogs.map(dialog => dialog)}
       </View>
     ); 
   }
