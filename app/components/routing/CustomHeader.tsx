@@ -1,7 +1,6 @@
 import React from "react";
 import {View, StyleSheet, ViewStyle} from "react-native";
 import {Text} from "react-native-paper";
-import { PARAM_NAME_SUBTITLE } from "./Router";
 import Theme from "../../styles/Theme";
 
 const styles = StyleSheet.create({
@@ -60,8 +59,6 @@ export default class CustomHeader extends React.Component<Props, State>
             title: this.props.title,
             subtitle: this.props.subtitle
         }
-
-        console.log("CustomHeaderConstructor: " + props[PARAM_NAME_SUBTITLE]);
     }
 
     getMidStyles = () => 
@@ -82,7 +79,6 @@ export default class CustomHeader extends React.Component<Props, State>
 
     componentWillReceiveProps(props: Props) 
     {   
-        console.log("componentWillReceiveProps: " + props.subtitle);
         this.setState({left: props.left, right: props.right, title: props.title, subtitle: props.subtitle});
     }
 

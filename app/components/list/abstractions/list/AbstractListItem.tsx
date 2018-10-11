@@ -5,6 +5,7 @@ import {TouchableRipple} from "react-native-paper"
 import { Divider } from "react-native-paper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 import ActionOption from "../../../../dtos/options/ActionOption";
+import update from "immutability-helper";
 
 const styles = StyleSheet.create({
     listItem:{ 
@@ -55,8 +56,8 @@ interface State<ModelType>
 
 export default class AbstractListItem<ModelType> extends Component<Props<ModelType>, State<ModelType>>
 {
-    private isMounted: boolean = false;
     private menu: any | null = null;
+    private isMounted: boolean = false;
 
     constructor(props: Props<ModelType>)
     {
@@ -69,8 +70,17 @@ export default class AbstractListItem<ModelType> extends Component<Props<ModelTy
         }
     }
 
+    componentDidMount = () =>
+    {   this.isMounted = true;}
+
+    componentWillUnmount = () =>
+    {   this.isMounted = false;}
+
     componentWillReceiveProps = (props: Props<ModelType>) =>
     {   
+        if(this.isMounted == false)
+        {   return;}
+
         if(props.item != undefined)
         {   this.setState({item: props.item});}
 
@@ -96,25 +106,19 @@ export default class AbstractListItem<ModelType> extends Component<Props<ModelTy
         {   this.props.onContextMenuItemSelected(this.state.item, this.state.index, action);}
     }
 
-    addContextMenuItem = (action: ActionOption) =>
+    addContextMenuItem = (action: ActionOption): Promise<boolean> =>
     {
-        var actions = this.state.actions;
-        actions.push(action);
-
-        if(this.isMounted)
-        {   this.setState({actions: actions});}
+        var newActions: Array<ActionOption>;
+        const found = this.state.actions.find(e => e.id == action.id);
+        if(found != undefined)
+        {
+            const index = this.state.actions.indexOf(found);
+            newActions = update(this.state.actions, {$splice: [[index, 1, action]]});
+        }
         else
-        {   this.state = {...this.state, actions};}
-    }
+        {   newActions = update(this.state.actions, {$push: [action]});}
 
-    componentWillMount = () =>
-    {
-        this.isMounted = true;
-    }
-
-    componentWillUnmount = () =>
-    {
-        this.isMounted = false;
+        return new Promise(resolve => this.setState({actions: newActions}, resolve));
     }
 
     hasContextMenuItems = () => 
@@ -141,7 +145,6 @@ export default class AbstractListItem<ModelType> extends Component<Props<ModelTy
                                 </MenuOptions>
                             </Menu>
                         }
-                        
                     </View>
                 </TouchableRipple>
                 <Divider />  

@@ -1,18 +1,26 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import FirebaseManager from '../FirebaseManager';
+import ActionUserLoggedIn from "../../../redux/actions/user/ActionUserLoggedIn";
+import  { RNFirebase } from "react-native-firebase";
+import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
+import DocumentUser from "../../../dtos/firebase/firestore/documents/DocumentUser";
+import UtilityObject from "../../../utilities/UtilityObject";
+import Migration_2018_10_11_WeekSchema from "../../../migrations/Migration_2018_10_11_WeekSchema";
 
 export default class UserLogin extends AbstractCrudOperation
 {
     private readonly email: string;
     private readonly password: string;
+    private readonly dispatch: (action: ActionUserLoggedIn) => ActionUserLoggedIn;
 
-    constructor(email: string, password: string)
+    constructor(email: string, password: string, dispatch: (action: ActionUserLoggedIn) => ActionUserLoggedIn)
     {
         super("Please be patient while we try to login..");
 
         this.email = email;
         this.password = password;
+        this.dispatch = dispatch;
     }
 
     onRollback = async (_: Updatable) =>
@@ -30,11 +38,20 @@ export default class UserLogin extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
+
+
         try 
         {
             const auth = FirebaseAdapter.getAuth();
-            await auth.signInAndRetrieveDataWithEmailAndPassword(this.email, this.password);
+            const credentials: RNFirebase.UserCredential = await auth.signInAndRetrieveDataWithEmailAndPassword(this.email, this.password);
+            await new Migration_2018_10_11_WeekSchema(credentials.user.uid).perform();
+
+            const snapshot = await FirebaseAdapter.getUsers().doc(credentials.user.uid).get();
+            const document = DocumentUser.fromSnapshot(snapshot);
+
+            console.log("UserLogin - Document: " + UtilityObject.stringify(document!));
             this.onSuccess(updatable, "You have successfully logged in.");
+            this.dispatch(new ActionUserLoggedIn(new AbstractFirestoreDocument<DocumentUser>(document!, credentials.user.uid)));
         }
         catch(error)
         {  

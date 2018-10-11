@@ -35,7 +35,7 @@ type DialogConfirmationPropsAndInjected = WithActionPropsInner<DialogConfirmatio
 
 export class ConcreteDialogConfirmation extends React.Component<DialogConfirmationPropsAndInjected, State> implements Baseable<AbstractDialog>
 {
-    private mBase: AbstractDialog | undefined;
+    public base: AbstractDialog | undefined;
     constructor(props: DialogConfirmationPropsAndInjected)
     {
         super(props);
@@ -47,20 +47,24 @@ export class ConcreteDialogConfirmation extends React.Component<DialogConfirmati
         }
     }
 
-    get base () : AbstractDialog | undefined 
-    {   return this.mBase;}
-
     getDialogContent =() =>
     {
         return <Text style={styles.message}>{this.state.message}</Text>
+    }
+
+    onActionClicked = (action: DialogConfirmationActionUnion) => 
+    {
+        this.props.onActionClicked(action);
+        if(this.base)
+        {   this.base.setVisible(false);}
     }
 
     getDialogActions = () =>
     {
         return (
             <Dialog.Actions>
-                <Button color={Theme.colors.primary} onPress={this.props.onActionClicked("Negative")}>{this.state.textNegative}</Button> 
-                <Button color={Theme.colors.primary} onPress={this.props.onActionClicked("Positive")}>{this.state.textPositive}</Button>
+                <Button color={Theme.colors.primary} onPress={() => this.onActionClicked("Negative") }>{this.state.textNegative}</Button> 
+                <Button color={Theme.colors.primary} onPress={() => this.onActionClicked("Positive")}>{this.state.textPositive}</Button>
             </Dialog.Actions>
         );
     }
@@ -82,8 +86,8 @@ export class ConcreteDialogConfirmation extends React.Component<DialogConfirmati
         return (
             <AbstractDialog 
                 ref={onBaseReference(this)}
-                content={this.getDialogContent()} 
-                actions={this.getDialogActions()} 
+                content={this.getDialogContent} 
+                actions={this.getDialogActions} 
                 {...this.props} />
         );
     }

@@ -15,7 +15,7 @@ type HocProps<B, P> = WithDatabaseProps & P & ConcreteRef<B>
 
 export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}, P>, P extends WithDatabaseProps> (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, P>) =>
 {
-    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, {}, P, HocProps<B, P>>
+    const hoc = class WithDatabase extends AbstractHigherOrderComponent<B, C, {}, P, HocProps<B, P>>
     {
         static contextTypes = 
         {   database: PropTypes.object.isRequired}

@@ -22,7 +22,7 @@ interface State
 
 export default class ListItemInterruption extends Component<Props, State> implements Baseable<AbstractListItem<ModelInterruption>>
 {
-    private mBase?: AbstractListItem<ModelInterruption>;
+    public base: AbstractListItem<ModelInterruption> | undefined;
 
     constructor(props: Props, _?: any)
     {
@@ -34,13 +34,10 @@ export default class ListItemInterruption extends Component<Props, State> implem
         }
     }
 
-    public get base ()
-    {   return this.mBase;}
-
-    onBaseReference = (reference?: AbstractListItem<ModelInterruption>) =>
+    onBaseReference = async (reference?: AbstractListItem<ModelInterruption>) =>
     {
         if(reference)
-        {   reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
+        {   await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
     }
 
 

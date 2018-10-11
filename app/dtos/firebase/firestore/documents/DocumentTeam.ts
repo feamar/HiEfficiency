@@ -5,6 +5,9 @@ export default class DocumentTeam
     static create(code: string, name: string, dateOfFirstSprint?: Date)
     {   return new DocumentTeam(code, name, dateOfFirstSprint);}
 
+    static empty()
+    {   return new DocumentTeam("" , "");}
+
     static fromSnapshot(snapshot: RNFirebase.firestore.DocumentSnapshot) : DocumentTeam | undefined
     {
         if(snapshot.exists == false)

@@ -1,7 +1,7 @@
 import {NetInfo} from 'react-native';
 import ReduxManager, { OnReduxStateChangedListener } from "../../../redux/ReduxManager";
-import AbstractReduxAction from '../../../redux/actions/AbstractReduxAction';
 import { ConcreteDialogLoading } from '../../dialog/instances/DialogLoading';
+import { AnyAction } from 'redux';
 
 export const TIMEOUT_RESOLVE_NONE = 0;
 export const TIMEOUT_RESOLVE_ROLL_BACK = 1;
@@ -91,7 +91,7 @@ export default abstract class AbstractCrudOperation
         return new Promise<T>(async (resolve, _) => 
         {
             var result: T;
-            const listener: OnReduxStateChangedListener = (action: AbstractReduxAction): void =>
+            const listener: OnReduxStateChangedListener = (action: AnyAction): void =>
             {
                 if(action.type == expectedReduxAction)
                 {

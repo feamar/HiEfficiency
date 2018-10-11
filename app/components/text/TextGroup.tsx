@@ -32,6 +32,12 @@ export default class TextGroup extends Component<Props, State>
         }
     }
 
+    componentWillReceiveProps = (props: Props) =>
+    {
+        if(props.title != this.props.title)
+        {   this.setState({title: props.title});}
+    }
+
     render() {
         return (
             <View>

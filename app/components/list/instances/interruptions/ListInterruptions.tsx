@@ -57,7 +57,7 @@ interface State
 
 export default class ListInterruptions extends Component<Props, State> implements Baseable<AbstractListCollapsible<InterruptionModelType, SectionType>>
 {
-    private mBase?: AbstractListCollapsible<InterruptionModelType, SectionType>;
+    public base: AbstractListCollapsible<InterruptionModelType, SectionType> | undefined;
 
     getListItemFor = (_section: SectionType, item: InterruptionModelType, index: number): JSX.Element =>
     {
@@ -93,9 +93,6 @@ export default class ListInterruptions extends Component<Props, State> implement
     public isFinish = (item: InterruptionModelType) : item is ModelFinish =>
     {   return item.constructor == ModelFinish;}
 
-
-    public get base ()
-    {   return this.mBase;}
 
     render()
     {

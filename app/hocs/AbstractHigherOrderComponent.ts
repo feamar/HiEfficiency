@@ -17,7 +17,7 @@ export interface ConcreteComponent<P = {}> extends React.Component<Partial<P>>
 export interface HigherComponent<B, C extends ConcreteOrHigher<B, C, F, P>, F, P> extends AbstractHigherOrderComponent<B, C, F, P>//React.Component<Partial<P>>
 {
     wrapped?: ConcreteOrHigher<B, C, F, P>
-    forEachWrappedComponent: (closure: (component: ConcreteOrHigher<B, C, F, P>) => void) => boolean;
+    forEachWrappedComponent: <ResultType> (closure: (component: ConcreteOrHigher<B, C, F, P>) => ResultType) => Array<ResultType>;
 }
 
 export interface ConcreteRef<B>
@@ -31,7 +31,11 @@ export interface ConcreteRef<B>
 //HS: HOC State Type
 export default class AbstractHigherOrderComponent<B, C extends ConcreteOrHigher<B, C, F, P>, F, P, HP = {}, HS = {}> extends React.Component<HP & ConcreteRef<B>, HS>
 {
-    wrapped?: ConcreteOrHigher<B, C, F, P>;
+    public wrapped?: ConcreteOrHigher<B, C, F, P>;
+    protected mounted: boolean = false;
+    protected onComponentDidMount?: () => any;
+    protected onComponentWillMount?: () => any;
+    protected onComponentWillUnmount?: () => any;
 
     protected onReference = (ref: ConcreteOrHigher<B, C, F, P> | null) =>
     {
@@ -66,20 +70,40 @@ export default class AbstractHigherOrderComponent<B, C extends ConcreteOrHigher<
     protected isConcrete(obj: any) : obj is B
     {   return this.isHigherOrderComponent(obj) == false;}
 
-    public forEachWrappedComponent = (closure: (component: ConcreteOrHigher<B, C, F, P>) => void): boolean => 
+    public forEachWrappedComponent = <ResultType> (closure: (component: ConcreteOrHigher<B, C, F, P>) => ResultType): Array<ResultType> => 
     {
         if(this.wrapped == undefined)
-        {   return false;}
+        {   return [];}
 
-        if(this.isHigherOrderComponent(this.wrapped))
+        var result: Array<ResultType> = [];
+        if(this.wrapped instanceof AbstractHigherOrderComponent)
         {   
-            closure(this.wrapped);
-            this.wrapped.forEachWrappedComponent(closure);
+            result.push(closure(this.wrapped));
+            result = result.concat(this.wrapped.forEachWrappedComponent(closure));
         }
+        else
+        {   result.push(closure(this.wrapped));}
 
-        if(this.isConcrete(this.wrapped))
-        {   closure(this.wrapped);}
+        return result;
+    }
 
-        return true;
+    componentWillMount = () =>
+    {
+        if(this.onComponentWillMount)
+        {   this.onComponentWillMount();}
+    }
+
+    componentDidMount = () =>
+    {
+        this.mounted = true;
+        if(this.onComponentDidMount)
+        {   this.onComponentDidMount();}
+    }
+
+    componentWillUnmount = () =>
+    {
+        this.mounted = false;
+        if(this.onComponentWillUnmount)
+        {   this.onComponentWillUnmount();}
     }
 }

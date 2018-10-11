@@ -36,7 +36,7 @@ interface State
 
 export default class DialogMultiSelect extends React.Component<Props, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
-    private _base: AbstractPreferenceDialog<StorageValue> | undefined;
+    public base: AbstractPreferenceDialog<StorageValue> | undefined;
 
     constructor(props: Props)
      {
@@ -47,9 +47,6 @@ export default class DialogMultiSelect extends React.Component<Props, State> imp
             options: this.props.options,
         }
     }
-
-    get base () 
-    {   return this._base;}
 
     onCheckboxPress = (index: number) => () => 
     {
@@ -72,12 +69,12 @@ export default class DialogMultiSelect extends React.Component<Props, State> imp
         {   return null;}
 
         //Check whether the current value array contains the current index.
-        var checked = sv.selected == item;
+        var status: "checked" | "unchecked" = sv.selected == item ? "checked" : "unchecked";
 
         return (
             <View style={styles.item} key={index}>
                 <Text style={styles.title}>{item}</Text>
-                <Checkbox style={styles.checkbox} checked={checked} onPress={this.onCheckboxPress(index)} />
+                <Checkbox status={status} onPress={this.onCheckboxPress(index)} />
             </View>
         );
     }

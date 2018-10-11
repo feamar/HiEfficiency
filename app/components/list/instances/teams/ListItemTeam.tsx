@@ -28,28 +28,25 @@ interface State
 
 export default class ListItemTeam extends React.Component<Props, State> implements Baseable<AbstractListItem<ReduxTeam>>
 {
-    private mBase: AbstractListItem<ReduxTeam> | undefined;
+    public base: AbstractListItem<ReduxTeam> | undefined;
 
     constructor(props: Props)
     {   super(props);}
 
-    get base()
-    {   return this.mBase;}
-    
     getItemContent = (item: ReduxTeam) => 
     {
         return <Text style={styles.teamName}>{item.document.data.name}</Text>
     }
 
-    onBaseReference = (reference?: AbstractListItem<ReduxTeam>) =>
+    onBaseReference = async (reference?: AbstractListItem<ReduxTeam>) =>
     {
-        if(reference)
+        if(reference != undefined)
         {
-            reference.addContextMenuItem(new ActionOption(ActionType.LEAVE, "Leave"));
-            reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));
+            await reference.addContextMenuItem(new ActionOption(ActionType.LEAVE, "Leave"));
+            await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));
 
             if(__DEV__)
-            {   reference.addContextMenuItem(new ActionOption(ActionType.DELETE, "(Development) Delete"));}
+            {   await reference.addContextMenuItem(new ActionOption(ActionType.DELETE, "(Development) Delete"));}
         }
     }
 

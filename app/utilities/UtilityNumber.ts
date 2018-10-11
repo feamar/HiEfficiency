@@ -4,13 +4,14 @@ export default class UtilityNumber
     {
         if(padding == undefined)
         {   padding = "0";}
-
-        const desiredLength: number = Math.pow(10, amount - 1);
         const stringValue: string = value.toString();
 
-        const difference: number = desiredLength - stringValue.length;
+        const difference: number = amount - stringValue.length;
         if(difference > 0 )
-        {   return new Array(difference).join(padding) + stringValue;}
+        {   
+            const prefix = new Array(difference).join(padding) + padding;
+            return prefix + stringValue;
+        }
         else
         {   return stringValue;}
     }

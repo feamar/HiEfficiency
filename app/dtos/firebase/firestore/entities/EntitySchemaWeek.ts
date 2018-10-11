@@ -3,6 +3,9 @@ import UtilityType from "../../../../utilities/UtilityType";
 
 export default class EntitySchemaWeek
 {
+    static fromJsonObject(json: any) : EntitySchemaWeek
+    {   return new EntitySchemaWeek(EntitySchemaDay.fromJsonObject(json.monday), EntitySchemaDay.fromJsonObject(json.tuesday), EntitySchemaDay.fromJsonObject(json.wednesday), EntitySchemaDay.fromJsonObject(json.thursday), EntitySchemaDay.fromJsonObject(json.friday), EntitySchemaDay.fromJsonObject(json.saturday), EntitySchemaDay.fromJsonObject(json.sunday));}
+
     static fromArray(schema: Array<EntitySchemaDay>) : EntitySchemaWeek
     {   return new EntitySchemaWeek(schema[0], schema[1], schema[2], schema[3], schema[4], schema[5], schema[6]);}
 

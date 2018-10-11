@@ -6,7 +6,7 @@ import WithBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
 import { SCREEN_NAME_STORY_DETAILS_INFO } from "../routing/Router";
 import update from "immutability-helper";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDialogContainer";
 import UtilityUpdate from "../../utilities/UtilityUpdate";
 import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
 import { ReduxState } from "../../redux/ReduxState";
@@ -39,7 +39,7 @@ type Props = ReduxStateProps & WithDatabaseProps & WithDialogContainerProps &
     navigation: HiEfficiencyNavigator
 }
 
-type State = WithDialogContainerState & 
+type State =  
 {
     story: AbstractFirestoreDocument<DocumentStory>,
     fabEnabled: boolean
@@ -110,7 +110,6 @@ class ScreenStoryCreate extends Component<Props, State>
         {
             story: story,
             fabEnabled: true,
-            dialogs: []
         }
     }
 
@@ -193,7 +192,7 @@ class ScreenStoryCreate extends Component<Props, State>
         switch(this.mode)
         { 
             case "Create":
-                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
+                await this.props.database.inDialog("dialog-creating-story", this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
                 {
                     const crud = this.props.database.createStory(teamId!, this.state.story.data);
                     crud.onCompleteListener = (successful: boolean) => 
@@ -210,7 +209,7 @@ class ScreenStoryCreate extends Component<Props, State>
                 const old: AbstractFirestoreDocument<DocumentStory> = this.props.navigation.getParam("story");
                 const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story);
                 
-                await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
+                await this.props.database.inDialog("dialog-updating-story", this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
                 {
                     const update = this.props.database.updateStory(teamId!, old.id!, old.data, updates);
                     const result = await execute(update, false);
@@ -267,9 +266,8 @@ class ScreenStoryCreate extends Component<Props, State>
                         <PreferenceText label="Story Points" ref={c => this.fields.points = c} plural={true} title="Story Points" storageValue={{text: storyPoints}} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
                     </PreferenceCategory>
                 </ScrollView>
-                <InputFloatingActionButton icon="save" open={false} onPress={this.onFabPress} actions={[]} enabled={this.state.fabEnabled}/>
+                <InputFloatingActionButton icon="save" onPress={this.onFabPress} enabled={this.state.fabEnabled}/>
                 <DialogConfirmation concreteRef={i => this.confirmationDialog = i} message="There are unsaved changes to the user story. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onActionClickListener={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />
-                {this.state.dialogs.map(dialog => dialog)}
             </View> 
         );
     }

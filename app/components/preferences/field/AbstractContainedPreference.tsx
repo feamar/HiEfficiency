@@ -1,10 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
 import { Text } from 'react-native-paper';
-import AbstractPreference, { AbstractPreferencePropsVirtual, AbstractPreferenceState, AbstractPreferenceStyles } from "./AbstractPreference";
+import AbstractPreference, { AbstractPreference_Props_Virtual, AbstractPreferenceState, AbstractPreferenceStyles } from "./AbstractPreference";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
 
-export type AbstractContainedPreference_Props_Virtual<StorageValue> = AbstractPreferencePropsVirtual<StorageValue> & 
+export type AbstractContainedPreference_Props_Virtual<StorageValue> = AbstractPreference_Props_Virtual<StorageValue> & 
 {
 
 }
@@ -24,15 +24,12 @@ interface State
 
 export default class AbstractContainedPreference<StorageValue> extends React.Component<Props<StorageValue>, State> implements Baseable<AbstractPreference<StorageValue>>
 {
-    private mBase?: AbstractPreference<StorageValue>;
+    public base: AbstractPreference<StorageValue> | undefined;
 
     constructor(props: Props<StorageValue>)
     {
         super(props);
     }
-
-    public get base ()
-    {   return this.mBase;}
 
     getDisplayContent = (state: AbstractPreferenceState<StorageValue>) =>
     {  

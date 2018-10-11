@@ -1,9 +1,8 @@
-export interface Baseable<BaseType>
+export interface Baseable<BaseType> 
 {
-    base: BaseType | undefined,
-    onBaseReference?: (reference?: BaseType) => void
+    base: BaseType | undefined
+    onBaseReference?: (reference?: BaseType) => void,
 }
-
 
 export const onBaseReference = <BaseType extends {}> (child: Baseable<BaseType>) => (reference: BaseType | null): void =>
 {
@@ -13,5 +12,5 @@ export const onBaseReference = <BaseType extends {}> (child: Baseable<BaseType>)
     {   child.base = reference;}
 
     if(child.onBaseReference)
-    {   child.onBaseReference(child.base);}
+    {   child.onBaseReference(reference == null ? undefined : reference);}
 }

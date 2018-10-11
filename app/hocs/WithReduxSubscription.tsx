@@ -3,6 +3,8 @@ import AbstractHigherOrderComponent, { ConcreteComponent, ConcreteOrHigher, Conc
 import { ReduxState } from "../redux/ReduxState";
 import WithStaticFields from "./WithStaticFields";
 import { Store, Unsubscribe, Dispatch } from "redux";
+import UtilityObject from "../utilities/UtilityObject";
+import PropTypes from "prop-types";
 
 type MapStateToProps<Result extends {}> = (state: ReduxState) => Result;
 type MapDispatchToProps<Result extends {}> = (dispatch: Dispatch) => Result;
@@ -15,8 +17,12 @@ export default
     (mapStateToProps?: MapStateToProps<SP>, mapDispatchToProps?: MapDispatchToProps<DP>) => 
     (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, P>) =>
 {
-    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, {}, P>
+    const hoc = class WithReduxSubscription extends AbstractHigherOrderComponent<B, C, {}, P>
     {
+        static contextTypes = {
+            store: PropTypes.object.isRequired
+        }
+
         private store: Store<ReduxState>;
         private unsubscriber?: Unsubscribe;
 
@@ -25,6 +31,7 @@ export default
             super(props);
 
             this.store = context.store;
+            console.log("Store: " + UtilityObject.stringify(this.store));
         }
 
         componentWillMount = () =>

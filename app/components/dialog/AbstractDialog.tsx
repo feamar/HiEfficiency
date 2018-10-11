@@ -22,8 +22,8 @@ interface AbstractDialog_Props_Sealed
 {
     visible?: boolean,
     title: string,
-    content: JSX.Element,
-    actions?: JSX.Element
+    content: () => JSX.Element,
+    actions?: () => JSX.Element
 }
 
 export interface AbstractDialog_Props_Virtual
@@ -42,8 +42,8 @@ export interface AbstractDialogState
 {
     visible: boolean,
     title: string,
-    content: JSX.Element,
-    actions?: JSX.Element
+    content: () => JSX.Element,
+    actions?: () => JSX.Element
 }
 
 export default class AbstractDialog extends Component<Props, AbstractDialogState>
@@ -79,6 +79,21 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
 
         if(this.props.visible === true)
         {   this.onOpen();}
+    }
+
+    componentWillReceiveProps = (props: Props) =>
+    {
+        if(props.visible != this.props.visible)
+        {   this.setState({visible: props.visible || this.state.visible});}
+
+        if(props.title != this.props.title)
+        {   this.setState({title: props.title});}
+
+        if(props.content != this.props.content)
+        {   this.setState({content: props.content});}
+
+        if(props.actions != this.props.actions)
+        {   this.setState({actions: props.actions});}
     }
 
     onOpen = (): void =>
@@ -127,10 +142,10 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
                         <Text style={styles.title}>{this.state.title}</Text>
                         <View  style={styles.content}>
                             <ScrollView>
-                                {   this.state.content}
+                                {   this.state.content()}
                             </ScrollView> 
                         </View>
-                        {   this.state.actions && this.state.actions}
+                        {   this.state.actions && this.state.actions()}
                     </Dialog>
                 </Portal>
             </View>

@@ -13,12 +13,15 @@ export default class DocumentInterruptions
         if(snapshot.exists == false)
         {   return undefined;}
 
-        return snapshot.data() as DocumentInterruptions;
+        const document: DocumentInterruptions =  snapshot.data() as DocumentInterruptions;
+        document.interruptions = document.interruptions.map(interruption => EntityInterruption.fromJsonObject(interruption));
+
+        return document;
     }
 
-    static fromReduxInterruptions = (reduxInterruptions: Map<string, ReduxInterruptions>, userId: string): DocumentInterruptions =>
+    static fromReduxInterruptions = (reduxInterruptions: {[id: string]: ReduxInterruptions}, userId: string): DocumentInterruptions =>
     {
-        const ofUser = reduxInterruptions.get(userId);
+        const ofUser = reduxInterruptions[userId];
         if(ofUser == undefined)
         {   return DocumentInterruptions.create();}
 

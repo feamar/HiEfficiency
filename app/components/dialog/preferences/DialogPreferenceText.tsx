@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import AbstractPreferenceDialog, { AbstractPreferenceDialog_Props_Virtual } from './AbstractPreferenceDialog';
 import InputError from '../../inputs/InputError';
@@ -26,13 +26,13 @@ interface State
     label: string,
     legalCharacters: string,
     multiline: boolean,
-    numberOfLines: number
+    numberOfLines: number,
 }
 
 
 export default class DialogPreferenceText extends React.Component<Props, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
-    private _base: AbstractPreferenceDialog<StorageValue> | undefined;
+    public base: AbstractPreferenceDialog<StorageValue> | undefined;
 
     constructor(props: Props)
     {
@@ -42,12 +42,9 @@ export default class DialogPreferenceText extends React.Component<Props, State> 
             label: props.label,
             legalCharacters: props.legalCharacters || UtilityValidate.DEFAULT_LEGAL_CHARACTERS,
             multiline: props.multiline || false,
-            numberOfLines: props.numberOfLines || 1
+            numberOfLines: props.numberOfLines || 1,
         }
     }
-
-    get base ()
-    {   return this._base;}
 
     onValueValidation = (storageValue: StorageValue): string | undefined =>
     {
@@ -67,20 +64,17 @@ export default class DialogPreferenceText extends React.Component<Props, State> 
 
     getErrorComponent = () =>
     {
-        if(this._base == undefined)
+        if(this.base == undefined)
         {   return null;}
 
-        return <InputError error={this._base.getCurrentError()} />
+        return <InputError error={this.base.getCurrentError()} />
     }
 
-    getDialogContent = () => 
+    getDialogContent = (storageValue: StorageValue) => 
     {
-        const value = this.base ? this.base.getCurrentStorageValue() : this.props.storageValue;
-        const text = value == null ? "" : value.text;
-
         return ( 
             <View style={{marginLeft: 25, marginRight: 25}}>
-                <TextInput style={{flex: 1}} autoFocus={true} name="value" label={this.state.label} value={text} onChangeText={this.onTextChanged} multiline={this.state.multiline} numberOfLines={this.state.numberOfLines} />
+                <TextInput autoFocus={true} label={this.state.label} value={storageValue.text} onChangeText={this.onTextChanged} multiline={this.state.multiline} numberOfLines={this.state.numberOfLines}/>
                 {this.getErrorComponent()}
             </View>
         );

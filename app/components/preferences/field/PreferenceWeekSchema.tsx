@@ -4,6 +4,7 @@ import DialogPreferenceWeekSchema from '../../dialog/preferences/DialogPreferenc
 import EntitySchemaWeek from '../../../dtos/firebase/firestore/entities/EntitySchemaWeek';
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
 import AbstractPreferenceDialog, { AbstractPreferenceDialog_Props_Virtual } from '../../dialog/preferences/AbstractPreferenceDialog';
+import UtilityObject from '../../../utilities/UtilityObject';
 
 type Props = AbstractDialogPreference_Props_Virtual<EntitySchemaWeek> & 
 {
@@ -17,15 +18,16 @@ type State =
 
 export default class PreferenceWeekSchema extends React.Component<Props, State> implements Baseable<AbstractDialogPreference<EntitySchemaWeek>>
 {
-    private mBase?: AbstractDialogPreference<EntitySchemaWeek>;
-    public get base()
-    {   return this.mBase;}
+    public base: AbstractDialogPreference<EntitySchemaWeek> | undefined;
 
     constructor(props: Props)
     {   super(props);}
 
     toDisplayValue = (storageValue: EntitySchemaWeek) =>
-    {   return "A " + storageValue.getTotalHours() + " hour workweek.";}
+    {  
+        console.log("toDisplayValue: " + UtilityObject.stringify(storageValue));    
+        return "A " + storageValue.getTotalHours() + " hour workweek.";
+    }
 
     getDialogComponent = (props: AbstractPreferenceDialog_Props_Virtual<EntitySchemaWeek>, onBaseReference: (ref: Baseable<AbstractPreferenceDialog<EntitySchemaWeek>> | null) => void) =>
     {

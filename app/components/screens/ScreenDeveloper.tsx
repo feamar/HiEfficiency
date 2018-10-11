@@ -48,12 +48,12 @@ export default class ScreenDeveloper extends Component<Props, State>
     }
 
 
+
     render()
     {
         return (
         <View style={{height: "100%", padding:20}}>
-            {/*<TouchableRipple style={styles.button} onPress={this.migrateInterruptions}><Text>Migrate Interruptions</Text></TouchableRipple>*/}
-            <TouchableRipple style={styles.button} onPress={this.migrateInterruptions}><Text></Text></TouchableRipple>
+            <TouchableRipple style={styles.button} onPress={this.migrateInterruptions}><Text>Migrate Interruptions</Text></TouchableRipple>
         </View>
         ); 
     }

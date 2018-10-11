@@ -15,12 +15,13 @@ import DatabaseProvider from './app/providers/DatabaseProvider';
 import FirestoreFacade from './app/components/firebase/FirestoreFacade';
 import update from 'immutability-helper';
 import { ReduxState } from './app/redux/ReduxState';
-import { Spec } from "immutability-helper";
-import DocumentUser from './app/dtos/firebase/firestore/documents/DocumentUser';
 import MiddlewareClassConversion from './app/redux/middleware/MiddlewareClassConversion';
+import UtilityIndexable from './app/utilities/UtilityIndexable';
 
-if (__DEV__ == false) 
-{   console.log = () => {};}
+if (__DEV__ == false)
+{
+  console.log = () => {};
+}
 
 const Database = FirestoreFacade.Instance;
 
@@ -29,7 +30,7 @@ type State =
   signedIn: boolean,
   checkedSignIn: boolean,
   shouldSplash: boolean,
-  dialogs: Array<JSX.Element>
+  dialogs: {[id: string]: JSX.Element}
 }
 
 
@@ -49,7 +50,7 @@ export default class App extends React.Component<any, State>
       signedIn: false,
       checkedSignIn: false,
       shouldSplash: true,
-      dialogs: []
+      dialogs: {}
     };
 
     this.store = createStore(ReducerInitial, applyMiddleware(MiddlewareClassConversion));
@@ -59,22 +60,23 @@ export default class App extends React.Component<any, State>
     this.unsubscribers.push(this.store.subscribe(this.onReduxStateChanged));
   }
 
-  addDialog = (dialog: JSX.Element) =>
+  addDialog = (dialog: JSX.Element, id: string) =>
   {
-    if(this.state.dialogs.indexOf(dialog) < 0)
-    {
-      const newDialogs = update(this.state.dialogs, {$push: [dialog]});
-      this.setState({dialogs: newDialogs});
-    }
-  }
-
-  removeDialog = (dialog: JSX.Element) =>
-  {
-    const index: number = this.state.dialogs.indexOf(dialog);
-    if(index < 0)
+    if(this.state.dialogs[id] != undefined)
     {   return false;}
 
-    const newDialogs: Array<JSX.Element> = update(this.state.dialogs, {$splice: [[index, 1]]});
+    const newDialogs = update(this.state.dialogs, {[id]: {$set: dialog}});
+    this.setState({dialogs: newDialogs});
+
+    return true;
+  }
+
+  removeDialog = (id: string) =>
+  {
+    if(this.state.dialogs[id] == undefined)
+    {   return false;}
+
+    const newDialogs = update(this.state.dialogs, {$unset: [id]});
     this.setState({dialogs: newDialogs});
     return true;
   }
@@ -85,15 +87,17 @@ export default class App extends React.Component<any, State>
     if(this.state.checkedSignIn == false)
     {   
       this.setState({checkedSignIn: true, signedIn: globalState.user != undefined});
-      await this.ensureUserAccount(globalState);
+      //await this.ensureUserAccount(globalState);
     }
 
     const signedIn: boolean = globalState.user != undefined;
     if(signedIn != this.state.signedIn)
-    {   this.setState({signedIn: signedIn});}
+    {   
+      this.setState({signedIn: signedIn});
+    }
   }
 
-  ensureUserAccount = async (globalState: ReduxState) =>
+  /*ensureUserAccount = async (globalState: ReduxState) =>
   {
     if(globalState == undefined || globalState.user == undefined)
     {
@@ -112,21 +116,23 @@ export default class App extends React.Component<any, State>
 
     if(updates != undefined)
     {
-      await Database.inDialog(this.addDialog, this.removeDialog, "Creating Profile", async (execute) => 
+      await Database.inDialog("dialog-creating-profile", this.addDialog, this.removeDialog, "Creating Profile", async (execute) => 
       {
         //We have to check for undefined again, because we're in an async function.
         if(updates != undefined)
         {
           const crud = Database.updateUser(globalState.user!.document.id!, globalState.user!.document.data, updates);
           const result = await execute(crud, false);
-  
-          console.log("Successful: " + result.successful);
-          if(result.successful == false)
-          {   this.setState({signedIn: false});}
+          if(result)
+          {
+            console.log("Successful: " + result.successful);
+            if(result.successful == false)
+            {   this.setState({signedIn: false});}
+          }
         }
       });
     }
-  }
+  }*/
   
 
   componentDidMount() 
@@ -136,6 +142,7 @@ export default class App extends React.Component<any, State>
 
   componentWillUnmount() 
   {   
+    this.unsubscribers.forEach(unsubscriber => unsubscriber());
     FirebaseManager.Instance.detach();
   }
 
@@ -163,7 +170,7 @@ export default class App extends React.Component<any, State>
                 <DatabaseProvider database={Database}>
                   <RouteStack />
                 </DatabaseProvider>
-                {this.state.dialogs.map(dialog => dialog)}
+                {UtilityIndexable.toArray(this.state.dialogs).map(dialog => dialog)}
               </Portal.Host>  
             </MenuProvider>
         </ThemeProvider>

@@ -1,9 +1,9 @@
 import React from "react";
 import {Component} from "react";
 import {FAB} from "react-native-paper";
-import { withTheme } from 'react-native-paper';
 import update from "immutability-helper";
 import Color from "../../dtos/color/Color";
+import { ViewStyle } from "react-native";
 
 var styles = {
     fab:
@@ -23,21 +23,22 @@ type State =
     icon: string,
     color: Color,
     enabled: boolean,
-    style: any
+    style?: ViewStyle,
+    shouldHaveBottomMargin: boolean
 }
 
 type Props = 
 {
     icon: string,
-    color: Color,
+    color?: Color,
     enabled: boolean,
-    style: any,
+    style?: ViewStyle,
     onPress?: () => void,
-    innerRef?: (fab: Component) => void,
-    shouldHaveBottomMargin: boolean
+    innerRef?: (fab: FAB | undefined) => void,
+    shouldHaveBottomMargin?: boolean
 }
 
-class InputFloatingActionButton extends Component<Props, State>
+export default class InputFloatingActionButton extends Component<Props, State>
 {
     public static defaultProps: Partial<Props> = 
     {
@@ -52,16 +53,17 @@ class InputFloatingActionButton extends Component<Props, State>
 
         this.state = {
             icon: props.icon,
-            color: props.color,
+            color: props.color || Color.fromName("white")!,
             enabled: props.enabled,
-            style: props.style
+            style: props.style,
+            shouldHaveBottomMargin: props.shouldHaveBottomMargin || false
         }
 
         this.handelingPress = false;
     }
     
     componentWillReceiveProps = (props: Props) : void =>
-    {   this.setState({icon: props.icon, color: props.color, enabled: props.enabled, style: props.style});}
+    {   this.setState({icon: props.icon, color: props.color || Color.fromName("white")!, enabled: props.enabled, style: props.style, shouldHaveBottomMargin: props.shouldHaveBottomMargin || false});}
 
     onPress = () : void =>
     {
@@ -81,10 +83,10 @@ class InputFloatingActionButton extends Component<Props, State>
         this.handelingPress = false;
     }
 
-    onReference = (reference: Component) : void =>
+    onReference = (reference: FAB | null) : void =>
     {
         if(this.props.innerRef != undefined)
-        {   this.props.innerRef(reference);}
+        {   this.props.innerRef(reference == null ? undefined : reference);}
     }
 
     getFabStyles = (style: any) =>
@@ -98,12 +100,8 @@ class InputFloatingActionButton extends Component<Props, State>
 
     render()
     {
-        console.log("RENDERING");
         return (
-            <FAB ref={this.onReference} disabled={this.state.enabled == false} style={this.getFabStyles(styles.fab)} icon={this.state.icon} color={this.state.color}  onPress={this.onPress} />
+            <FAB ref={this.onReference} disabled={this.state.enabled == false} style={this.getFabStyles(styles.fab)} icon={this.state.icon} color={this.state.color.toHexadecimal()}  onPress={this.onPress} />
         );
     }
 }
-
-const hoc1 = withTheme(InputFloatingActionButton);
-export default hoc1;

@@ -4,15 +4,10 @@ import AbstractReduxAction from "../actions/AbstractReduxAction";
 
 export default (_store: MiddlewareAPI<Dispatch, ReduxState>)  => (next: Dispatch<AnyAction>) => (action: AnyAction) => 
 {
+    console.log("Redux Reduxer - " + action.constructor.name);    
+    
     if(action instanceof AbstractReduxAction)
-    {   
-        action = action.toPlainObject();
-        console.log("Middleware - if");
-    }
-    else
-    {
-        console.log("Middleware - else");
-
-    }
+    {   action = action.toPlainObject();}
+    
     return next(action);
 }

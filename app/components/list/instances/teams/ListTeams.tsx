@@ -16,10 +16,7 @@ interface State
 
 export default class ListTeams extends Component<Props, State> implements Baseable<AbstractList<ReduxTeam>>
 {
-    private mBase: AbstractList<ReduxTeam> | undefined = undefined;
-
-    get base ()
-    {   return this.mBase;}
+    public base: AbstractList<ReduxTeam> | undefined = undefined;
 
     getItemKey = (item: ReduxTeam) => 
     {   return item.document.id!;}
@@ -27,6 +24,8 @@ export default class ListTeams extends Component<Props, State> implements Baseab
     getListItemFor = (item: ReduxTeam, index: number) =>
     {
         return <ListItemTeam 
+            {...this.props}
+            key={item.document.id!}
             item={item} 
             index={index} />
     }

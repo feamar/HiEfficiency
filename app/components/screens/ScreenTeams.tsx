@@ -4,20 +4,21 @@ import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT, SCREEN_NAME_STORY_BOARD_D
 import { FAB } from "react-native-paper";
 import ActionType from "../../enums/ActionType";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDialogContainer";
 import { ReduxState } from "../../redux/ReduxState";
 import ReduxUser from "../../dtos/redux/ReduxUser";
 import { Dispatch } from "redux";
 import ActionStartInspectTeam from "../../redux/actions/inspection/ActionStartInspectTeam";
-import { WithLoadingProps } from "../../hocs/WithLoading";
+import WithLoading, { WithLoadingProps } from "../../hocs/WithLoading";
 import ReduxTeam from "../../dtos/redux/ReduxTeam";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from "../dialog/instances/DialogConfirmation";
-import UtilityMap from "../../utilities/UtilityMap";
+import UtilityIndexable from "../../utilities/UtilityIndexable";
 import ListTeams from "../list/instances/teams/ListTeams";
 import FabAction from "../../dtos/options/FabAction";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
-import DialogPreferenceTextMulti, { TextElement } from "../dialog/preferences/DialogPreferenceTextMulti";
+import DialogPreferenceTextMulti, { TextElement, DialogPreferenceTextMulti_StorageValue } from "../dialog/preferences/DialogPreferenceTextMulti";
+import ActionOption from "../../dtos/options/ActionOption";
 
 
 interface ReduxStateProps 
@@ -49,7 +50,7 @@ type Props = ReduxStateProps & WithDatabaseProps & WithLoadingProps & WithDialog
   navigation: HiEfficiencyNavigator
 }
 
-interface State extends WithDialogContainerState
+interface State
 {
   user: ReduxUser,
   open: boolean,
@@ -79,7 +80,6 @@ class ScreenTeams extends Component<Props, State>
     {
       user: this.props.user,
       open: false,
-      dialogs: []
     } 
 
     this.setLoading(this.props);
@@ -103,9 +103,10 @@ class ScreenTeams extends Component<Props, State>
     this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD_DOING);
   }
 
-  onContextMenuItemSelected = (item: ReduxTeam, _index: number, action: ActionType) =>
+  onContextMenuItemSelected = (item: ReduxTeam, _index: number, action: ActionOption) =>
   {
-    switch (action) 
+    console.log("ON CONTEXT MENU ITEM SELECTED: " + action);
+    switch (action.id) 
     {
       case ActionType.LEAVE:
         if(this.dialogConfirmLeave)
@@ -127,7 +128,7 @@ class ScreenTeams extends Component<Props, State>
         break;
 
       case ActionType.EDIT:
-        this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT, {team: item});
+        this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT, {team: item.document});
         break;
     } 
   }
@@ -142,28 +143,28 @@ class ScreenTeams extends Component<Props, State>
         break;
 
       case ActionType.CREATE:
-        this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT);
+        this.props.navigation.navigate(SCREEN_NAME_TEAM_EDIT, {title: "Create Team"});
     }
   }
  
-  onJoinDialogSubmitted = async (storageValue: Map<string, string> | null) => 
+  onJoinDialogSubmitted = (storageValue: DialogPreferenceTextMulti_StorageValue | null) => 
   {   
     if(storageValue == null)
     { return;}
     
-    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Joining Team", async (execute) => 
+    this.props.database.inDialog("dialog-joining-team", this.props.addDialog, this.props.removeDialog, "Joining Team", async (execute) => 
     {
-      const join = this.props.database.joinTeam(storageValue.get("name")!, storageValue.get("code")!, this.props.user.document.id!, this.props.user.document.data.teams);
+      const join = this.props.database.joinTeam(storageValue.name!, storageValue.code!, this.props.user.document.id!, this.props.user.document.data.teams);
       await execute(join, false);
     });
   }
  
-  onLeaveDialogActionPressed = async (_concreteComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
+  onLeaveDialogActionPressed = (_concreteComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
   {
     switch(action)
     {
       case "Positive":
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Leaving Team", async (execute) => 
+        this.props.database.inDialog("dialog-leaving-team", this.props.addDialog, this.props.removeDialog, "Leaving Team", async (execute) => 
         {
           const leave = this.props.database.leaveTeam(this.currentlyLeavingTeam!.document.id!, this.state.user.document.id!, this.state.user.document.data.teams);
           await execute(leave, false);
@@ -172,12 +173,12 @@ class ScreenTeams extends Component<Props, State>
     }
   }
 
-  onDeleteDialogActionPressed = async (_concreteComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
+  onDeleteDialogActionPressed = (_concreteComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
   {
     switch(action)
     {
       case "Positive":
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Leaving Team", async (execute) => 
+        this.props.database.inDialog("dialog-deleting-team", this.props.addDialog, this.props.removeDialog, "Deleting Team", async (execute) => 
         {
           const del = this.props.database.deleteTeam(this.currentlyDeletingTeam!.document.id!, this.props.user.document.id!, this.props.user.document.data.teams);
           await execute(del, false);
@@ -193,12 +194,10 @@ class ScreenTeams extends Component<Props, State>
 
     return (  
       <View style={{height: "100%"}}>  
-        <ListTeams containerHasFab={true} items={UtilityMap.toArray(this.state.user.teams)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+        <ListTeams containerHasFab={true} items={UtilityIndexable.toArray(this.state.user.teams)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         <DialogPreferenceTextMulti<JoinTeamStorageValue> storageValue={null} title="Join Team" onSubmit={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
         <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmLeave = i}   visible={false} message="Are you sure you want to leave this team?" onActionClickListener={this.onLeaveDialogActionPressed} />
         <DialogConfirmation title="Deleting Team" concreteRef={i => this.dialogConfirmDelete = i} visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onActionClickListener={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
-
-        {this.state.dialogs.map(dialog => dialog)}
 
         <FAB.Group color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open: {open: boolean}) => this.setState(open)} />
       </View>
@@ -219,5 +218,6 @@ class ScreenTeams extends Component<Props, State>
 const hoc1 = WithReduxSubscription<ScreenTeams, ScreenTeams, Props, ReduxStateProps, ReduxDispatchProps>(mapStateToProps, mapDispatchToProps)(ScreenTeams);
 const hoc2 = WithDatabase(hoc1);
 const hoc3 = WithDialogContainer(hoc2);
+const hoc4 = WithLoading(hoc3);
 
-export default hoc3;
+export default hoc4;

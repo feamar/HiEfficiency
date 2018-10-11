@@ -29,31 +29,28 @@ interface State
 
 export default class DialogPreferenceDateTime extends React.Component<Props, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
-    private _base: AbstractPreferenceDialog<StorageValue> | undefined;
+    public base: AbstractPreferenceDialog<StorageValue> | undefined;
 
     constructor(props: Props)
     {   super(props);}
-
-    public get base (): AbstractPreferenceDialog<StorageValue> | undefined 
-    {   return this._base;}
 
     onTimePickerCancel = () =>
     {   }
 
     onTimePickerConfirmed = (timestamp: Date) =>
     {
-        if(this._base == undefined)
+        if(this.base == undefined)
         {   return;}
 
-        this._base.onValueChange({timestamp: {$set: timestamp}});
+        this.base.onValueChange({timestamp: {$set: timestamp}});
     }
 
     getInputComponent = (): JSX.Element | null =>
     {
-        if(this._base == undefined)
+        if(this.base == undefined)
         {   return null;}
 
-        const value = this._base.getCurrentStorageValue();
+        const value = this.base.getCurrentStorageValue();
         if(value)
         {
             switch(this.props.mode)
@@ -74,10 +71,10 @@ export default class DialogPreferenceDateTime extends React.Component<Props, Sta
     
     getErrorComponent = () =>
     {
-        if(this._base == undefined)
+        if(this.base == undefined)
         {   return null;}
 
-        return <InputError error={this._base.getCurrentError()} />
+        return <InputError error={this.base.getCurrentError()} />
     }
 
 

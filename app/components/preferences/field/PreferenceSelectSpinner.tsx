@@ -26,9 +26,7 @@ interface State
 
 export default class PreferenceSelectSpinner extends React.Component<Props, State> implements Baseable<AbstractContainedPreference<StorageValue>>
 {
-    private mBase?: AbstractContainedPreference<StorageValue>;
-    public get base()
-    {   return this.mBase;}
+    public base: AbstractContainedPreference<StorageValue> | undefined;
 
     constructor(props: Props)
     {
@@ -43,9 +41,9 @@ export default class PreferenceSelectSpinner extends React.Component<Props, Stat
 
     onValueSelected = (value: SelectOption) =>
     {
-        if(this.mBase)
+        if(this.base)
         {
-            const abstractPreference = this.mBase.base;
+            const abstractPreference = this.base.base;
             if(abstractPreference)
             {
                 const updated = update(abstractPreference.state.storageValue, {selected: {$set: value}});

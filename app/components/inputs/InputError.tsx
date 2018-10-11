@@ -8,7 +8,9 @@ const styles = StyleSheet.create({
     {
         fontWeight: "bold",
         color: "red",
-        opacity: 0.75
+        opacity: 0.75,
+        marginLeft: 25,
+        marginRight: 25
     }
 });
 
@@ -24,8 +26,21 @@ interface State
 
 export default class InputError extends React.Component<Props, State>
 {
+    constructor(props: Props)
+    {
+        super(props);
+        console.log("INPUT ERROR CONSTRUCTOR");
+
+        this.state = {
+            error: props.error
+        }
+    }
+
     componentWillReceiveProps = (props: Props) =>
-    {   this.setState({error: props.error});}
+    {
+        console.log("INPUT ERROR componentWillReceiveProps");
+        this.setState({error: props.error});
+    }
 
     shouldComponentUpdate = (nextProps: Props, nextState: State) =>
     {   return UtilityCompare.shallowEqual(this.props, nextProps) == false || UtilityCompare.shallowEqual(this.state, nextState) == false;}

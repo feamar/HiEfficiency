@@ -4,7 +4,7 @@ import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DE
 import {FAB} from "react-native-paper";
 import ActionType from "../../enums/ActionType";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDialogContainer";
 import { ReduxState } from "../../redux/ReduxState";
 import ReduxUser from "../../dtos/redux/ReduxUser";
 import { Dispatch } from "redux";
@@ -15,7 +15,7 @@ import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 import DocumentTeam from "../../dtos/firebase/firestore/documents/DocumentTeam";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
-import { WithLoadingProps } from "../../hocs/WithLoading";
+import WithLoading, { WithLoadingProps } from "../../hocs/WithLoading";
 import ReduxStory from "../../dtos/redux/ReduxStory";
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from "../dialog/instances/DialogConfirmation";
 import ReduxTeam from "../../dtos/redux/ReduxTeam";
@@ -39,7 +39,7 @@ type Props = ReduxStateProps & ReduxDispatchProps & WithDatabaseProps & WithDial
   mode: StoryboardMode
 }
 
-type State = ReduxStateProps & WithDialogContainerState & 
+type State = ReduxStateProps  & 
 {
   open: boolean,
   storyListItems: Array<ReduxStory>
@@ -82,7 +82,6 @@ class ScreenStoryBoard extends Component<Props, State>
       open: false, 
       user: props.user,
       storyListItems: this.getStoryListItems(props),
-      dialogs: []
     }
   }  
 
@@ -102,7 +101,7 @@ class ScreenStoryBoard extends Component<Props, State>
     {   shouldBeLoading = true;}
     else
     {
-      var team = props.user.teams.get(this.team.id);
+      var team = props.user.teams[this.team.id];
       if(team == undefined || team.stories == undefined || team.loaded == false)
       {   shouldBeLoading = true;}
     }
@@ -115,14 +114,14 @@ class ScreenStoryBoard extends Component<Props, State>
     if(this.team.id == undefined)
     {   return [];}
 
-    const team = props.user.teams.get(this.team.id);
+    const team = props.user.teams[this.team.id];
     if(team == undefined)
     {   return [];}
 
     const stories = team.stories;
     const keys = Object.keys(stories);
     const collection = keys.map(key => 
-    {   return stories.get(key)!});
+    {   return stories[key]!});
     
     const filtered = this.filter(collection, props.mode)
     return filtered;
@@ -172,15 +171,15 @@ class ScreenStoryBoard extends Component<Props, State>
         if(this.team.id == undefined || item.document.id == undefined)
         {   return;}
 
-        const team: ReduxTeam | undefined = this.props.user.teams.get(this.team.id);
+        const team: ReduxTeam | undefined = this.props.user.teams[this.team.id];
         if(team == undefined)
         {   return;}
 
-        const old: ReduxStory | undefined = team.stories.get(item.document.id);
+        const old: ReduxStory | undefined = team.stories[item.document.id];
         if(old == undefined)
         {   return;}
 
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Upvoting Story", async (execute) => 
+        await this.props.database.inDialog("dialog-upvoting-story", this.props.addDialog, this.props.removeDialog, "Upvoting Story", async (execute) => 
         {
           const update = this.props.database.updateStory(this.team.id!, item.document.id!, old.document.data, {upvotes: {$set: item.document.data.upvotes + 1}});
           await execute(update, false);
@@ -211,7 +210,7 @@ class ScreenStoryBoard extends Component<Props, State>
         if(this.team.id == undefined)
         {   return ToastAndroid.show("Could not retrieve team id, please try again later.", ToastAndroid.LONG);}  
 
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
+        await this.props.database.inDialog("dialog-creating-story", this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
         {
             const create = this.props.database.createStory(this.team.id!, story);
             await execute(create, false);
@@ -228,7 +227,7 @@ class ScreenStoryBoard extends Component<Props, State>
         if(this.team.id == undefined)
         {   return ToastAndroid.show("Could not retrieve team id, please try again later.", ToastAndroid.LONG);}  
 
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Deleting Story", async (execute) => 
+        await this.props.database.inDialog("dialog-deleting-story", this.props.addDialog, this.props.removeDialog, "Deleting Story", async (execute) => 
         {
           const del = this.props.database.deleteStory(this.team.id!, this.itemToDelete!.document.id!);
           await execute(del, false);
@@ -279,7 +278,6 @@ class ScreenStoryBoard extends Component<Props, State>
           <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmDelete = i}  visible={false} message="Are you sure you want to delete this user story?" onActionClickListener={this.onDialogActionPressed} />
           <ListStories containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
           {this.props.mode == "Todo" && <FAB.Group color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open: {open: boolean}) => this.setState(open)} />}
-          {this.state.dialogs.map(dialog => dialog)}
       </View>
     );
   } 
@@ -288,5 +286,6 @@ class ScreenStoryBoard extends Component<Props, State>
 const hoc1 = WithReduxSubscription<ScreenStoryBoard, ScreenStoryBoard, Props, ReduxStateProps, ReduxDispatchProps>(mapStateToProps, mapDispatchToProps)(ScreenStoryBoard);
 const hoc2 = WithDatabase(hoc1);
 const hoc3 = WithDialogContainer(hoc2);
+const hoc4 = WithLoading(hoc3);
 
-export default hoc3;
+export default hoc4;

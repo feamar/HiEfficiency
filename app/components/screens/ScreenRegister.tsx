@@ -4,7 +4,10 @@ import { View, StyleSheet } from "react-native";
 import Theme from "../../styles/Theme";
 import {Button,Card,TextInput,Text} from 'react-native-paper';
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDialogContainer";
+import ActionUserLoggedIn from "../../redux/actions/user/ActionUserLoggedIn";
+import { Dispatch } from "redux";
+import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 
 const styles = StyleSheet.create({
   wrapper: 
@@ -42,16 +45,28 @@ const styles = StyleSheet.create({
   }
 });
 
-type Props = WithDatabaseProps & WithDialogContainerProps & 
+interface ReduxDispatchProps
+{
+  onUserLoggedIn: (action: ActionUserLoggedIn) => ActionUserLoggedIn
+}
+
+type Props = WithDatabaseProps & WithDialogContainerProps & ReduxDispatchProps &
 {
 
 }
 
-type State = WithDialogContainerState & 
+type State =  
 {
   email?: string,
   password?: string,
   confirmation?: string
+}
+
+const mapDispatchToProps = (dispatch: Dispatch): ReduxDispatchProps =>
+{
+  return {
+    onUserLoggedIn: (action: ActionUserLoggedIn) => dispatch(action)
+  }
 }
 
 class ScreenRegister extends React.Component<Props, State>
@@ -65,7 +80,6 @@ class ScreenRegister extends React.Component<Props, State>
       email: '',
       password: '',
       confirmation: '',
-      dialogs: []
     }
   }
 
@@ -100,7 +114,7 @@ class ScreenRegister extends React.Component<Props, State>
 
     this.setState({email: this.state.email.trim()}, async () => {
       //State change will automatically navigate to HOME route if successful.
-      await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Registering Account", async (execute) => 
+      await this.props.database.inDialog("dialog-registering-account", this.props.addDialog, this.props.removeDialog, "Registering Account", async (execute) => 
       {   
         const register = this.props.database.registerUser(this.state.email!, this.state.password!);
         const result = await execute(register, true);
@@ -108,7 +122,7 @@ class ScreenRegister extends React.Component<Props, State>
         if(result.successful == false)
         {   return;}
 
-        const login = this.props.database.loginUser(this.state.email!, this.state.password!);
+        const login = this.props.database.loginUser(this.state.email!, this.state.password!, this.props.onUserLoggedIn);
         await execute(login, false);
         
       }, 200);
@@ -124,19 +138,19 @@ class ScreenRegister extends React.Component<Props, State>
             <Text style={styles.title}>Register</Text>
           </View> 
           <Card.Content>  
-            <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.onEmailChange} />
-            <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.onPasswordChange} />
-            <TextInput style={styles.input} secureTextEntry id="confirmation" name="confirmation" label="Confirm Password" value={this.state.confirmation} onChangeText={this.onConfirmationChange} />
-            <Button style={styles.button_login} dark raised primary variant="contained" onPress={this.handleRegister}>Register</Button>
+            <TextInput style={styles.input} label="E-mail address" value={this.state.email} onChangeText={this.onEmailChange} />
+            <TextInput style={styles.input} secureTextEntry  label="Password" value={this.state.password} onChangeText={this.onPasswordChange} />
+            <TextInput style={styles.input} secureTextEntry  label="Confirm Password" value={this.state.confirmation} onChangeText={this.onConfirmationChange} />
+            <Button style={styles.button_login} dark onPress={this.handleRegister}>Register</Button>
           </Card.Content>    
         </Card> 
-        {this.state.dialogs.map(dialog => dialog)}
       </View>   
     ); 
   }
 }
 
-const hoc1 = WithDatabase(ScreenRegister);
-const hoc2 = WithDialogContainer(hoc1);
+const hoc1 = WithReduxSubscription<ScreenRegister, ScreenRegister, Props, {}, ReduxDispatchProps>(undefined, mapDispatchToProps)(ScreenRegister);
+const hoc2 = WithDatabase(hoc1);
+const hoc3 = WithDialogContainer(hoc2);
 
-export default hoc2;
+export default hoc3;

@@ -23,15 +23,12 @@ interface State
 
 export default class ListItemProductive extends React.Component<Props, State> implements Baseable<AbstractListItem<ModelProductive>>
 {
-    private mBase?: AbstractListItem<ModelProductive>;
+    public base: AbstractListItem<ModelProductive> | undefined;
 
     constructor(props: Props) 
     {
         super(props);
     }
-
-    public get base () 
-    {   return this.mBase;}
 
     getDuration = (item: ModelProductive) =>
     {
@@ -56,10 +53,10 @@ export default class ListItemProductive extends React.Component<Props, State> im
         );
     }
 
-    onBaseReference = (reference?: AbstractListItem<ModelProductive>) =>
+    onBaseReference = async (reference?: AbstractListItem<ModelProductive>) =>
     {
         if(reference)
-        {   reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
+        {   await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
     }
     
     render()

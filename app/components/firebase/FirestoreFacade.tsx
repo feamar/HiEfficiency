@@ -22,6 +22,10 @@ import DocumentInterruptions from "../../dtos/firebase/firestore/documents/Docum
 import EntityInterruption from "../../dtos/firebase/firestore/entities/EntityInterruption";
 import React from "react";
 import DialogLoading, { ConcreteDialogLoading } from "../dialog/instances/DialogLoading";
+import ActionUserLoggedIn from "../../redux/actions/user/ActionUserLoggedIn";
+import { AddDialogCallback } from "../../hocs/WithDialogContainer";
+import {AdjustedCallbackReference } from "../../render_props/CallbackReference";
+import AbstractDialog from "../dialog/AbstractDialog";
 
 class SingletonEnforcer {}
 const EnforcerInstance = new SingletonEnforcer();
@@ -51,8 +55,8 @@ export default class FirestoreFacade
     updateUser = (userId: string, oldUser: DocumentUser, updates: Spec<DocumentUser, never>) : UserUpdate =>
     {   return new UserUpdate(userId, oldUser, updates );}
 
-    loginUser = (email: string, password: string) : UserLogin =>
-    {   return new UserLogin(email, password);}
+    loginUser = (email: string, password: string, dispatch: (action: ActionUserLoggedIn) => ActionUserLoggedIn) : UserLogin =>
+    {   return new UserLogin(email, password, dispatch);}
 
     registerUser = (email: string, password: string) : UserRegister =>
     {   return new UserRegister(email, password);}
@@ -92,15 +96,16 @@ export default class FirestoreFacade
 
 
 
-    inDialog = (addDialogCallback: (dialog: JSX.Element) => void, removeDialogCallback: (dialog: JSX.Element) => void, title: string, closure: (execute: InDialogExecutor) => void, showDelay: number = 3000) => 
+    inDialog = (id: string, addDialogCallback: AddDialogCallback, removeDialogCallback: (id: string) => void, title: string, closure: (execute: InDialogExecutor) => void, showDelay: number = 3000) => 
     {
         const execute = (dialog: ConcreteDialogLoading) => async (crud: AbstractCrudOperation, hasNextOperation: boolean = false): Promise<InDialogResult> =>
         {   
             var resolved: boolean = false;
             setTimeout(() => 
             {
+                console.log("Timeout expired - " + resolved + " - " + dialog.base);
                 if(resolved == false && dialog.base)
-                {   dialog.base.setVisible(true);}
+                {   console.log("In If"); dialog.base.setVisible(true);}
             }, showDelay);
 
             const successful = await crud.execute(dialog);
@@ -122,6 +127,7 @@ export default class FirestoreFacade
 
         const onReference = (ref: ConcreteDialogLoading | undefined) => 
         {
+            console.log("In Dialog - On Reference - " + ref);
             if(ref != undefined)
             {
                 const executor = execute(ref);
@@ -131,20 +137,24 @@ export default class FirestoreFacade
 
         return new Promise(resolve => 
         {
-            const component:JSX.Element = <DialogLoading 
-            concreteRef = {onReference}
-            title={title}
-            key={title} 
-            section={SECTION_CONNECTING}
-            isComplete={false}
-            timeout={30000} 
-            visible={false} 
-            cancelable={false}
-            warning={undefined} 
-            onTimeout={() => {}}
-            onClose={() => {removeDialogCallback(component); resolve();}} />
+            const getDialog = (ref: AdjustedCallbackReference<AbstractDialog>) =>
+            {
+                return  <DialogLoading 
+                    concreteRef = {onReference}
+                    title={title}
+                    key={title} 
+                    section={SECTION_CONNECTING}
+                    isComplete={false}
+                    timeout={30000} 
+                    visible={false} 
+                    cancelable={false}
+                    warning={undefined} 
+                    onTimeout={() => {}}
+                    baseRef={ref}
+                    onClose={() => {removeDialogCallback(id); resolve();}} />
+            }
 
-            addDialogCallback(component);
+            addDialogCallback(getDialog, id);
         });
     }
 }

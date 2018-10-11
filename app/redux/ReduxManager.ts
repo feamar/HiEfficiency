@@ -1,9 +1,9 @@
-import AbstractReduxAction from "./actions/AbstractReduxAction";
+import { AnyAction } from "redux";
 
 class SingletonEnforcer {}
 const EnforcerInstance = new SingletonEnforcer();
 
-export type OnReduxStateChangedListener = (action: AbstractReduxAction) => void;
+export type OnReduxStateChangedListener = (action: AnyAction) => void;
 
 export default class ReduxManager
 {
@@ -38,7 +38,7 @@ export default class ReduxManager
         return true;
     }
 
-    notifyListeners = (action: AbstractReduxAction) =>
+    notifyListeners = (action: AnyAction) =>
     {
         for(var i = 0 ; i < this.listeners.length ; i ++)
         {

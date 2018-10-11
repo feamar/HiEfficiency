@@ -1,5 +1,8 @@
 export default class EntityInterruption
 {
+    static fromJsonObject = (json: any): EntityInterruption =>
+    {   return new EntityInterruption(json.category, json.timestamp, json.duration);}
+    
     static create(category: number, timestamp: Date, duration?: number)
     {   return new EntityInterruption(category, timestamp, duration);}
 

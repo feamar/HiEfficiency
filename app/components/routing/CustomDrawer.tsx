@@ -56,18 +56,18 @@ export default class CustomDrawer extends Component<Props, State>
 
     getItemStyle = (active: boolean) =>
     {
-        const styles = StyleSheet.create(
+        var styles = StyleSheet.create( 
         {
             touchable:
             { 
                 flexDirection: "row",
                 padding: 20,
-                backgroundColor: active ? Theme.colors.selectedBackground : "inherit" 
+                backgroundColor: active ? Theme.colors.selectedBackground : undefined 
             },
             title:
             {
-                color: active ? Theme.colors.primary : "inherit",
-                fontWeight: active ? "bold" : "normal"
+                fontWeight: active ? "bold" : "normal",
+                color: active ? Theme.colors.primary : undefined
             }
         });
 

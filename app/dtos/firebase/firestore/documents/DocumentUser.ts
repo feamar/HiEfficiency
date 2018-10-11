@@ -1,5 +1,6 @@
 import { RNFirebase } from "react-native-firebase";
 import EntitySchemaWeek from "../entities/EntitySchemaWeek";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 export default class DocumentUser
 {
@@ -8,12 +9,14 @@ export default class DocumentUser
         if(snapshot.exists == false)
         {   return undefined;}
 
-        return snapshot.data() as DocumentUser;
+        const document: DocumentUser = snapshot.data() as DocumentUser;
+        console.log("USER HER!: "+ UtilityObject.stringify(document));
+        document.weekSchema = EntitySchemaWeek.fromJsonObject(document.weekSchema);
+
+        console.log("USER HERE: " + UtilityObject.stringify(document));
+        return document;
     }
 
-    static fromUser = (user: any) =>
-    {   return new DocumentUser(user.uid, user.teams, user.initials, user.weekSchema);}
-    
     public uid: string;
     public teams: Array<string>;
     public weekSchema: EntitySchemaWeek

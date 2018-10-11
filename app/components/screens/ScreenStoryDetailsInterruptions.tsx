@@ -11,7 +11,7 @@ import ActionType from "../../enums/ActionType";
 import {  MenuOptionProps } from "react-native-popup-menu";
 import WithOverflowMenu, { WithOverflowMenu_RequiredFunctions } from "../../hocs/WithOverflowMenu";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDialogContainer";
 import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
 import { ReduxState } from "../../redux/ReduxState";
 import ReduxUser from "../../dtos/redux/ReduxUser";
@@ -22,7 +22,7 @@ import { Dispatch } from "redux";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import ReduxStory from "../../dtos/redux/ReduxStory";
 import ListInterruptions, { InterruptionModelType } from "../list/instances/interruptions/ListInterruptions";
-import { WithLoadingProps } from "../../hocs/WithLoading";
+import WithLoading, { WithLoadingProps } from "../../hocs/WithLoading";
 import DocumentInterruptions from "../../dtos/firebase/firestore/documents/DocumentInterruptions";
 import EntityInterruption from "../../dtos/firebase/firestore/entities/EntityInterruption";
 import DialogPreferenceDateTime, { DialogPreferenceDateTime_StorageValue } from "../dialog/preferences/DialogPreferenceDateTime";
@@ -118,7 +118,7 @@ type Props = ReduxStateProps & ReduxDispatchProps & WithLoadingProps & WithDatab
     navigation: HiEfficiencyNavigator
 }
 
-type State = WithDialogContainerState & 
+type State =  
 {
     lifecycle: Lifecycle,
     sections: Array<AbstractListCollapsible_SectionType<InterruptionModelType>>,
@@ -160,7 +160,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         super(props);
 
         const storyId = props.navigation.getParam("storyId");
-        this.story = props.user.teams.get(this.props.inspecting.team!)!.stories.get(storyId)!;
+        this.story = props.user.teams[this.props.inspecting.team!]!.stories[storyId]!;
 
         this.state = 
         {
@@ -168,7 +168,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             lifecycle: this.getLifecycleFromStory(this.story),
             sections: this.getSectionsFromStory(this.story),
             open: false,
-            dialogs: []
         }
 
         this.setLoading(props);
@@ -183,11 +182,11 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         if(isEqual(this.state.user, props.user))
         {   return;}
 
-        const team = props.user.teams.get(teamId);
+        const team = props.user.teams[teamId];
         if(team == undefined)
         {   return;}
 
-        const story = team.stories.get(this.story.document.id!);
+        const story = team.stories[this.story.document.id!];
         if(story == undefined)
         {   return;}
 
@@ -225,7 +224,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     }
 
     shouldShowOverflowMenu = () =>
-    {   return this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.size == 0)}
+    {   return this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)}
 
     onStartStory = async () => 
     {   
@@ -234,7 +233,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
         this.showConfirmationDialog("Start Issue", "Are you sure you want to start working on this issue?", "Start", async() => 
         {
-            await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
+            await this.props.database.inDialog("dialog-starting-story", this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
             {
                 const update = this.props.database.updateStory(this.props.inspecting.team!, this.story.document.id!, this.story.document.data, {startedOn: {$set: new Date()}});
                 await execute(update, false);
@@ -253,7 +252,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         const interruption = EntityInterruption.create(category.dbId, timestamp);
         const inspecting = this.props.inspecting;
         
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Adding Interruption", async (execute) => 
+        await this.props.database.inDialog("dialog-adding-interruption", this.props.addDialog, this.props.removeDialog, "Adding Interruption", async (execute) => 
         {
             const interruptions = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
             const creation = this.props.database.createInterruption(inspecting.team!, inspecting.story!, this.props.user.document.id!, interruptions, interruption);
@@ -263,7 +262,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     
     getFirstInterruption = () =>
     {
-        if(this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.size == 0)
+        if(this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions.size).length == 0)
         {   return undefined;}
 
         const interruptions = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
@@ -272,7 +271,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     getLastInterruption = () =>
     {
-        if(this.story == undefined || this.story.interruptions == undefined || this.story.interruptions.size == 0)
+        if(this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions.size).length == 0)
         {   return undefined;}
 
         const interruptions = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
@@ -310,7 +309,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
                 this.showConfirmationDialog("Finish Story", "Are you sure you want to finish this story?", "Finish", async() => 
                 {
                     const document = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
-                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Finishing Story", async (execute) => 
+                    await this.props.database.inDialog("dialog-finishing-story", this.props.addDialog, this.props.removeDialog, "Finishing Story", async (execute) => 
                     {
                         var last = document.getLastInterruption();
                         if(last && last.duration == undefined)
@@ -337,7 +336,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
                 this.showConfirmationDialog("Reopen Story", "Are you sure you want to re-open this story?", "Reopen", async() => 
                 {
                     const inspecting = this.props.inspecting;
-                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Reopening Story", async (execute) => 
+                    await this.props.database.inDialog("dialog-reopening-story", this.props.addDialog, this.props.removeDialog, "Reopening Story", async (execute) => 
                     {
                         const update = this.props.database.updateStory(inspecting.team!, inspecting.story!, this.story.document.data, {finishedOn: {$set: undefined}});
                         await execute(update, false);
@@ -362,7 +361,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             const inspecting = this.props.inspecting;
             const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
             
-            await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Resuming Work", async (execute) => 
+            await this.props.database.inDialog("dialog-resuming-work", this.props.addDialog, this.props.removeDialog, "Resuming Work", async (execute) => 
             {
                 const update = this.props.database.updateInterruption(inspecting.team!, inspecting.story!, this.props.user.document.id!, document, last, updates);
                 await execute(update, false);
@@ -421,7 +420,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
         const inspecting = this.props.inspecting;
 
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Start Story", async (execute) => 
+        await this.props.database.inDialog("dialog-updating-story-start", this.props.addDialog, this.props.removeDialog, "Updating Start Story", async (execute) => 
         {
             const update = this.props.database.updateStory(inspecting.team!, inspecting.story!, this.story.document.data, {startedOn: {$set: storageValue.timestamp}});
             await execute(update, false);
@@ -435,7 +434,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
         const inspecting = this.props.inspecting;
 
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Finish Time", async (execute) => 
+        await this.props.database.inDialog("dialog-updating-story-finish", this.props.addDialog, this.props.removeDialog, "Updating Finish Time", async (execute) => 
         {
             const update = this.props.database.updateStory(inspecting.team!, inspecting.story!, this.story.document.data, {finishedOn: {$set: storageValue.timestamp}});
             await execute(update, false);
@@ -454,7 +453,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
                 this.showConfirmationDialog("Unstart Story", "Are you sure you want to unstart this story?", "Unstart", async() => 
                 {
-                    await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Unstarting Story", async (execute) => 
+                    await this.props.database.inDialog("dialog-unstarting-story", this.props.addDialog, this.props.removeDialog, "Unstarting Story", async (execute) => 
                     {
                         const update = this.props.database.updateStory(inspecting.team!, inspecting.story!, this.story.document.data, {startedOn: {$set: undefined}});
                         await execute(update, false);
@@ -480,7 +479,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             this.onConfirmationClickListener = async (_baseComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
             {
                 if(action != "Positive")
-                {   return;}
+                {   return ;}
 
                 onConfirm();
             };
@@ -504,7 +503,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
                     this.showConfirmationDialog("Delete Interruption", "Are you sure you want to delete this interruption?", "Delete", async () => 
                     {
-                        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Deleting Interruption", async (execute) => 
+                        await this.props.database.inDialog("dialog-deleting-interruption", this.props.addDialog, this.props.removeDialog, "Deleting Interruption", async (execute) => 
                         {
                             const document = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
 
@@ -593,7 +592,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         const inspecting = this.props.inspecting;
         const updates = {timestamp: {$set: storageValue.start}, duration: {$set: storageValue.end!.getTime() - storageValue.start!.getTime()}, category: {$set: storageValue.type.dbId}};
         
-        await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Interruption", async (execute) => 
+        await this.props.database.inDialog("dialog-updating-interruption", this.props.addDialog, this.props.removeDialog, "Updating Interruption", async (execute) => 
         {
             const document = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
             const update = this.props.database.updateInterruption(inspecting.team!, inspecting.story!, this.props.user.document.id!, document, current, updates);
@@ -625,14 +624,13 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
                 <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={{timestamp: start}} ref={i => this.dialogEditTimeStart = i}  mode={"datetime-separate"} title="Edit Start"  visible={false} onSubmit={this.onEditTimeStart}  />
                 <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={{timestamp: end}} ref={i => this.dialogEditTimeFinish = i} mode={"datetime-separate"} title="Edit Finish" visible={false} onSubmit={this.onEditTimeFinish} />
                 <DialogConfirmation title={""} message={""} concreteRef={i => this.dialogConfirmation = i} onActionClickListener={this.onConfirmationClickListener}/>
-                {this.state.dialogs.map(dialog => dialog)}
              </View>
          );
     }
 
     getFabComponent = (icon: string, action: ActionType, shouldHaveBottomMargin: boolean) =>
     {
-        return <InputFloatingActionButton shouldHaveBottomMargin={shouldHaveBottomMargin} icon={icon} onPress={() => this.onFabMenuItemSelected(action)} />
+        return <InputFloatingActionButton enabled={true} shouldHaveBottomMargin={shouldHaveBottomMargin} icon={icon} onPress={() => this.onFabMenuItemSelected(action)} />
     }
 
     render()
@@ -854,5 +852,6 @@ const hoc1 = WithReduxSubscription<ScreenStoryDetailsInterruptions, ScreenStoryD
 const hoc2 = WithOverflowMenu(hoc1);
 const hoc3 = WithDatabase(hoc2);
 const hoc4 = WithDialogContainer(hoc3);
+const hoc5 = WithLoading(hoc4);
 
-export default hoc4;
+export default hoc5;

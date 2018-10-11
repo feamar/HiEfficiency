@@ -4,10 +4,11 @@ import Theme from '../../../styles/Theme';
 import AbstractDialog, { AbstractDialog_Props_Virtual } from '../AbstractDialog';
 import update, {Spec} from "immutability-helper";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
+import UtilityObject from '../../../utilities/UtilityObject';
 
 interface AbstractPreferenceDialog_Props_Sealed<StorageValue> 
 {
-    getDialogContent: () => JSX.Element,
+    getDialogContent: (storageValue: StorageValue) => JSX.Element,
     onInputError?: (error: string) => any,
     onInternalValueValidation?: (storageValue: StorageValue) => string | undefined
 }
@@ -20,18 +21,20 @@ export type AbstractPreferenceDialog_Props_Virtual<StorageValue> = AbstractDialo
     onValueValidation?: (storageValue: StorageValue) => string | undefined,
 }
 
-type Props<StorageValue> = AbstractPreferenceDialog_Props_Sealed<StorageValue> & AbstractPreferenceDialog_Props_Virtual<StorageValue>
+type Props<StorageValue> = AbstractPreferenceDialog_Props_Sealed<StorageValue> & AbstractPreferenceDialog_Props_Virtual<StorageValue> & 
+{
+}
 
 interface State<StorageValue>
 {
-    storageValue: StorageValue | null,
+    storageValue: StorageValue,
     error?: string,
     required: boolean
 }
 
-export default class AbstractPreferenceDialog<StorageValue> extends React.Component<Props<StorageValue>, State<StorageValue>> implements Baseable<AbstractDialog>
+export default class AbstractPreferenceDialog<StorageValue extends object> extends React.Component<Props<StorageValue>, State<StorageValue>> implements Baseable<AbstractDialog>
 {
-    private mBase: AbstractDialog | undefined;
+    public base: AbstractDialog | undefined;
 
     constructor(props: Props<StorageValue>) 
     {
@@ -39,14 +42,20 @@ export default class AbstractPreferenceDialog<StorageValue> extends React.Compon
 
         this.state = 
         {
-            storageValue: this.props.storageValue,
+            storageValue: this.props.storageValue || {} as StorageValue,
             error: undefined,
             required: this.props.required || false
         }
     }
 
-    public get base (): AbstractDialog | undefined 
-    {   return this.mBase;}
+    componentWillReceiveProps = (props: Props<StorageValue>) =>
+    {
+        if(props.storageValue != this.props.storageValue)
+        {   this.setState({storageValue: props.storageValue || this.state.storageValue});}
+
+        if(props.required != this.props.required)
+        {   this.setState({required: props.required || this.state.required});}
+    }
 
     getCurrentStorageValue = () : StorageValue | null =>
     {   return this.state.storageValue;}
@@ -117,24 +126,31 @@ export default class AbstractPreferenceDialog<StorageValue> extends React.Compon
 
         this.setState({error: undefined});
 
-        if(this.mBase)
-        {   this.mBase.setVisible(false);}
+        if(this.base)
+        {   this.base.setVisible(false);}
     }
 
     onCancel = () =>
     {
-        if(this.mBase)
-        {   this.mBase.onDismiss();}
+        if(this.base)
+        {   this.base.onDismiss();}
     }
 
     onDialogClosed = () =>
-    {       setTimeout(() => this.setState({error: undefined, storageValue: this.getOriginalStorageValue()}), 500);}
+    {       
+        console.log("ON DIALOG CLOSED!");
+        setTimeout(() => this.setState({error: undefined, storageValue: this.getOriginalStorageValue() || {} as StorageValue}), 500);
+    }
 
-    setStorageValue = (storageValue: StorageValue | null) =>
-    {   this.setState({storageValue: storageValue});}
-
-    onValueChange = (spec: Spec<StorageValue | null, never>): void =>
+    setStorageValue = (storageValue: StorageValue) =>
     {
+        console.log("SET STORAGE VALUE!: " + UtilityObject.stringify(storageValue));
+        this.setState({storageValue: storageValue});
+    }
+
+    onValueChange = (spec: Spec<StorageValue, never>): void =>
+    {
+        console.log("onValueChange: " + UtilityObject.stringify(spec));
         const newStorageValue = update(this.state.storageValue, spec);
         this.setStorageValue(newStorageValue);
     }
@@ -144,8 +160,8 @@ export default class AbstractPreferenceDialog<StorageValue> extends React.Compon
         return (
             <AbstractDialog 
                 ref={onBaseReference(this)}
-                content={this.props.getDialogContent()} 
-                actions={this.getDialogActions()} 
+                content={() => this.props.getDialogContent(this.state.storageValue)} 
+                actions={this.getDialogActions} 
                 {...this.props} />
         );
     }

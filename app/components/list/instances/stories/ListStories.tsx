@@ -16,10 +16,7 @@ interface State
 
 export default class ListStories extends Component<Props, State> implements Baseable<AbstractList<ReduxStory>>
 {
-    private mBase: AbstractList<ReduxStory> | undefined = undefined;
-
-    get base ()
-    {   return this.mBase;}
+    public base: AbstractList<ReduxStory> | undefined = undefined;
 
     getItemKey = (item: ReduxStory) => 
     {   return item.document.data.name;}
@@ -27,6 +24,7 @@ export default class ListStories extends Component<Props, State> implements Base
     getListItemFor = (item: ReduxStory, index: number) =>
     {
         return <ListItemStory 
+            {...this.props}
             item={item} 
             index={index} />
     }

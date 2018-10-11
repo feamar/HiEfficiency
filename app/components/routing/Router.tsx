@@ -56,6 +56,7 @@ export const TAB_NAME_PROFILE = 'Profile';
 export const PARAM_NAME_HEADER_RIGHT_INJECTION = "header_right_injection";
 export const PARAM_NAME_INITIAL_ROUTE_NAME = "initial_route_name";
 export const PARAM_NAME_SUBTITLE = "subtitle";
+export const PARAM_NAME_TITLE = "title";
 
 export default class Router
 {
@@ -268,7 +269,7 @@ const getNavigationOptions = (title: string, actionLeft?: (navigation: HiEfficie
       {   headerRight = headerRightInjection();}
 
       const options = {
-        header: <CustomHeader left={headerLeft} title={title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
+        header: <CustomHeader left={headerLeft} title={navigation.getParam(PARAM_NAME_TITLE) || title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
       }
 
       return options;

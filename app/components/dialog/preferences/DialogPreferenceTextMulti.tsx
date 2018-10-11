@@ -3,8 +3,8 @@ import {View, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import AbstractPreferenceDialog, { AbstractPreferenceDialog_Props_Virtual } from './AbstractPreferenceDialog';
 import UtilityValidate from "../../../utilities/UtilityValidate";
-import InputError from '../../inputs/InputError';
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
+import InputError from '../../inputs/InputError';
 
 const styles = StyleSheet.create({
     error:{
@@ -22,10 +22,10 @@ const styles = StyleSheet.create({
 });
 
 
-export type DialogPreferenceTextMulti_StorageValue<Fields> = Map<keyof Fields, string> 
-type StorageValue<Fields> = DialogPreferenceTextMulti_StorageValue<Fields>;
+export type DialogPreferenceTextMulti_StorageValue<> = {[index: string]: string}
+type StorageValue = DialogPreferenceTextMulti_StorageValue;
 
-type Props<Fields> = AbstractPreferenceDialog_Props_Virtual<StorageValue<Fields>> &
+type Props<Fields> = AbstractPreferenceDialog_Props_Virtual<StorageValue> &
 {
     elements: Array<TextElement<Fields>>
 }
@@ -35,9 +35,9 @@ interface State<Fields>
     elements: Array<TextElement<Fields>>
 }
 
-export default class DialogPreferenceTextMulti<Fields> extends React.Component<Props<Fields>, State<Fields>> implements Baseable<AbstractPreferenceDialog<StorageValue<Fields>>>
+export default class DialogPreferenceTextMulti<Fields> extends React.Component<Props<Fields>, State<Fields>> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
-    private _base: AbstractPreferenceDialog<StorageValue<Fields>> | undefined;
+    public base: AbstractPreferenceDialog<StorageValue> | undefined;
 
     constructor(props: Props<Fields>)
     {
@@ -48,16 +48,13 @@ export default class DialogPreferenceTextMulti<Fields> extends React.Component<P
         }
     }
 
-    get base ()
-    {   return this._base;}
-
-    onValueValidation = (storageValue: StorageValue<Fields>) =>
+    onValueValidation = (storageValue: StorageValue) =>
     {
         var allIllegals = "";
         for(var outer = 0 ; outer < this.state.elements.length ; outer ++)
         {
             const element = this.state.elements[outer];
-            const value = storageValue.get(element.field);
+            const value = storageValue[element.field];
          
             if(element.required && (value == undefined || value == ""))
             {   return "Please fill out all the required fields first.";}
@@ -80,39 +77,35 @@ export default class DialogPreferenceTextMulti<Fields> extends React.Component<P
         {   return "Please refrain from using the following illegal characters: " + allIllegals;}
     }
 
-    onTextInputChanged = (field: keyof Fields) => (value: string) =>
+    onTextInputChanged = (field: string) => (value: string) =>
     {
         if(this.base)
-        {   this.base.onValueChange({$add: [[field, value]]});}
+        {   this.base.onValueChange({[field]: {$set: value}});}
     }
 
     getErrorComponent = () =>
     {
-        if(this._base == undefined)
+        if(this.base == undefined)
         {   return null;}
-
-        return <InputError error={this._base.getCurrentError()} />
+        const component = <InputError error={this.base.getCurrentError()} />
+        return component
     }
 
-    getDialogContent = () => 
+    getDialogContent = (storageValue: StorageValue) => 
     {
-        var storageValue: StorageValue<Fields>;
-        if(this.base)
-        {   storageValue = this.base.getCurrentStorageValue() || new Map<keyof Fields, string>();}
-        else
-        {   storageValue = this.props.storageValue || new Map<keyof Fields, string>();}
-
+        const TheErrorComponent = this.getErrorComponent();
         return (
-            <View> 
+            <View style={{flex: 1}}> 
+                
+                {TheErrorComponent}
                 {this.state.elements.map((element, index) => 
                 {
                     return (
-                        <View key={element.field.toString()} style={styles.element}>
-                            <TextInput autoFocus={index == 0} name="value" label={element.label} value={storageValue.get(element.field)} onChangeText={this.onTextInputChanged(element.field)} multiline={element.multiline} numberOfLines={element.numberOfLines} />
+                        <View key={element.field} style={styles.element}>
+                            <TextInput autoFocus={index == 0} label={element.label} value={storageValue[element.field]} onChangeText={this.onTextInputChanged(element.field)} multiline={element.multiline} numberOfLines={element.numberOfLines} />
                         </View>
                     );
                 })}
-                {this.getErrorComponent()}
             </View>
         );
     }
@@ -128,7 +121,7 @@ export default class DialogPreferenceTextMulti<Fields> extends React.Component<P
 export class TextElement<Fields>
 {
     public required: boolean;
-    public field: keyof Fields;
+    public field: string;
     public label: string;
     public multiline: boolean;
     public numberOfLines: number
@@ -137,7 +130,7 @@ export class TextElement<Fields>
     constructor(field: keyof Fields, label: string, required: boolean = false, multiline: boolean = false, numberOfLines: number = 1, legalCharacters: string = UtilityValidate.DEFAULT_LEGAL_CHARACTERS)
     {
         this.required = required;
-        this.field = field;
+        this.field = field.toString();
         this.label = label;
         this.multiline = multiline;
         this.numberOfLines = numberOfLines;

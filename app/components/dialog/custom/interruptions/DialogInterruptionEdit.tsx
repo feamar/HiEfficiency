@@ -76,10 +76,7 @@ export interface DialogInterruptionEdit_StorageValue
 
 export default class DialogInterruptionEdit extends React.Component<DialogInterruptionEditProps, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
-    private _base: AbstractPreferenceDialog<StorageValue> | undefined;
-
-    public get base () : AbstractPreferenceDialog<StorageValue> | undefined
-    {   return this._base;}
+    public base: AbstractPreferenceDialog<StorageValue> | undefined;
 
     constructor(props: DialogInterruptionEditProps)
     {

@@ -57,7 +57,10 @@ interface State
 
 export default class DialogPreferenceWeekSchema extends React.Component<Props, State> implements Baseable<AbstractPreferenceDialog<EntitySchemaWeek>>
 {
-    private _base: AbstractPreferenceDialog<EntitySchemaWeek> | undefined;
+    //This is REALLY messy, but needed during TypeScript conversion. Change when localization comes into play.
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    public base: AbstractPreferenceDialog<EntitySchemaWeek> | undefined;
 
     constructor(props: Props) 
     {
@@ -67,9 +70,6 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         {
         }
     }
-
-    public get base ()
-    {   return this._base;}
 
     onCheckboxPress = (index: number) => () => 
     {
@@ -179,17 +179,18 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         //Check whether the current value array contains the current index.
         const enabled = this.isEnabled(index);
         const status = enabled ? "checked" : "unchecked";
-        const value = this.getCurrentStorageValue() || EntitySchemaWeek.default();
 
-
+        console.log("INDEX: " + index);
+        const dayName = this.days[index];
+        console.log("DAYNAME: "+ dayName);
         return (
             <View style={styles.item} key={index}>
                 <View style={styles.wrapper}>
                     <View style={styles.contentWrapper}>
-                        <Text style={styles.title}>{item}</Text>
-                        <InputTimeRange disabled={enabled == false} onRangeChange={this.onRangeChange(index)} start={UtilityTime.HhmmToDate(value.getByIndex(index).start)} end={UtilityTime.HhmmToDate(value.getByIndex(index).end)} />
+                        <Text style={styles.title}>{dayName}</Text>
+                        <InputTimeRange disabled={enabled == false} onRangeChange={this.onRangeChange(index)} start={UtilityTime.HhmmToDate(item.start)} end={UtilityTime.HhmmToDate(item.end)} />
                     </View>
-                    <Checkbox style={styles.checkbox} status={status} onPress={this.onCheckboxPress(index)} />
+                    <Checkbox status={status} onPress={this.onCheckboxPress(index)} />
                 </View>
             </View>
         );
@@ -210,10 +211,10 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
 
     getErrorComponent = () =>
     {
-        if(this._base == undefined)
+        if(this.base == undefined)
         {   return null;}
 
-        return <InputError error={this._base.getCurrentError()} />
+        return <InputError error={this.base.getCurrentError()} />
     }
 
     render()

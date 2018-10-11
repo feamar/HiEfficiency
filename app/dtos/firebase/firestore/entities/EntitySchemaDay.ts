@@ -1,5 +1,8 @@
 export default class EntitySchemaDay 
 {
+    static fromJsonObject = (json: any): EntitySchemaDay =>
+    {   return new EntitySchemaDay(json.start, json.end, json.enabled);}
+
     static create(start:string, end: string, enabled: boolean) : EntitySchemaDay
     {   return new EntitySchemaDay(start, end, enabled);}
 
@@ -22,6 +25,9 @@ export default class EntitySchemaDay
 
     getHours = () =>
     {
+        if(this.enabled == false)
+        {   return 0;}
+        
         const splitStart = this.start.split(":");
         const splitEnd = this.end.split(":");
 

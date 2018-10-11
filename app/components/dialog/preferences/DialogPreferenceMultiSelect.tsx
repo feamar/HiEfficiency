@@ -14,8 +14,7 @@ const styles = StyleSheet.create({
     },
     title: {
         paddingTop: 9
-    },
-    checkbox: {}
+    }
 });
 
 export interface DialogPreferenceMultiSelect_StorageValue
@@ -37,7 +36,7 @@ interface State
 
 export default class DialogPreferenceMultiSelect extends React.Component<Props, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
-    private _base: AbstractPreferenceDialog<StorageValue> | undefined;
+    public base: AbstractPreferenceDialog<StorageValue> | undefined;
     
     constructor(props: Props) 
     {
@@ -49,9 +48,6 @@ export default class DialogPreferenceMultiSelect extends React.Component<Props, 
         }
     }
 
-    public get base ()
-    {   return this._base;}
-    
     onCheckboxPress = (index: number) => () => 
     {
         if(this.base == undefined)
@@ -82,12 +78,12 @@ export default class DialogPreferenceMultiSelect extends React.Component<Props, 
         if(sv == null)
         {   return null;}
 
-        var checked = sv.selected.indexOf(item) > -1; 
+        var status: "checked" | "unchecked" = sv.selected.indexOf(item) > -1 ? "checked" : "unchecked"; 
 
         return (
             <View style={styles.item} key={index}>
                 <Text style={styles.title}>{item}</Text>
-                <Checkbox style={styles.checkbox} checked={checked} onPress={this.onCheckboxPress(index)} />
+                <Checkbox status={status} onPress={this.onCheckboxPress(index)} />
             </View>
         );
     } 

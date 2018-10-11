@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
         paddingTop: 5,
         paddingBottom: 5,
         alignItems: "center",
+        width: "100%", 
         borderBottomWidth: 1,
         borderBottomColor: "#CECECE"
     }
@@ -96,7 +97,7 @@ export default class InputDateTime extends Component<Props, State>
     {
         return(
             <View testID="root" style={this.props.style}>
-                <TouchableRipple testID="touchable" disabled={this.state.disabled} style={styles.touchable} onPress={this.open}><Text testID="text">{this.getDisplayValue(this.state.timestamp, this.state.mode)}</Text></TouchableRipple>
+                <TouchableRipple disabled={this.state.disabled} style={styles.touchable} onPress={this.open}><Text testID="text">{this.getDisplayValue(this.state.timestamp, this.state.mode)}</Text></TouchableRipple>
                 {this.state.error == undefined && <DateTimePicker datePickerModeAndroid="spinner" date={new Date(this.state.timestamp)} onCancel={this.onCancel} mode={this.state.mode} isVisible={this.state.open} onConfirm={this.onConfirm} />}
             </View>
         );

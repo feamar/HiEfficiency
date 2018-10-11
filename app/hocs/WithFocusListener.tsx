@@ -30,7 +30,7 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Re
             this.unsubscribers = [];
         }
 
-        componentWillMount()
+        onComponentWillMount = () =>
         {
             var unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.onScreenWillFocus(payload)});
             this.unsubscribers.push(unsubscriber);
@@ -81,7 +81,7 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Re
             });
         }
         
-        componentWillUnmount()
+        onComponentDidMount = () =>
         {   this.unsubscribers.forEach(unsubscriber => unsubscriber.remove());}
 
         render()

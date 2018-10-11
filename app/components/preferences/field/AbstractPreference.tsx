@@ -26,7 +26,7 @@ export const AbstractPreferenceStyles = StyleSheet.create({
     }
 });
 
-export interface AbstractPreferencePropsVirtual<StorageValue>
+export interface AbstractPreference_Props_Virtual<StorageValue>
 {
     storageValue: StorageValue | null,
     title: string
@@ -36,7 +36,7 @@ export interface AbstractPreferencePropsVirtual<StorageValue>
     required?: boolean
 }
 
-interface AbstractPreferencePropsSealed<StorageValue>
+interface AbstractPreference_Props_Sealed<StorageValue>
 {
     onValueValidationInternal?: (value: StorageValue) => string | undefined,
     onPreferencePressInternal?: () => void,
@@ -45,18 +45,18 @@ interface AbstractPreferencePropsSealed<StorageValue>
     toDisplayValue: (storageValue: StorageValue) => string
 }
 
-type Props<StorageValue> = AbstractPreferencePropsSealed<StorageValue> & AbstractPreferencePropsVirtual<StorageValue>;
+type Props<StorageValue> = AbstractPreference_Props_Sealed<StorageValue> & AbstractPreference_Props_Virtual<StorageValue>;
 
 export interface AbstractPreferenceState<StorageValue>
 {
     required: boolean,
     title: string,
-    storageValue: StorageValue | null,
+    storageValue: StorageValue,
     displayValue: string,
     error?: string
 }
 
-export default class AbstractPreference<StorageValue> extends Component<Props<StorageValue>, AbstractPreferenceState<StorageValue>>
+export default class AbstractPreference<StorageValue extends {}> extends Component<Props<StorageValue>, AbstractPreferenceState<StorageValue>>
 {
   
     constructor(props : Props<StorageValue>)
@@ -64,7 +64,7 @@ export default class AbstractPreference<StorageValue> extends Component<Props<St
         super(props);
 
         this.state = { 
-            storageValue: props.storageValue,
+            storageValue: props.storageValue || {} as StorageValue,
             title: props.title,
             required: props.required || false,
             displayValue: props.storageValue == null ? "" : props.toDisplayValue(props.storageValue)
@@ -72,12 +72,15 @@ export default class AbstractPreference<StorageValue> extends Component<Props<St
     }  
 
     componentWillMount = () =>
-    {   this.onValueChanged(this.state.storageValue);}
+    {   this.onValueChanged(this.state.storageValue, false);}
 
-    onValueChanged = (storage: StorageValue | null) =>
+    onValueChanged = (storage: StorageValue, notifyListeners: boolean = true) =>
     {
-        const display = storage == null ? "" : this.props.toDisplayValue(storage);
+        const display = this.props.toDisplayValue(storage);
         this.setState({storageValue: storage, displayValue: display});
+        
+        if(notifyListeners)
+        {   this.props.onValueChanged(storage);}
     }
 
     validate = () =>

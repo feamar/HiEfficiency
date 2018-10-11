@@ -5,8 +5,11 @@ import {Button,  Card, TextInput, Text} from 'react-native-paper';
 import {SCREEN_NAME_AUTH_REGISTER} from '../routing/Router';
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import Theme from '../../styles/Theme';
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from "../../hocs/WithDialogContainer";
+import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDialogContainer";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
+import ActionUserLoggedIn from "../../redux/actions/user/ActionUserLoggedIn";
+import { Dispatch } from "redux";
+import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -45,12 +48,24 @@ const styles = StyleSheet.create({
   }
 }); 
 
-type Props = WithDatabaseProps & WithDialogContainerProps & 
+interface ReduxDispatchProps
+{
+  onUserLoggedIn: (action: ActionUserLoggedIn) => ActionUserLoggedIn
+}
+
+const mapDispatchToProps = (dispatch: Dispatch): ReduxDispatchProps =>
+{
+  return {
+    onUserLoggedIn: (action: ActionUserLoggedIn) => dispatch(action)
+  }
+}
+
+type Props = ReduxDispatchProps & WithDatabaseProps & WithDialogContainerProps & 
 {
   navigation: HiEfficiencyNavigator
 }
 
-type State = WithDialogContainerState & 
+type State =  
 {
   email: string,
   password: string
@@ -65,7 +80,6 @@ class ScreenLogin extends React.Component<Props, State>
     {
       email: '', 
       password: '',
-      dialogs: []
     }
   } 
 
@@ -91,11 +105,9 @@ class ScreenLogin extends React.Component<Props, State>
 
     this.setState({email: this.state.email.trim()}, async () => 
     {
-
-
-      await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Loging In", async (execute) => 
+      await this.props.database.inDialog("dialog-logging-in", this.props.addDialog, this.props.removeDialog, "Logging In", async (execute) => 
       {   
-        const crud = this.props.database.loginUser(this.state.email, this.state.password);
+        const crud = this.props.database.loginUser(this.state.email, this.state.password, this.props.onUserLoggedIn);
         await execute(crud, false);
       }, 200);
     });
@@ -115,19 +127,19 @@ class ScreenLogin extends React.Component<Props, State>
             <Text style={styles.title}>Login</Text>
           </View> 
           <Card.Content>  
-            <TextInput style={styles.input} id="email" name="email" label="E-mail address" value={this.state.email} onChangeText={this.onEmailChange} />
-            <TextInput style={styles.input} secureTextEntry id="password" name="password" label="Password" value={this.state.password} onChangeText={this.onPasswordChange} />
+            <TextInput style={styles.input}  label="E-mail address" value={this.state.email} onChangeText={this.onEmailChange} />
+            <TextInput style={styles.input} secureTextEntry  label="Password" value={this.state.password} onChangeText={this.onPasswordChange} />
             <Button style={styles.button_login} dark mode="contained" onPress={this.handleLogin}>Login</Button>
-            <Button style={styles.button_register} flat primary onPress={this.handleRegister}>Register</Button>
+            <Button style={styles.button_register} onPress={this.handleRegister}>Register</Button>
           </Card.Content>     
         </Card> 
-        {this.state.dialogs.map(dialog => dialog)}
       </View>     
     );
   }
 }
 
-const hoc1 = WithDatabase(ScreenLogin);
-const hoc2 = WithDialogContainer(hoc1);
+const hoc1 = WithReduxSubscription<ScreenLogin, ScreenLogin, Props, {}, ReduxDispatchProps>(undefined, mapDispatchToProps)(ScreenLogin);
+const hoc2 = WithDatabase(hoc1);
+const hoc3 = WithDialogContainer(hoc2);
 
-export default hoc2;
+export default hoc3;

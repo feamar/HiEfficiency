@@ -11,8 +11,10 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
         width: "50%",
         alignItems: "center",
-        borderBottomWidth: 1,
-        borderBottomColor: "#CECECE"
+    },
+    hyphen:
+    {
+        paddingTop: 7
     }
 });
 
@@ -78,7 +80,7 @@ export default class InputTimeRange extends React.Component<Props, State>
         return (
             <View style={this.getRootStyle()}>
                 <InputDateTime style={styles.input} disabled={this.state.disabled} timestamp={this.state.start} mode="time" onSelected={this.onSelectedFrom}/>
-                <Text> - </Text>
+                <Text style={styles.hyphen}> - </Text>
                 <InputDateTime style={styles.input} disabled={this.state.disabled} timestamp={this.state.end} mode="time" onSelected={this.onSelectedTo}/>
             </View>
         );

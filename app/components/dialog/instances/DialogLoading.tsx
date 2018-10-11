@@ -9,6 +9,7 @@ import TextGroup from "../../text/TextGroup";
 import WithActions, { WithActionPropsInner } from "../hocs/WithActions";
 import UtilityCompare from "../../../utilities/UtilityCompare";
 import { Baseable, onBaseReference } from "../../../render_props/Baseable";
+import { AdjustedCallbackReference } from "../../../render_props/CallbackReference";
 
 const styles = StyleSheet.create({
     wrapper:{
@@ -48,10 +49,11 @@ export type DialogLoadingProps = AbstractDialog_Props_Virtual &
     onTimeout: OnTimeOutListener
     isComplete: boolean,
     cancelable?: boolean,
+    baseRef?: AdjustedCallbackReference<AbstractDialog>
 }
 
 export type DialogLoadingActionUnion = "Ok" | "Cancel";
-type Lifecycle = "Unstarted" | "Canceled" | "Running" | "Timed Out" | "Completed";
+type Lifecycle = "Canceled" | "Running" | "Timed Out" | "Completed";
 
 type DialogLoadingPropsAndInjected = WithActionPropsInner<DialogLoadingProps, DialogLoadingActionUnion>
 
@@ -64,13 +66,13 @@ interface State
     lifecycle: Lifecycle,
     timeLeft: number,
     cancelable: boolean,
-    timeStart?: number,
+    timeStart: number,
     shouldShowButtonOk: boolean
 }
 
 export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAndInjected, State> implements Baseable<AbstractDialog>
 {
-    private mBase: AbstractDialog | undefined;
+    public base: AbstractDialog | undefined;
     public readonly onTimeoutListeners: Array<OnTimeOutListener>;
 
     constructor(props: DialogLoadingPropsAndInjected)
@@ -83,7 +85,8 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
             warning: props.warning,
             timeout: props.timeout || 30000,
             section: props.section,
-            lifecycle: "Unstarted",
+            lifecycle: "Running",
+            timeStart: new Date().getTime(),
             timeLeft: props.timeout || 30000,
             cancelable: props.cancelable || false,
             shouldShowButtonOk: false,
@@ -101,9 +104,6 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
     shouldComponentUpdate = (nextProps: DialogLoadingPropsAndInjected, nextState: State) =>
     {   return UtilityCompare.shallowEqual(this.props, nextProps) == false || UtilityCompare.shallowEqual(this.state, nextState) == false;}
-
-    public get base (): AbstractDialog | undefined
-    {   return this.mBase;}
 
     getStatus = (lifecycle: Lifecycle): string =>
     {   
@@ -123,10 +123,10 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
         this.setState({lifecycle: "Completed", shouldShowButtonOk: true});
 
-        if(this.mBase)
+        if(this.base)
         {
-            if(this.mBase.state.visible == false)
-            {   this.mBase.notifyListeners(this.mBase.onCloseListeners, "onCloseListeners from ConcreteDialogLoading");}
+            if(this.base.state.visible == false)
+            {   this.base.notifyListeners(this.base.onCloseListeners, "onCloseListeners from ConcreteDialogLoading");}
         }
 
         return true;
@@ -134,7 +134,8 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
     setMessage = (message: string): boolean =>
     {
-        if(message == this.state.message || this.state.lifecycle != "Running")
+        console.log("Set Message: " + this.state.lifecycle + " AND " + message);
+        if(message == this.state.message || this.state.lifecycle == "Completed")
         {   return false;}
 
         this.setState({message: message});
@@ -170,7 +171,7 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
     setTimeout = (timeout: number): boolean =>
     {
-        if(this.state.timeout == timeout || this.state.lifecycle != "Unstarted")
+        if(this.state.timeout == timeout || this.state.lifecycle != "Running")
         {   return false;}
 
         this.setState({timeout: timeout});
@@ -182,7 +183,7 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
     setTimeoutLeft = () =>
     {
-        const timeStart: number = this.state.timeStart || new Date().getTime();
+        const timeStart: number = this.state.timeStart;
         const now: number = new Date().getTime();
         const difference: number = now - timeStart;
         const left: number = this.state.timeout - difference;
@@ -193,13 +194,15 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         {
             this.onTimeoutListeners.forEach(listener => 
             {   listener(this, this.state.section)});
-            this.setState({lifecycle: "Timed Out", timeLeft: seconds});
+            this.setState({lifecycle: "Timed Out", timeLeft: seconds, shouldShowButtonOk: true});
         }
         else
-        {   this.setState({timeLeft: seconds});}
+        {
+            this.setState({timeLeft: seconds});
+            if(this.state.lifecycle == "Running")
+            {   setTimeout(this.setTimeoutLeft, 1000 - remainder);}
+        }
 
-        if(this.state.lifecycle == "Running")
-        {   setTimeout(this.setTimeoutLeft, 1000 - remainder);}
     }
   
     getDialogContent = () =>
@@ -210,7 +213,7 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
                 <Progress.Bar style={styles.loading} width={undefined} color={Theme.colors.primary} borderRadius={0} progress={1} indeterminate={this.state.lifecycle == "Running"} borderWidth={1} />
                 {this.state.lifecycle == "Running" && <Text style={styles.timeout}>Timeout in {this.state.timeLeft} seconds..</Text>}
             </TextGroup>
-            <TextGroup title="Result" ref={i => console.log(i)}>
+            <TextGroup title="Result">
                 <Text style={styles.message}>{this.state.message}</Text>
                 <Text style={styles.warning}>{this.state.warning}</Text>
             </TextGroup>
@@ -228,14 +231,20 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
     }
 
     onDialogOpen = (_: AbstractDialog): void => 
-    {   this.setTimeoutLeft();}
+    {
+        this.setTimeoutLeft();
+    }
 
     onBaseReference = (reference?: AbstractDialog): void =>
     {
+        if(this.props.baseRef)
+        {   this.props.baseRef(reference);}
         if(reference)
         {
             if(reference.onOpenListeners.includes(this.onDialogOpen) == false)
-            {   reference.onOpenListeners.push(this.onDialogOpen);}
+            { 
+                reference.onOpenListeners.push(this.onDialogOpen);
+            }
         }
     }
     
@@ -244,15 +253,15 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         switch(action)
         {
             case "Ok":
-                if(this.mBase)
-                {   this.mBase.setVisible(false);}
+                if(this.base)
+                {   this.base.setVisible(false);}
                 break;
 
             case "Cancel":
                 this.setState({lifecycle: "Canceled"}, () =>
                 {
-                    if(this.mBase)
-                    {   this.mBase.onDismiss();}
+                    if(this.base)
+                    {   this.base.onDismiss();}
                 });
                 break;
         }
@@ -265,8 +274,8 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         return (
             <AbstractDialog 
                 ref={onBaseReference(this)} 
-                content={this.getDialogContent()} 
-                actions={this.getDialogActions()} 
+                content={this.getDialogContent} 
+                actions={this.getDialogActions} 
                 {...this.props}/>
         );
     }

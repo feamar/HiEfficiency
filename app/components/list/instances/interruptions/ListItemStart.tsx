@@ -22,7 +22,7 @@ interface State
 
 export default class ListItemStart extends Component<Props, State> implements Baseable<AbstractListItem<ModelStart>>
 {
-    private mBase?: AbstractListItem<ModelStart>;
+    public base: AbstractListItem<ModelStart> | undefined;
 
     constructor(props: Props, _?: any)
     {
@@ -34,15 +34,11 @@ export default class ListItemStart extends Component<Props, State> implements Ba
         }
     }
 
-    public get base ()
-    {   return this.mBase;}
 
-    onBaseReference = (reference?: AbstractListItem<ModelStart>) =>
+    onBaseReference = async (reference?: AbstractListItem<ModelStart>) =>
     {
         if(reference)
-        {
-            reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));
-        }
+        {   await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
     }
 
     getTimeOfDay = (timestamp: Date) =>

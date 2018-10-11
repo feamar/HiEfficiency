@@ -48,7 +48,7 @@ export default <B extends ConcreteComponent & RequiredFunctions, C extends Concr
         constructor(props: HocProps<B, P>)
         {   super(props);}
 
-        componentDidMount()
+        onComponentDidMount = () =>
         {
             const concrete = this.concrete;
             if(concrete)

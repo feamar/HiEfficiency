@@ -6,9 +6,9 @@ export default class ReduxTeam
 {
     public readonly document: AbstractFirestoreDocument<DocumentTeam>;
     public readonly loaded: boolean;
-    public readonly stories: Map<string, ReduxStory>;
+    public readonly stories: {[id: string]: ReduxStory};
 
-    constructor(document: AbstractFirestoreDocument<DocumentTeam>, stories: Map<string, ReduxStory>, loaded: boolean)
+    constructor(document: AbstractFirestoreDocument<DocumentTeam>, stories: {[id: string]: ReduxStory}, loaded: boolean)
     {
         this.document = document;
         this.loaded = loaded;

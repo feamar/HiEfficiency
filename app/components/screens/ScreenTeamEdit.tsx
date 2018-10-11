@@ -4,10 +4,9 @@ import {View} from 'react-native';
 import withBackButtonInterceptor, { WithBackButtonInterceptorProps } from "../../hocs/WithBackButtonInterceptor";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import UtilityUpdate from '../../utilities/UtilityUpdate';
-import WithDialogContainer, { WithDialogContainerProps, WithDialogContainerState } from '../../hocs/WithDialogContainer';
+import WithDialogContainer, { WithDialogContainerProps } from '../../hocs/WithDialogContainer';
 import { HiEfficiencyNavigator } from '../routing/RoutingTypes';
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from '../dialog/instances/DialogConfirmation';
-import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
 import PreferenceDateTime from '../preferences/field/PreferenceDateTime';
 import PreferenceText from '../preferences/field/PreferenceText';
 import DocumentTeam from '../../dtos/firebase/firestore/documents/DocumentTeam';
@@ -18,6 +17,8 @@ import AbstractFirestoreDocument from '../../dtos/firebase/firestore/documents/A
 import { DialogPreferenceText_StorageValue } from '../dialog/preferences/DialogPreferenceText';
 import { DialogPreferenceDateTime_StorageValue } from '../dialog/preferences/DialogPreferenceDateTime';
 import update from 'immutability-helper';
+import UtilityObject from '../../utilities/UtilityObject';
+import InputFloatingActionButton from '../inputs/InputFloatingActionButton';
 
 interface ReduxStateProps 
 {
@@ -36,7 +37,7 @@ type Props = ReduxStateProps & WithBackButtonInterceptorProps & WithDialogContai
     navigation: HiEfficiencyNavigator
 }
 
-type State = WithDialogContainerState & 
+type State =  
 {
     team: AbstractFirestoreDocument<DocumentTeam>,
     fabEnabled: boolean
@@ -56,17 +57,20 @@ class ScreenTeamEdit extends Component<Props, State>
     {
         super(props);
         
-        const team = this.props.navigation.getParam("team");
+        var team = this.props.navigation.getParam("team");
+        console.log("HERE: " + UtilityObject.stringify(team));
         if(team == undefined || team == null)
-        {   this.mode = "Create";}
+        {
+            this.mode = "Create";
+            team = new AbstractFirestoreDocument<DocumentTeam>(DocumentTeam.empty(), null);
+        }
         else
         {   this.mode = "Edit";}
 
         this.state =
         {
           team: team,
-          fabEnabled: true,
-          dialogs: []
+          fabEnabled: false
         } 
     }
 
@@ -75,6 +79,7 @@ class ScreenTeamEdit extends Component<Props, State>
  
     onSoftwareBackPress = () =>
     {
+        console.log("on Back Press in ScreenTeamEdit");
         if(this.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
 
@@ -86,18 +91,18 @@ class ScreenTeamEdit extends Component<Props, State>
 
     onTextValueChanged = (field: keyof DocumentTeam) => async (value: DialogPreferenceText_StorageValue) =>
     {
-      this.unsavedChanges = true;
-      const newData = update(this.state.team, {[field]: {$set: value.text}});
-  
-      this.setState({team: newData});
+        this.unsavedChanges = true;
+        const newData = update(this.state.team, {data: {[field]: {$set: value.text}}});
+
+        this.setState({team: newData, fabEnabled: true});
     }
 
     onDateValueChanged = (field: keyof DocumentTeam) => async (value: DialogPreferenceDateTime_StorageValue) =>
     {
-      this.unsavedChanges = true;
-      const newData = update(this.state.team, { [field]: {$set: value.timestamp}});
-  
-      this.setState({team: newData});
+        this.unsavedChanges = true;
+        const newData = update(this.state.team, { data: {[field]: {$set: value.timestamp}}});
+    
+        this.setState({team: newData, fabEnabled: true});
     }
 
     onDialogConfirmed = (_baseComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
@@ -116,28 +121,32 @@ class ScreenTeamEdit extends Component<Props, State>
 
         if(this.mode == "Create")
         {
-            await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Creating Team", async (execute) => 
+            await this.props.database.inDialog("dialog-create-team", this.props.addDialog, this.props.removeDialog, "Creating Team", async (execute) => 
             {
                 const create = this.props.database.createTeam(this.state.team.data, this.props.user.document.id!, this.props.user.document.data.teams);
                 create.onCompleteListener = (successful: boolean) =>  
                 {
                     if(successful)
                     {   this.props.navigation.goBack();}
+                    else
+                    {   this.setState({fabEnabled: true});}
                 }
                 await execute(create, false);
             });
         }
         else
         {
-            const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.team);
+            const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.team.data);
             const oldTeam = this.props.navigation.getParam("team");
-            await this.props.database.inDialog(this.props.addDialog, this.props.removeDialog, "Updating Team", async (execute) => 
+            await this.props.database.inDialog("dialog-update-team", this.props.addDialog, this.props.removeDialog, "Updating Team", async (execute) => 
             {
                 const update = this.props.database.updateTeam(this.state.team.id!, oldTeam.data, updates);
                 update.onCompleteListener = (successful: boolean) =>  
                 {
                     if(successful)
                     {   this.props.navigation.goBack();}
+                    else
+                    {   this.setState({fabEnabled: true});}
                 }
                 await execute(update, false);
             });
@@ -157,7 +166,6 @@ class ScreenTeamEdit extends Component<Props, State>
                 </PreferenceCategory>
                 <InputFloatingActionButton enabled={this.state.fabEnabled} icon="save" onPress={this.onFabPress} />
                 <DialogConfirmation concreteRef={i => this.confirmationDialog = i} title="Unsaved Changes" onActionClickListener={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel"  message="There are unsaved changes to the team. Are you sure you want to go back and discard your unsaved changes?"/>
-                {this.state.dialogs.map(dialog => dialog)}
             </View>
         );
     }

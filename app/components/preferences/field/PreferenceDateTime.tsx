@@ -1,36 +1,42 @@
 import React from 'react';
 
 import AbstractPreferenceDialog, { AbstractPreferenceDialog_Props_Virtual } from '../../dialog/preferences/AbstractPreferenceDialog';
-import AbstractDialogPreference, { AbstractDialogPreference_Props_Virtual } from './AbstractDialogPreference';
-import DialogPreferenceDateTime, { DialogPreferenceDateTime_StorageValue as StorageValue, DialogPreferenceDateTime_DateTimeMode as DateTimeMode} from '../../dialog/preferences/DialogPreferenceDateTime';
+import DialogPreferenceDateTime, { DialogPreferenceDateTime_StorageValue as StorageValue} from '../../dialog/preferences/DialogPreferenceDateTime';
 import UtilityTime from '../../../utilities/UtilityTime';
 import { onBaseReference, Baseable } from '../../../render_props/Baseable';
+import AbstractContainedPreference, { AbstractContainedPreference_Props_Virtual } from './AbstractContainedPreference';
+import { AbstractPreferenceState, AbstractPreferenceStyles } from './AbstractPreference';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
 
-type Props = AbstractDialogPreference_Props_Virtual<StorageValue> & 
+type Props = AbstractContainedPreference_Props_Virtual<StorageValue> & 
 {
     multiline?: boolean,
     numberOfLines?: number,
     label: string,
-    mode: DateTimeMode
+    mode: PreferenceDateTime_Mode
 }
 
 interface State
 {
+    pickerIsVisible: boolean
 }
 
-export default class PreferenceDateTime extends React.Component<Props, State> implements Baseable<AbstractDialogPreference<StorageValue>>
+export type PreferenceDateTime_Mode = "date" | "time" | "datetime";
+
+export default class PreferenceDateTime extends React.Component<Props, State> implements Baseable<AbstractContainedPreference<StorageValue>>
 {
-    private mBase?: AbstractDialogPreference<StorageValue>;
+    public base: AbstractContainedPreference<StorageValue> | undefined;
     constructor(props: Props)
     {
         super(props);
         
         this.state = 
-        {   }
+        {   
+            pickerIsVisible: false
+        }
     }
-
-    get base () 
-    {   return this.mBase;}
 
     getDialogComponent = (props: AbstractPreferenceDialog_Props_Virtual<StorageValue>, onBaseReference: (ref: Baseable<AbstractPreferenceDialog<StorageValue>> | null) => void) =>
     {
@@ -47,8 +53,32 @@ export default class PreferenceDateTime extends React.Component<Props, State> im
         return UtilityTime.dateToString(storage.timestamp, undefined);
     }
 
+    onTimePickerConfirmed = (timestamp: Date) =>
+    {
+        if(this.base && this.base.base)
+        {   this.base.base.onValueChanged({timestamp: timestamp});}
+
+        this.setState({pickerIsVisible: false});
+    }
+
+    onTimePickerCanceled = () =>
+    {   this.setState({pickerIsVisible: false});}
+
+    onPreferencePress = () => 
+    {   this.setState({pickerIsVisible: true});}
+
+    getAdditionalDisplayContent = (state: AbstractPreferenceState<StorageValue>) =>
+    {
+        return (
+            <View>
+                {state.displayValue ? <Text style={AbstractPreferenceStyles.displayValue}>{state.displayValue}</Text> : <Text style={AbstractPreferenceStyles.hintValue}>{"Press to enter a date."}</Text>}
+                <DateTimePicker datePickerModeAndroid="spinner" date={state.storageValue.timestamp || new Date()} onCancel={this.onTimePickerCanceled} mode={this.props.mode} isVisible={this.state.pickerIsVisible} onConfirm={this.onTimePickerConfirmed} />
+            </View>
+        );
+    }
+
     render ()
     {
-        return <AbstractDialogPreference ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
+        return <AbstractContainedPreference  onPreferencePress={this.onPreferencePress} ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getAdditionalDisplayContent={this.getAdditionalDisplayContent} {...this.props} />
     }
 }

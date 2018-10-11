@@ -3,6 +3,7 @@ import {BackHandler} from "react-native";
 import withStaticFields from "./WithStaticFields"
 import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent } from './AbstractHigherOrderComponent';
 import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
+import UtilityObject from "../utilities/UtilityObject";
 
 interface HocProps
 {   navigation: HiEfficiencyNavigator}
@@ -20,37 +21,44 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
 {
     const hoc = class withBackButtonInterceptor extends AbstractHigherOrderComponent<B, C, WithBackButtonInterceptorProps, P, HocProps & P>
     {
-        componentDidMount() 
+        onComponentDidMount = () =>
         {
             BackHandler.addEventListener('hardwareBackPress', this.onHardwareBackPress);
             this.props.navigation.setParams({onBackClicked: this.onSoftwareBackPress});
         }
         
-        componentWillUnmount() 
+        onComponentWillUnmount = () =>  
         {
             BackHandler.removeEventListener('hardwareBackPress', this.onHardwareBackPress);
         }
 
         onSoftwareBackPress = () =>
         {
-            this.forEachWrappedComponent(componentOrHoc => 
+            const results: Array<boolean> = this.forEachWrappedComponent(componentOrHoc => 
             {
                 if(componentOrHoc.onSoftwareBackPress != undefined)
-                {   componentOrHoc.onSoftwareBackPress();}
+                {   return componentOrHoc.onSoftwareBackPress();}
+                return false;
             });
 
-            return false;
+            const wasHandled = results.some(e => e == true);
+            console.log("Software Back Press Was Handled: " + wasHandled);
+            return wasHandled;
         }
 
         onHardwareBackPress = () =>
         {
-            this.forEachWrappedComponent(componentOrHoc => 
+            const results: Array<boolean>  = this.forEachWrappedComponent(componentOrHoc => 
             {
                 if(componentOrHoc.onHardwareBackPress != undefined)
-                {   componentOrHoc.onHardwareBackPress();}
+                {   return componentOrHoc.onHardwareBackPress();}
+
+                return false;
             });
 
-            return false;
+            const wasHandled = results.some(e => e == true);
+            console.log("Hardware Back Press Was Handled: " + wasHandled + " WITH: " + UtilityObject.stringify(results));
+            return wasHandled;
         }
         
         render()
