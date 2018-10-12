@@ -77,8 +77,11 @@ export default class PreferenceDateTime extends React.Component<Props, State> im
         );
     }
 
+    satisfiesRequired = (storageValue: StorageValue) =>
+    {   return storageValue.timestamp != undefined;}
+
     render ()
     {
-        return <AbstractContainedPreference  onPreferencePress={this.onPreferencePress} ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getAdditionalDisplayContent={this.getAdditionalDisplayContent} {...this.props} />
+        return <AbstractContainedPreference satisfiesRequired={this.satisfiesRequired} onPreferencePress={this.onPreferencePress} ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getAdditionalDisplayContent={this.getAdditionalDisplayContent} {...this.props} />
     }
 }

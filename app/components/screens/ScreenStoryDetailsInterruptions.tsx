@@ -37,6 +37,7 @@ import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 import Color from "../../dtos/color/Color";
 import { AbstractListCollapsible_SectionType } from "../list/abstractions/collapsible/AbstractListCollapsible";
 import ModelProductive from "../list/instances/interruptions/models/ModelProductive";
+import ActionOption from "../../dtos/options/ActionOption";
 
 const isEqual = require("react-fast-compare");
 
@@ -489,11 +490,11 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         }
     }
 
-    onContextMenuItemSelected = async (item: InterruptionModelType, _index: number, action: ActionType) =>
+    onContextMenuItemSelected = async (item: InterruptionModelType, _index: number, action: ActionOption) =>
     { 
         if(ModelInterruption.is(item))
         {
-            switch(action) 
+            switch(action.id) 
             {
                 case ActionType.DELETE:
                 
@@ -553,7 +554,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         }
         else if(ModelStart.is(item))
         {
-            switch(action)
+            switch(action.id)
             {
                 case ActionType.EDIT:
                 if(this.dialogEditTimeStart && this.dialogEditTimeStart.base && this.dialogEditTimeStart.base.base)
@@ -563,7 +564,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         }
         else if(ModelFinish.is(item))
         {
-            switch(action)
+            switch(action.id)
             {
                 case ActionType.EDIT:
                 if(this.dialogEditTimeFinish && this.dialogEditTimeFinish.base && this.dialogEditTimeFinish.base.base)

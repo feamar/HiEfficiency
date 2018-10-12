@@ -12,7 +12,8 @@ export type AbstractContainedPreference_Props_Virtual<StorageValue> = AbstractPr
 interface AbstractContainedPreference_Props_Sealed<StorageValue> 
 {
     getAdditionalDisplayContent?: (state: AbstractPreferenceState<StorageValue>) => JSX.Element,
-    toDisplayValue: (storage: StorageValue) => string
+    toDisplayValue: (storage: StorageValue) => string,
+    satisfiesRequired: (storageValue: StorageValue) => boolean
 }
 
 type Props<StorageValue> = AbstractContainedPreference_Props_Sealed<StorageValue> & AbstractContainedPreference_Props_Virtual<StorageValue>;

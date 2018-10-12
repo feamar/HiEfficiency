@@ -1,10 +1,17 @@
 import React from 'react';
-import {View } from 'react-native';
+import {View, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import AbstractPreferenceDialog, { AbstractPreferenceDialog_Props_Virtual } from './AbstractPreferenceDialog';
 import InputError from '../../inputs/InputError';
 import UtilityValidate from '../../../utilities/UtilityValidate';
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
+
+const styles = StyleSheet.create({
+    input: {
+        marginLeft: 25,
+        marginRight: 25
+    }
+});
 
 export interface DialogPreferenceText_StorageValue
 {
@@ -62,20 +69,12 @@ export default class DialogPreferenceText extends React.Component<Props, State> 
         {   this.base.onValueChange({text: {$set: text}});}
     }
 
-    getErrorComponent = () =>
-    {
-        if(this.base == undefined)
-        {   return null;}
-
-        return <InputError error={this.base.getCurrentError()} />
-    }
-
-    getDialogContent = (storageValue: StorageValue) => 
+    getDialogContent = (storageValue: StorageValue, error: string | undefined) => 
     {
         return ( 
-            <View style={{marginLeft: 25, marginRight: 25}}>
-                <TextInput autoFocus={true} label={this.state.label} value={storageValue.text} onChangeText={this.onTextChanged} multiline={this.state.multiline} numberOfLines={this.state.numberOfLines}/>
-                {this.getErrorComponent()}
+            <View>
+                <TextInput autoFocus={true} style={styles.input} label={this.state.label} value={storageValue.text} onChangeText={this.onTextChanged} multiline={this.state.multiline} numberOfLines={this.state.numberOfLines}/>
+                <InputError error={error} />
             </View>
         );
     }

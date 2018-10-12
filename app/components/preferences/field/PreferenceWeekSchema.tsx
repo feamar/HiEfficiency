@@ -36,9 +36,12 @@ export default class PreferenceWeekSchema extends React.Component<Props, State> 
         );
     }
 
+    satisfiesRequired = (storageValue: EntitySchemaWeek) =>
+    {   return storageValue != undefined;}
+
     render ()
     {
-        return <AbstractDialogPreference ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
+        return <AbstractDialogPreference satisfiesRequired={this.satisfiesRequired} ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
     }
 } 
  

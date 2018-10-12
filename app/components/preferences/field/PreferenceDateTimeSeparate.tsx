@@ -47,8 +47,12 @@ export default class PreferenceDateTimeSeparate extends React.Component<Props, S
         return UtilityTime.dateToString(storage.timestamp, undefined);
     }
 
+
+    satisfiesRequired = (storageValue: StorageValue) =>
+    {   return storageValue.timestamp != undefined;}
+
     render ()
     {
-        return <AbstractDialogPreference ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
+        return <AbstractDialogPreference ref={onBaseReference(this)}  satisfiesRequired={this.satisfiesRequired} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
     }
 }

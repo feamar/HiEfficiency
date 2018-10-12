@@ -83,21 +83,11 @@ export default class DialogPreferenceTextMulti<Fields> extends React.Component<P
         {   this.base.onValueChange({[field]: {$set: value}});}
     }
 
-    getErrorComponent = () =>
+    getDialogContent = (storageValue: StorageValue, error: string | undefined) => 
     {
-        if(this.base == undefined)
-        {   return null;}
-        const component = <InputError error={this.base.getCurrentError()} />
-        return component
-    }
-
-    getDialogContent = (storageValue: StorageValue) => 
-    {
-        const TheErrorComponent = this.getErrorComponent();
         return (
             <View style={{flex: 1}}> 
                 
-                {TheErrorComponent}
                 {this.state.elements.map((element, index) => 
                 {
                     return (
@@ -106,6 +96,7 @@ export default class DialogPreferenceTextMulti<Fields> extends React.Component<P
                         </View>
                     );
                 })}
+                <InputError error={error} />
             </View>
         );
     }

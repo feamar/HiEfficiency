@@ -1,6 +1,6 @@
 import React from "react";
 import SelectOption from '../../../dtos/options/SelectOption';
-import { Baseable } from '../../../render_props/Baseable';
+import { Baseable, onBaseReference } from '../../../render_props/Baseable';
 import { AbstractContainedPreference_Props_Virtual } from './AbstractContainedPreference';
 import AbstractContainedPreference from "./AbstractContainedPreference";
 import { View } from "react-native";
@@ -62,8 +62,11 @@ export default class PreferenceSelectSpinner extends React.Component<Props, Stat
         );
     }
 
+    satisfiesRequired = (storageValue: StorageValue) =>
+    {   return storageValue.selected != undefined;}
+
     render ()
     {
-        return <AbstractContainedPreference getAdditionalDisplayContent={this.getAdditionalDisplayContent} toDisplayValue={this.toDisplayValue} {...this.props} />
+        return <AbstractContainedPreference satisfiesRequired={this.satisfiesRequired} ref={onBaseReference(this)} getAdditionalDisplayContent={this.getAdditionalDisplayContent} toDisplayValue={this.toDisplayValue} {...this.props} />
     }
 }

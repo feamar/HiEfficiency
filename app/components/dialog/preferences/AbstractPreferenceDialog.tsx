@@ -4,11 +4,10 @@ import Theme from '../../../styles/Theme';
 import AbstractDialog, { AbstractDialog_Props_Virtual } from '../AbstractDialog';
 import update, {Spec} from "immutability-helper";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
-import UtilityObject from '../../../utilities/UtilityObject';
 
 interface AbstractPreferenceDialog_Props_Sealed<StorageValue> 
 {
-    getDialogContent: (storageValue: StorageValue) => JSX.Element,
+    getDialogContent: (storageValue: StorageValue, currentError: string | undefined) => JSX.Element,
     onInputError?: (error: string) => any,
     onInternalValueValidation?: (storageValue: StorageValue) => string | undefined
 }
@@ -64,7 +63,9 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
     {   return this.state.error;}
 
     getOriginalStorageValue = (): StorageValue | null =>
-    {   return this.props.storageValue;}
+    {
+        return this.props.storageValue;
+    }
 
     getInputValidationError = (storageValue: StorageValue | null): string | undefined =>
     {
@@ -83,7 +84,7 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
             {   return error;}
         }
 
-        if(this.props.onValueValidation === undefined)
+        if(this.props.onValueValidation == undefined)
         {   return undefined;}
 
         return this.props.onValueValidation(storageValue);
@@ -138,19 +139,16 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
 
     onDialogClosed = () =>
     {       
-        console.log("ON DIALOG CLOSED!");
         setTimeout(() => this.setState({error: undefined, storageValue: this.getOriginalStorageValue() || {} as StorageValue}), 500);
     }
 
     setStorageValue = (storageValue: StorageValue) =>
     {
-        console.log("SET STORAGE VALUE!: " + UtilityObject.stringify(storageValue));
         this.setState({storageValue: storageValue});
     }
 
     onValueChange = (spec: Spec<StorageValue, never>): void =>
     {
-        console.log("onValueChange: " + UtilityObject.stringify(spec));
         const newStorageValue = update(this.state.storageValue, spec);
         this.setStorageValue(newStorageValue);
     }
@@ -160,7 +158,7 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
         return (
             <AbstractDialog 
                 ref={onBaseReference(this)}
-                content={() => this.props.getDialogContent(this.state.storageValue)} 
+                content={() => this.props.getDialogContent(this.state.storageValue, this.state.error)} 
                 actions={this.getDialogActions} 
                 {...this.props} />
         );

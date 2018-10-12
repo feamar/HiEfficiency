@@ -3,7 +3,6 @@ import AbstractHigherOrderComponent, { ConcreteComponent, ConcreteOrHigher, Conc
 import { ReduxState } from "../redux/ReduxState";
 import WithStaticFields from "./WithStaticFields";
 import { Store, Unsubscribe, Dispatch } from "redux";
-import UtilityObject from "../utilities/UtilityObject";
 import PropTypes from "prop-types";
 
 type MapStateToProps<Result extends {}> = (state: ReduxState) => Result;
@@ -30,29 +29,41 @@ export default
         {
             super(props);
 
+            this.log("Constructor", "Start");
             this.store = context.store;
-            console.log("Store: " + UtilityObject.stringify(this.store));
         }
 
         componentWillMount = () =>
         {
+            this.log("componentWillMount", "Start");
             if(this.unsubscriber)
             {   this.unsubscriber();}
 
             this.unsubscriber = this.store.subscribe(this.onReduxStateChanged);
+            this.log("componentWillMount", "End");
         }
         
         onReduxStateChanged = () =>
-        {   this.forceUpdate();}
+        {
+            this.log("onReduxStateChanged", "Start");
+            this.forceUpdate();
+            this.log("onReduxStateChanged", "End");
+        }
 
         componentWillUnmount = () =>
         {
+            this.log("componentWillUnmount", "Start");
             if(this.unsubscriber)
-            {   this.unsubscriber();}
+            {
+                this.log("componentWillUnmount", "If");
+                this.unsubscriber();
+            }
+            this.log("componentWillUnmount", "End");
         }
 
         render()
         {   
+            this.log("render", "Start");
             const state = this.store.getState();
 
             var mappedState: SP | undefined = undefined;
@@ -65,6 +76,11 @@ export default
             {   mappedDispatch = mapDispatchToProps(this.store.dispatch);}
             
             return <WrappedComponent ref={this.onReference} {...this.props} {...mappedState} {...mappedDispatch} />
+        }
+
+        log = (_method: string, _message: string) =>
+        {   
+            //console.log("WithReduxSubscription - " + method + " - " + message);
         }
     }
 

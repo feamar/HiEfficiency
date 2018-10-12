@@ -42,9 +42,15 @@ export default class PreferenceText extends React.Component<Props, State> implem
         
         return storage.text;
     }
+    
+    satisfiesRequired = (storageValue: StorageValue) =>
+    {   
+        console.log("Storagevalue.text: " + storageValue.text + " WHILE " + storageValue.text != undefined);
+        return storageValue.text != undefined && storageValue.text != "";
+    }
 
     render ()
     {
-        return <AbstractDialogPreference ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
+        return <AbstractDialogPreference satisfiesRequired={this.satisfiesRequired} ref={onBaseReference(this)} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
     }
 }

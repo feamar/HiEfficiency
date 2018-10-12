@@ -69,22 +69,13 @@ export default class DialogPreferenceDateTime extends React.Component<Props, Sta
     }
 
     
-    getErrorComponent = () =>
-    {
-        if(this.base == undefined)
-        {   return null;}
-
-        return <InputError error={this.base.getCurrentError()} />
-    }
-
-
-    getDialogContent = () => 
+    getDialogContent = (_storageValue: StorageValue, error: string | undefined) => 
     {
         return ( 
             <View style={{marginLeft: 25, marginRight: 25}}>
                 <PreferenceCategory title="Timestamp">
                     {this.getInputComponent()}
-                    {this.getErrorComponent()}
+                    <InputError error={error} />
                 </PreferenceCategory>
             </View>
         );

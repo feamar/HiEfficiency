@@ -37,8 +37,12 @@ export default class PreferenceMultiSelect extends React.Component<Props, State>
     toDisplayValue = (storage: StorageValue) =>
     {   return storage.selected.map(selected => selected.value).join(", ");}
 
+
+    satisfiesRequired = (storageValue: StorageValue) =>
+    {   return storageValue.selected.length != 0;}
+
     render ()
     {
-        return <AbstractDialogPreference toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
+        return <AbstractDialogPreference  satisfiesRequired={this.satisfiesRequired} toDisplayValue={this.toDisplayValue} getDialogComponent={this.getDialogComponent} {...this.props} />
     }
 }

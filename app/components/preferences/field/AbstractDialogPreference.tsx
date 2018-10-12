@@ -13,7 +13,8 @@ export type AbstractDialogPreference_Props_Virtual<StorageValue> = AbstractPrefe
 interface AbstractDialogPreference_Props_Sealed<StorageValue extends {}>
 {
     toDisplayValue: (storage: StorageValue) => string,
-    getDialogComponent: (props: AbstractPreferenceDialog_Props_Virtual<StorageValue>, ref: (ref: Baseable<AbstractPreferenceDialog<StorageValue>> | null) => void) => JSX.Element
+    getDialogComponent: (props: AbstractPreferenceDialog_Props_Virtual<StorageValue>, ref: (ref: Baseable<AbstractPreferenceDialog<StorageValue>> | null) => void) => JSX.Element,
+    satisfiesRequired: (storageValue: StorageValue) => boolean
 }
 
 type Props<StorageValue> = AbstractDialogPreference_Props_Sealed<StorageValue> & AbstractDialogPreference_Props_Virtual<StorageValue>;

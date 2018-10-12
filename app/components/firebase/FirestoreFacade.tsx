@@ -103,9 +103,8 @@ export default class FirestoreFacade
             var resolved: boolean = false;
             setTimeout(() => 
             {
-                console.log("Timeout expired - " + resolved + " - " + dialog.base);
                 if(resolved == false && dialog.base)
-                {   console.log("In If"); dialog.base.setVisible(true);}
+                {   dialog.base.setVisible(true);}
             }, showDelay);
 
             const successful = await crud.execute(dialog);

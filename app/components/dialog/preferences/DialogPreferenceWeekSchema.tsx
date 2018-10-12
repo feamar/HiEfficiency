@@ -196,25 +196,15 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         );
     }
 
-    getDialogContent = () =>
+    getDialogContent = (storageValue: EntitySchemaWeek, error: string | undefined) =>
     {
-        const value = this.getCurrentStorageValue() || EntitySchemaWeek.default();
-
         return (
             <View>
-                {value.toArray().map((item, index) => 
+                {storageValue.toArray().map((item, index) => 
                 {   return this.getTimespanFor(item, index); })}
-                {this.getErrorComponent()}
+                <InputError error={error} />
             </View>
         );
-    }
-
-    getErrorComponent = () =>
-    {
-        if(this.base == undefined)
-        {   return null;}
-
-        return <InputError error={this.base.getCurrentError()} />
     }
 
     render()

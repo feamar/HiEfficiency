@@ -17,7 +17,6 @@ import AbstractFirestoreDocument from '../../dtos/firebase/firestore/documents/A
 import { DialogPreferenceText_StorageValue } from '../dialog/preferences/DialogPreferenceText';
 import { DialogPreferenceDateTime_StorageValue } from '../dialog/preferences/DialogPreferenceDateTime';
 import update from 'immutability-helper';
-import UtilityObject from '../../utilities/UtilityObject';
 import InputFloatingActionButton from '../inputs/InputFloatingActionButton';
 
 interface ReduxStateProps 
@@ -58,7 +57,6 @@ class ScreenTeamEdit extends Component<Props, State>
         super(props);
         
         var team = this.props.navigation.getParam("team");
-        console.log("HERE: " + UtilityObject.stringify(team));
         if(team == undefined || team == null)
         {
             this.mode = "Create";
@@ -79,7 +77,6 @@ class ScreenTeamEdit extends Component<Props, State>
  
     onSoftwareBackPress = () =>
     {
-        console.log("on Back Press in ScreenTeamEdit");
         if(this.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
 

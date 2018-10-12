@@ -3,7 +3,6 @@ import {BackHandler} from "react-native";
 import withStaticFields from "./WithStaticFields"
 import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent } from './AbstractHigherOrderComponent';
 import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
-import UtilityObject from "../utilities/UtilityObject";
 
 interface HocProps
 {   navigation: HiEfficiencyNavigator}
@@ -42,7 +41,6 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
             });
 
             const wasHandled = results.some(e => e == true);
-            console.log("Software Back Press Was Handled: " + wasHandled);
             return wasHandled;
         }
 
@@ -57,7 +55,6 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
             });
 
             const wasHandled = results.some(e => e == true);
-            console.log("Hardware Back Press Was Handled: " + wasHandled + " WITH: " + UtilityObject.stringify(results));
             return wasHandled;
         }
         

@@ -1,8 +1,9 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentStory from '../../../dtos/firebase/firestore/documents/DocumentStory';
-import ActionStoryCreated from "../../../redux/actions/user/ActionStoryCreated";
 import { RNFirebase } from "react-native-firebase";
+import UtilityObject from "../../../utilities/UtilityObject";
+import ActionStoriesOfTeamLoaded from "../../../redux/actions/user/ActionStoriesOfTeamLoaded";
 
 export default class StoryCreate extends AbstractCrudOperation
 {
@@ -33,11 +34,17 @@ export default class StoryCreate extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-        //console.log("CREATING STORY: " + UtilityObject.stringify(this.story));
+        console.log("TeamId: "+ this.teamId);
+        console.log("CREATING STORY: " + UtilityObject.stringify(this.story));
         try
         {
-            this.doc = await this.sendUpdates(updatable, ActionStoryCreated.TYPE, async (): Promise<RNFirebase.firestore.DocumentReference> => 
-            {   return await FirebaseAdapter.getStories(this.teamId).add(this.story);});
+            console.log("Story Create: 1");
+            this.doc = await this.sendUpdates(updatable, ActionStoriesOfTeamLoaded.TYPE, async (): Promise<RNFirebase.firestore.DocumentReference> => 
+            {
+                console.log("Story Create: 2");
+                return await FirebaseAdapter.getStories(this.teamId).add(this.story);
+            });
+            console.log("Story Create: 3");
     
             this.onSuccess(updatable, "Story successfully created!");
         }

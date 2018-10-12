@@ -54,20 +54,23 @@ export default class FirebaseManager
         if(this.store == undefined)
         {   return;}
 
+
         const newState = this.store.getState();
+        if(this.state)
+
         if(equal(this.state, newState))
         {   return;}
 
+
         if(newState.inspecting != undefined)
         {
-            if(this.state == undefined || this.state.inspecting == undefined || newState.inspecting.team != this.state.inspecting.team)
+        if(this.state == undefined || this.state.inspecting == undefined || newState.inspecting.team != this.state.inspecting.team)
             {
                 if(newState.inspecting.team == undefined)
                 {   this.onUserInspectingTeamEnd();}
                 else
                 {   this.onUserInspectingTeamStart(newState.inspecting.team);}
             }
-
             if(this.state == undefined || this.state.inspecting == undefined || newState.inspecting.story != this.state.inspecting.story)
             {
                 if(newState.inspecting.story == undefined)
@@ -153,7 +156,6 @@ export default class FirebaseManager
 
     onUserDocumentChanged = async (snapshot: RNFirebase.firestore.DocumentSnapshot) =>
     {
-        console.log("onUserDocumentChanged");
         //Get the differences between the snapshot and the state BEFORE dispatching the changed event to the store.
         if(this.store == undefined)
         {   return;}
@@ -173,12 +175,10 @@ export default class FirebaseManager
 
         //Dispatch leave events for each team that was removed.
         const removed = UtilityArray.getRemoved(original, next);
-        console.log("onUserDocumentChanged - Removed: " + removed.length);
         removed.forEach(teamId => this.onUserLeftTeam(teamId));
 
         //Dispatch join events for each team that was added.
         const added = UtilityArray.getAdded(original, next);
-        console.log("onUserDocumentChanged - Added: " + added.length);
         added.forEach(teamId => this.onUserJoinedTeam(teamId));
     }
 
@@ -187,17 +187,12 @@ export default class FirebaseManager
     {
         if(snapshot.exists)
         {
-            console.log("onTeamDocumentchanged - Exists");
-
             const document = DocumentTeam.fromSnapshot(snapshot);
             const afd = new AbstractFirestoreDocument(document!, snapshot.id!);
             this.store!.dispatch(new ActionTeamDataChanged(afd));
         }
         else
-        {
-            console.log("onTeamDocumentchanged - Does not exist");
-            this.onTeamDeleted(snapshot);           
-        }
+        {   this.onTeamDeleted(snapshot);           }
     }
 
   
@@ -243,10 +238,7 @@ export default class FirebaseManager
 
         const user = state.user;
         if(user)
-        {   
-            //this.interruptionUnsubscriber = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).doc(user.document.id!).onSnapshot(this.onInterruptionsDocumentChanged(teamId, storyId), this.onSnapshotError);
-            this.interruptionUnsubscriber = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).onSnapshot(this.onInterruptionsDocumentChanged(teamId, storyId), this.onSnapshotError);
-        }
+        {   this.interruptionUnsubscriber = FirebaseAdapter.getInterruptionsFromTeam(teamId, storyId).onSnapshot(this.onInterruptionsDocumentChanged(teamId, storyId), this.onSnapshotError);}
     }
 
     onUserInspectingStoryEnd = async () =>
@@ -263,6 +255,7 @@ export default class FirebaseManager
         if(user)
         {
             const team = user.teams[teamId];
+
             if(team)
             {
                 const stories = team.stories;
@@ -287,8 +280,6 @@ export default class FirebaseManager
 
     onTeamDeleted = async (snapshot: RNFirebase.firestore.DocumentSnapshot) =>
     {
-        console.log("onTeamDeleted: " + snapshot.id);
-
         const state = this.store!.getState();
         var user = state.user;
 
@@ -312,21 +303,15 @@ export default class FirebaseManager
 
     onUserJoinedTeam = async (teamId: string) =>
     {
-        console.log("onUserJoinedTeam: " + teamId);
-
         const snapshot = await FirebaseAdapter.getTeams().doc(teamId).get();
         const document = DocumentTeam.fromSnapshot(snapshot);
         if(document)
         {
-            console.log("onUserJoinedTeam - inside if");
             this.store!.dispatch(new ActionUserJoinedTeam(new AbstractFirestoreDocument<DocumentTeam>(document, teamId)));
             this.teamUnsubscribers[teamId] = snapshot.ref.onSnapshot(this.onTeamDocumentChanged, this.onSnapshotError);
         }
     }
 
     onUserLeftTeam = async (teamId: string) =>
-    {
-        console.log("onUserLeftTeam: " + teamId);
-        this.store!.dispatch(new ActionUserLeftTeam(teamId));
-    }
+    {   this.store!.dispatch(new ActionUserLeftTeam(teamId));}
 }

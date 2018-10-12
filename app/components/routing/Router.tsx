@@ -168,17 +168,17 @@ export default class Router
       [SCREEN_NAME_STORY_BOARD_TODO]:
       {
         //Props parameter is of type: NavigationContainerProps & NavigationNavigatorProps<any>,
-        screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_TODO} />,
+        screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={"Todo"} />,
         navigationOptions: getNavigationOptions("Todo", getBackIcon())
       },  
       [SCREEN_NAME_STORY_BOARD_DOING]:
       {
-        screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_DOING} />,
+        screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={"Doing"} />,
         navigationOptions: getNavigationOptions("Doing", getBackIcon())
       },
       [SCREEN_NAME_STORY_BOARD_DONE]:
       {
-        screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={ScreenStoryBoard.MODE_DONE} />,
+        screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={"Done"} />,
         navigationOptions: getNavigationOptions("Done", getBackIcon())
       }
     },

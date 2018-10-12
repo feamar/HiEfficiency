@@ -29,7 +29,6 @@ export default class InputError extends React.Component<Props, State>
     constructor(props: Props)
     {
         super(props);
-        console.log("INPUT ERROR CONSTRUCTOR");
 
         this.state = {
             error: props.error
@@ -38,7 +37,6 @@ export default class InputError extends React.Component<Props, State>
 
     componentWillReceiveProps = (props: Props) =>
     {
-        console.log("INPUT ERROR componentWillReceiveProps");
         this.setState({error: props.error});
     }
 

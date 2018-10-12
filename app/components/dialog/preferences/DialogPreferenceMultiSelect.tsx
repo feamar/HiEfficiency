@@ -88,7 +88,7 @@ export default class DialogPreferenceMultiSelect extends React.Component<Props, 
         );
     } 
 
-    getDialogContent = () =>
+    getDialogContent = (_storageValue: StorageValue, _error: string | undefined) =>
     {
         return (
             <View style={{margin: 25}}>

@@ -125,9 +125,8 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
     setTitle = (title: string) =>
     {   this.setState({title: title});}
 
-    notifyListeners = (listeners: Array<(dialog: AbstractDialog) => void>, name: string) =>
+    notifyListeners = (listeners: Array<(dialog: AbstractDialog) => void>, _name: string) =>
     {
-        console.log("Notifying listeners: " + name);
         listeners.forEach(listener => 
         {   listener(this);});
     }

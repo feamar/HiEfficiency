@@ -109,7 +109,7 @@ class ScreenStoryCreate extends Component<Props, State>
         this.state =
         {
             story: story,
-            fabEnabled: true,
+            fabEnabled: false,
         }
     }
 
@@ -127,24 +127,41 @@ class ScreenStoryCreate extends Component<Props, State>
         return true;
     }
  
-    onValueChanged = (field: keyof DocumentStory) => (value: any) =>
+    
+    onSelectValueChanged = (field: keyof DocumentStory) => (value: PreferenceSelectSpinner_StorageValue) =>
     {
         var story = this.state.story;
-        if(story.data[field] == value)
+        if(story.data[field] == value.selected.id)
         {   return;}
 
         this.unsavedChanges = true ;
-        story = update(story, {data: {[field]: {$set: value}}});
-        this.setState({story: story});
+        story = update(story, {data: {[field]: {$set: value.selected.id}}});
+        this.setState({story: story, fabEnabled: true});
     }
 
-    onValueValidation = (field: keyof DocumentStory) => (value: any) =>
+    onTextValueChanged = (field: keyof DocumentStory) => (value: DialogPreferenceText_StorageValue) =>
+    {
+        var story = this.state.story;
+        if(story.data[field] == value.text)
+        {   return;}
+
+        this.unsavedChanges = true ;
+        story = update(story, {data: {[field]: {$set: value.text}}});
+        this.setState({story: story, fabEnabled: true});
+    }
+
+    onValueValidation = (field: keyof DocumentStory) => (value: DialogPreferenceText_StorageValue) =>
     {
         switch(field)
         {
-            case "upvotes":
-                if(value % 1 != 0)
-                {   return "Please enter an integer value.";}
+            case "points":
+                if(value.text)
+                {
+                    const intValue = parseInt(value.text);
+                    if(intValue % 1 != 0)
+                    {   return "Please enter an integer value.";}
+                }
+                
             break;
         }
 
@@ -181,7 +198,6 @@ class ScreenStoryCreate extends Component<Props, State>
     {
         this.setState({fabEnabled: false});
         const valid: boolean = this.chainValidation([this.fields.name, this.fields.description, this.fields.type, this.fields.points])
-
         if(valid == false) 
         {
             this.setState({fabEnabled: true});
@@ -258,12 +274,12 @@ class ScreenStoryCreate extends Component<Props, State>
             <View style={{height: "100%"}}> 
                 <ScrollView style={styles.scrollView}>
                     <PreferenceCategory title="Mandatory">
-                        <PreferenceText label="Name" required ref={c => this.fields.name = c} title="Name" storageValue={{text: data.name}} onValueChanged={this.onValueChanged("name")}  multiline={true} numberOfLines={2} />
-                        <PreferenceText label="Description" ref={c => this.fields.description = c} title="Description" storageValue={{text: data.description}} onValueChanged={this.onValueChanged("description")} multiline={true} numberOfLines={5} />
-                        <PreferenceSelectSpinner required ref={c => this.fields.type = c} title="Story Type" storageValue={{selected: new SelectOption(storyType.id, storyType.name)}} onValueChanged={this.onValueChanged("type")} options={this.getStoryTypeOptions()} /> 
+                        <PreferenceText label="Name" required ref={c => this.fields.name = c} title="Name" storageValue={{text: data.name}} onValueChanged={this.onTextValueChanged("name")}  multiline={true} numberOfLines={2} />
+                        <PreferenceText label="Description" ref={c => this.fields.description = c} title="Description" storageValue={{text: data.description}} onValueChanged={this.onTextValueChanged("description")} multiline={true} numberOfLines={5} />
+                        <PreferenceSelectSpinner required ref={c => this.fields.type = c} title="Story Type" storageValue={{selected: new SelectOption(storyType.id, storyType.name)}} onValueChanged={this.onSelectValueChanged("type")} options={this.getStoryTypeOptions()} /> 
                     </PreferenceCategory>
                     <PreferenceCategory title="Optional">
-                        <PreferenceText label="Story Points" ref={c => this.fields.points = c} plural={true} title="Story Points" storageValue={{text: storyPoints}} onValueChanged={this.onValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
+                        <PreferenceText label="Story Points" ref={c => this.fields.points = c} plural={true} title="Story Points" storageValue={{text: storyPoints}} onValueChanged={this.onTextValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
                     </PreferenceCategory>
                 </ScrollView>
                 <InputFloatingActionButton icon="save" onPress={this.onFabPress} enabled={this.state.fabEnabled}/>

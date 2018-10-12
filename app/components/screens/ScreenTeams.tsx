@@ -99,13 +99,12 @@ class ScreenTeams extends Component<Props, State>
 
   onItemSelected = (item: ReduxTeam, _index: number) => 
   { 
-    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item, [PARAM_NAME_SUBTITLE]: item.document.data.name});
+    this.props.navigation.navigate(STACK_NAME_STORY_BOARD, { team: item.document, [PARAM_NAME_SUBTITLE]: item.document.data.name});
     this.props.navigation.navigate(SCREEN_NAME_STORY_BOARD_DOING);
   }
 
   onContextMenuItemSelected = (item: ReduxTeam, _index: number, action: ActionOption) =>
   {
-    console.log("ON CONTEXT MENU ITEM SELECTED: " + action);
     switch (action.id) 
     {
       case ActionType.LEAVE:

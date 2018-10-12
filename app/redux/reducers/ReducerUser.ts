@@ -12,7 +12,6 @@ import ActionUserJoinedTeam from '../actions/user/ActionUserJoinedTeam';
 import ActionTeamDeleted from '../actions/user/ActionTeamDeleted';
 import ActionTeamDataChanged from '../actions/user/ActionTeamDataChanged';
 import ActionStoryDataChanged from '../actions/user/ActionStoryDataChanged';
-import ActionStoryCreated from '../actions/user/ActionStoryCreated';
 import ActionStoryDeleted from '../actions/user/ActionStoryDeleted';
 import ActionStoriesOfTeamLoaded from '../actions/user/ActionStoriesOfTeamLoaded';
 import ActionInterruptionsOfStoryLoaded from '../actions/user/ActionInterruptionsOfStoryLoaded';
@@ -58,7 +57,7 @@ export default (user: ReduxUser | undefined | null, action: AnyAction): ReduxUse
     if(UtilityRedux.actionIs<ActionTeamDeleted>(action, ActionTeamDeleted.TYPE))
     {   return update(user, {teams: {$unset: [action.teamId]}});}    
 
-    if(UtilityRedux.actionIs<ActionStoryDataChanged>(action, ActionStoryDataChanged.TYPE) || UtilityRedux.actionIs<ActionStoryCreated>(action, ActionStoryCreated.TYPE))
+    if(UtilityRedux.actionIs<ActionStoryDataChanged>(action, ActionStoryDataChanged.TYPE))
     {
         var team: ReduxTeam | undefined = user.teams[action.teamId];
         if(team != undefined)
@@ -91,7 +90,8 @@ export default (user: ReduxUser | undefined | null, action: AnyAction): ReduxUse
             action.stories.forEach(story => 
             {   map[story.id!] = new ReduxStory(story, {}, false);});
 
-            team = update(team, {stories: {$set: map}, loaded: {$set: true}})
+
+            team = update(team, {stories: {$merge: map}, loaded: {$set: true}})
             return update(user, {teams: {[action.teamId]: {$set: team}}});
         }
     }

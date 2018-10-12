@@ -20,6 +20,7 @@ import ReduxStory from "../../dtos/redux/ReduxStory";
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from "../dialog/instances/DialogConfirmation";
 import ReduxTeam from "../../dtos/redux/ReduxTeam";
 import ListStories from "../list/instances/stories/ListStories";
+import ActionOption from "../../dtos/options/ActionOption";
 
 interface ReduxStateProps
 {
@@ -87,9 +88,10 @@ class ScreenStoryBoard extends Component<Props, State>
 
   componentWillReceiveProps = (props: Props) =>
   {
+    //console.log("NEW PROPS FOR STORYBOARD: " + UtilityObject.stringify(props));
     if(this.state.user != props.user)
     { 
-      this.setState({user: props.user});
+      this.setState({user: props.user, storyListItems: this.getStoryListItems(props)});
       this.setLoading(props);
     }
   }
@@ -123,7 +125,7 @@ class ScreenStoryBoard extends Component<Props, State>
     const collection = keys.map(key => 
     {   return stories[key]!});
     
-    const filtered = this.filter(collection, props.mode)
+    const filtered = this.filter(collection, props.mode);
     return filtered;
   }
 
@@ -135,7 +137,9 @@ class ScreenStoryBoard extends Component<Props, State>
   }
 
   componentDidMount()
-  {   this.props.onInspectTeamStart(this.team.id!); }
+  {   
+    this.props.onInspectTeamStart(this.team.id!); 
+  }
 
   componentWillUnmount()
   {   this.props.onInspectTeamEnd();}
@@ -150,9 +154,9 @@ class ScreenStoryBoard extends Component<Props, State>
   } 
 
 
-  onContextMenuItemSelected = async (item: ReduxStory, index: number, action: ActionType) =>
+  onContextMenuItemSelected = async (item: ReduxStory, index: number, action: ActionOption) =>
   {
-    switch(action)
+    switch(action.id)
     {
       case ActionType.DELETE:
         if(this.dialogConfirmDelete)

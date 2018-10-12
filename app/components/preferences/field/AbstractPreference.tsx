@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {View, StyleSheet} from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import Theme from "../../../styles/Theme";
+import UtilityObject from '../../../utilities/UtilityObject';
 
 export const AbstractPreferenceStyles = StyleSheet.create({
     root: {
@@ -42,7 +43,8 @@ interface AbstractPreference_Props_Sealed<StorageValue>
     onPreferencePressInternal?: () => void,
     getDisplayContent: (state: AbstractPreferenceState<StorageValue>) => JSX.Element,
     getAdditionalContent?: (state: AbstractPreferenceState<StorageValue>) => JSX.Element,
-    toDisplayValue: (storageValue: StorageValue) => string
+    toDisplayValue: (storageValue: StorageValue) => string,
+    satisfiesRequired: (storageValue: StorageValue) => boolean
 }
 
 type Props<StorageValue> = AbstractPreference_Props_Sealed<StorageValue> & AbstractPreference_Props_Virtual<StorageValue>;
@@ -71,6 +73,18 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
         }
     }  
 
+    componentWillReceiveProps = (props: Props<StorageValue>) =>
+    {
+        if(props.storageValue != this.props.storageValue)
+        {   this.setState({storageValue: props.storageValue || this.state.storageValue});}
+
+        if(props.required != this.props.required)
+        {   this.setState({required: props.required || this.state.required});}
+
+        if(props.title != this.props.title)
+        {   this.setState({title: props.title});}
+    }
+
     componentWillMount = () =>
     {   this.onValueChanged(this.state.storageValue, false);}
 
@@ -85,11 +99,23 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
 
     validate = () =>
     {
+        console.log("VALIDATING: " + this.props.title);
         const storageValue = this.state.storageValue;
-        if(this.props.required && (storageValue === undefined || storageValue === null))
-        {   
-            this.setState({error: "Please enter the " + this.props.title.toLowerCase() + "."});    
-            return false;
+        if(this.props.required)
+        {
+            if(storageValue == undefined)
+            {
+                this.setState({error: "Please enter the " + this.props.title.toLowerCase() + "."});    
+                return false;
+            }
+
+            const satisfiesRequired = this.props.satisfiesRequired(storageValue);
+            console.log(UtilityObject.stringify(storageValue) + " :SatisfiesRequired: " + satisfiesRequired)
+            if(satisfiesRequired == false)
+            {
+                this.setState({error: "Please enter the " + this.props.title.toLowerCase() + "."});    
+                return false;
+            }
         }
 
         return true;

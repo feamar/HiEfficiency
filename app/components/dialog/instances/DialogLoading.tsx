@@ -134,7 +134,6 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
     setMessage = (message: string): boolean =>
     {
-        console.log("Set Message: " + this.state.lifecycle + " AND " + message);
         if(message == this.state.message || this.state.lifecycle == "Completed")
         {   return false;}
 
