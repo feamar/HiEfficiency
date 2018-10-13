@@ -3,7 +3,7 @@ import update, { Spec } from "immutability-helper";
 import UtilityObject from '../../../utilities/UtilityObject';
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentStory from '../../../dtos/firebase/firestore/documents/DocumentStory';
-import ActionStoryDataChanged from '../../../redux/actions/user/ActionStoryDataChanged';
+import ActionStoriesOfTeamLoaded from "../../../redux/actions/user/ActionStoriesOfTeamLoaded";
 
 export default class StoryUpdate extends AbstractCrudOperation
 {
@@ -34,7 +34,7 @@ export default class StoryUpdate extends AbstractCrudOperation
         try 
         {
             const newStory = update(this.oldStory, this.updates);
-            await this.sendUpdates(updatable, ActionStoryDataChanged.TYPE, async () => 
+            await this.sendUpdates(updatable, ActionStoriesOfTeamLoaded.TYPE, async () => 
             {   await FirebaseAdapter.getStories(this.teamId).doc(this.storyId).update(newStory);});
             this.onSuccess(updatable, "Successfully updated the story.");
         }

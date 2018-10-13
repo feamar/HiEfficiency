@@ -27,8 +27,6 @@ import DocumentInterruptions from "../../dtos/firebase/firestore/documents/Docum
 import EntityInterruption from "../../dtos/firebase/firestore/entities/EntityInterruption";
 import DialogPreferenceDateTime, { DialogPreferenceDateTime_StorageValue } from "../dialog/preferences/DialogPreferenceDateTime";
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from "../dialog/instances/DialogConfirmation";
-import { OnActionClickedListener } from "../dialog/hocs/WithActions";
-import ListItemFinish from "../list/instances/interruptions/ListItemInterruption";
 import ModelInterruption from "../list/instances/interruptions/models/ModelInterruption";
 import DialogInterruptionEdit, { DialogInterruptionEdit_StorageValue } from "../dialog/custom/interruptions/DialogInterruptionEdit";
 import ModelStart from "../list/instances/interruptions/models/ModelStart";
@@ -38,6 +36,8 @@ import Color from "../../dtos/color/Color";
 import { AbstractListCollapsible_SectionType } from "../list/abstractions/collapsible/AbstractListCollapsible";
 import ModelProductive from "../list/instances/interruptions/models/ModelProductive";
 import ActionOption from "../../dtos/options/ActionOption";
+import { AdjustedCallbackReference } from "../../render_props/CallbackReference";
+import AbstractDialog from "../dialog/AbstractDialog";
 
 const isEqual = require("react-fast-compare");
 
@@ -148,10 +148,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     static displayName = "Story Details Interruptions";
 
     private story: ReduxStory
-    private onConfirmationClickListener?: OnActionClickedListener<ConcreteDialogConfirmation, DialogConfirmationActionUnion>
     private currentlyEditingInterruptionIndex?: number;
 
-    private dialogConfirmation?: ConcreteDialogConfirmation;
     private dialogInterruptionEdit: DialogInterruptionEdit | null = null;
     private dialogEditTimeFinish: DialogPreferenceDateTime | null = null;
     private dialogEditTimeStart: DialogPreferenceDateTime | null = null;
@@ -159,9 +157,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     constructor(props: Props)
     {
         super(props);
-
-        const storyId = props.navigation.getParam("storyId");
-        this.story = props.user.teams[this.props.inspecting.team!]!.stories[storyId]!;
+        this.story = props.navigation.getParam("story");
 
         this.state = 
         {
@@ -225,10 +221,12 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     }
 
     shouldShowOverflowMenu = () =>
-    {   return this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)}
+    {   
+        return this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)}
 
     onStartStory = async () => 
     {   
+        console.log("on Start Story");
         if(this.story == undefined)
         {   return;}
 
@@ -236,6 +234,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         {
             await this.props.database.inDialog("dialog-starting-story", this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
             {
+                console.log("UPDATING");
                 const update = this.props.database.updateStory(this.props.inspecting.team!, this.story.document.id!, this.story.document.data, {startedOn: {$set: new Date()}});
                 await execute(update, false);
             });
@@ -467,27 +466,32 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     showConfirmationDialog = (title: string, message: string, positiveText: string, onConfirm: () => any) =>
     {
-        if(this.dialogConfirmation)
+        console.log("Show confirmation dialog");
+        const listener = async (_baseComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
         {
-            if(this.dialogConfirmation.base)
-            {
-                this.dialogConfirmation.base.setTitle(title);
-                this.dialogConfirmation.setActionText
-            }
-            this.dialogConfirmation.setMessage(message);
-            this.dialogConfirmation.setActionTextPositive(positiveText);
+            console.log("Show confirmation dialog - in listneer");
 
-            this.onConfirmationClickListener = async (_baseComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
-            {
-                if(action != "Positive")
-                {   return ;}
+            if(action != "Positive")
+            {   return ;}
 
-                onConfirm();
-            };
+            onConfirm();
+        };
 
-            if(this.dialogConfirmation.base)
-            {   this.dialogConfirmation.base.setVisible(true);}
+        const id = "confirmation-dialog";
+        const removeDialog = () =>
+        {
+            console.log("Show confirmation dialog - Remove dialog");
+            this.props.removeDialog(id);
         }
+
+        const addDialog = (ref: AdjustedCallbackReference<AbstractDialog>) => 
+        {   
+            console.log("Show confirmation dialog - Add dialog");
+            return <DialogConfirmation key={id} visible={true} baseRef={ref} title={title} message={message} textPositive={positiveText} onActionClickListener={listener} onClose={removeDialog} />
+        };
+
+        console.log("ADDING! ");
+        this.props.addDialog(addDialog, id);
     }
 
     onContextMenuItemSelected = async (item: InterruptionModelType, _index: number, action: ActionOption) =>
@@ -606,7 +610,9 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         return (
             <ListInterruptions containerHasFab={true} sections={this.state.sections} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         );
+
     }
+
 
     getDialogComponent = () =>
     {  
@@ -620,11 +626,10 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         }
 
         return (
-             <View>
-                <DialogInterruptionEdit storageValue={null} title="Edit Interruption" visible={false} onSubmit={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
+             <View> 
+                <DialogInterruptionEdit storageValue={{type: InterruptionType.Values[0]}} title="Edit Interruption" visible={false} onSubmit={this.onInterruptionEdited} ref={instance => this.dialogInterruptionEdit = instance} />
                 <DialogPreferenceDateTime onValueValidation={this.validateTimeStarted}  storageValue={{timestamp: start}} ref={i => this.dialogEditTimeStart = i}  mode={"datetime-separate"} title="Edit Start"  visible={false} onSubmit={this.onEditTimeStart}  />
                 <DialogPreferenceDateTime onValueValidation={this.validateTimeFinished} storageValue={{timestamp: end}} ref={i => this.dialogEditTimeFinish = i} mode={"datetime-separate"} title="Edit Finish" visible={false} onSubmit={this.onEditTimeFinish} />
-                <DialogConfirmation title={""} message={""} concreteRef={i => this.dialogConfirmation = i} onActionClickListener={this.onConfirmationClickListener}/>
              </View>
          );
     }
@@ -636,7 +641,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     render()
     {
-
         switch(this.state.lifecycle)
         {
             case "Loading":
@@ -815,7 +819,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         {
             var date = asDate(new Date(data.finishedOn));
 
-            const finishItem = {timestamp: data.finishedOn, id: -2, ListItemType: ListItemFinish, duration: 0}
+            const finishItem = new ModelFinish(data.finishedOn);
             if(previousDate != date)
             {
                 section = 

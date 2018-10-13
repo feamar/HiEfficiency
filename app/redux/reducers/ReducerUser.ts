@@ -88,7 +88,13 @@ export default (user: ReduxUser | undefined | null, action: AnyAction): ReduxUse
         {
             const map: {[id: string]: ReduxStory} = {};
             action.stories.forEach(story => 
-            {   map[story.id!] = new ReduxStory(story, {}, false);});
+            {
+                const oldStory: ReduxStory | undefined = team.stories[story.id!];
+                if(oldStory)
+                {   map[story.id!] = new ReduxStory(story, oldStory.interruptions, oldStory.loaded);}
+                else
+                {   map[story.id!] = new ReduxStory(story, {}, false);}
+            });
 
 
             team = update(team, {stories: {$merge: map}, loaded: {$set: true}})
@@ -105,9 +111,19 @@ export default (user: ReduxUser | undefined | null, action: AnyAction): ReduxUse
 
             const map: {[id: string]: ReduxInterruptions} = {};
             action.interruptions.forEach(interruption => 
-            {   map[interruption.id!] = new ReduxInterruptions(interruption);});
+            {   
+                //If an old interruption is already present in the state, fork over other attributes like "loaded" and subentities. 
+                //This is not required at the moment, because interruptions don't have any,
+                //but I'll leave this structure plus comment here for future reference.
+                //See the same structure in the ActionStoriesOfTeamLoaded above.
+                const old = story.interruptions[interruption.id!];
+                if(old)
+                {   map[interruption.id!] = new ReduxInterruptions(interruption);}
+                else
+                {   map[interruption.id!] = new ReduxInterruptions(interruption);}
+            });
 
-            story = update(story, {interruptions: {$set: map}, loaded: {$set: true}});
+            story = update(story, {interruptions: {$merge: map}, loaded: {$set: true}});
             team = update(team, {stories: {[action.storyId]: {$set:story}}});
 
             return update(user, {teams: {[action.teamId]: {$set: team}}});

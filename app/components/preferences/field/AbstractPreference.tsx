@@ -29,7 +29,7 @@ export const AbstractPreferenceStyles = StyleSheet.create({
 
 export interface AbstractPreference_Props_Virtual<StorageValue>
 {
-    storageValue: StorageValue | null,
+    storageValue: StorageValue,
     title: string
     onValueChanged: (value: StorageValue) => void,
     onValueValidation?: (value: StorageValue) => string | undefined,

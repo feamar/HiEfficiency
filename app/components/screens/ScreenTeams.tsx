@@ -194,7 +194,7 @@ class ScreenTeams extends Component<Props, State>
     return (  
       <View style={{height: "100%"}}>  
         <ListTeams containerHasFab={true} items={UtilityIndexable.toArray(this.state.user.teams)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
-        <DialogPreferenceTextMulti<JoinTeamStorageValue> storageValue={null} title="Join Team" onSubmit={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
+        <DialogPreferenceTextMulti<JoinTeamStorageValue> storageValue={{name: "", code: ""}} title="Join Team" onSubmit={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
         <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmLeave = i}   visible={false} message="Are you sure you want to leave this team?" onActionClickListener={this.onLeaveDialogActionPressed} />
         <DialogConfirmation title="Deleting Team" concreteRef={i => this.dialogConfirmDelete = i} visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onActionClickListener={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
 

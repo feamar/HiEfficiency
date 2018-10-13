@@ -6,9 +6,6 @@ export default class ModelFinish extends AbstractInterruptionModel
     {   return obj.constructor == ModelFinish;}
 
     public finishedOn: Date;
-    public get timestamp ()
-    {   return this.finishedOn;}
-
     constructor(finishedOn: Date)
     {   
         super(finishedOn, 0);

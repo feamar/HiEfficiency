@@ -11,6 +11,7 @@ import { Baseable, onBaseReference } from '../../../../render_props/Baseable';
 import Theme from '../../../../styles/Theme';
 import UtilityTime from '../../../../utilities/UtilityTime';
 import InputDateTimeSeparate from '../../../inputs/InputDateTimeSeparate';
+import UtilityObject from '../../../../utilities/UtilityObject';
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -82,6 +83,8 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
     {
         super(props);
 
+        console.log("Interruption Edit Storage Value: " + UtilityObject.stringify(props.storageValue));
+
         this.state = 
         {
         }
@@ -142,26 +145,19 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
         return <InputError error={this.base.getCurrentError()} />
     }
 
-    getDialogContent = () => 
+    getDialogContent = (storageValue: StorageValue, error: string | undefined) => 
     {
-        if(this.base == undefined)
-        {   return <View></View>;}
-        
-        const value = this.base.getCurrentStorageValue();
-        if(value == null)
-        {   return <View></View>;}
-
         return (
             <View style={styles.wrapper}>
                 <Text style={styles.fieldTitle}>Timestamp Start</Text>
-                <InputDateTimeSeparate style={styles.field_start} onSelected={this.onDateTimeSelected("start")} timestamp={value.start || new Date()} />
+                <InputDateTimeSeparate style={styles.field_start} onSelected={this.onDateTimeSelected("start")} timestamp={storageValue.start || new Date()} />
                 
                 <Text style={styles.fieldTitle2}>Timestamp End</Text>
-                <InputDateTimeSeparate style={styles.field_end} onSelected={this.onDateTimeSelected("end")} timestamp={value.end || new Date()} />
-                {this.getErrorComponent()}
+                <InputDateTimeSeparate style={styles.field_end} onSelected={this.onDateTimeSelected("end")} timestamp={storageValue.end || new Date()} />
+                <InputError error={error} />
 
                 <Text style={styles.fieldTitle3}>Type</Text>
-                <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={value.type.title} />
+                <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={storageValue.type.title} />
             </View>
         );
     }

@@ -147,7 +147,7 @@ class ScreenStoryBoard extends Component<Props, State>
   onItemSelected = async (item: ReduxStory, _index: number, selectedTabScreenName?: string) =>
   {   
     this.props.onInspectStoryStart(item.document.id!);
-    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {storyId: item.document.id!, story: item, subtitle: item.document.data.name});
+    this.props.navigation.navigate(STACK_NAME_STORY_DETAILS, {story: item, subtitle: item.document.data.name});
 
     if(selectedTabScreenName != undefined)
     {   this.props.navigation.navigate(selectedTabScreenName);}

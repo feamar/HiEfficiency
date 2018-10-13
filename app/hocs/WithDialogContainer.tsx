@@ -16,7 +16,6 @@ export interface WithDialogContainerProps
 interface State
 {
     dialogs: {[id: string]: JSX.Element},
-    references: {[id: string] : AbstractDialog}
 }
 
 
@@ -31,22 +30,24 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
 {
     const hoc = class WithDialogContainer extends AbstractHigherOrderComponent<B, C, {}, P, HocProps & P, State>
     {
+        private references: {[id: string] : AbstractDialog} = {};
         constructor(props: HocProps & P)
         {
             super(props);
 
             this.state = {
-                dialogs: {},
-                references: {}
+                dialogs: {}
             }
         }
 
         onComponentWillUnmount = () =>
         {
-            const keys = Object.keys(this.state.references);
+            this.log("onComponentWillUnmount", "Start")
+
+            const keys = Object.keys(this.references);
             keys.forEach(key => 
             {
-               const reference = this.state.references[key];
+               const reference = this.references[key];
                if(reference)
                {    reference.setVisible(false);} 
             });
@@ -54,17 +55,14 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
 
         onDialogReference = (id: string) => (reference: AbstractDialog | undefined) =>
         {
+            this.log("onDialogReference", "Start")
             var spec: Spec<{[id: string] : AbstractDialog}, never>;
             if(reference == undefined)
             {   spec = {$unset: [id]};}
             else
             {   spec = {[id]: {$set: reference}};}
 
-            const newReferences = update(this.state.references, spec);
-            if(this.mounted)
-            {   this.setState({references: newReferences});}
-            else
-            {   this.state = {...this.state,  references: newReferences}}
+            this.references = update(this.references, spec);
         }
 
         public addDialog: AddDialogCallback = (getDialog: (ref: AdjustedCallbackReference<AbstractDialog>) => JSX.Element, id: string): boolean =>
@@ -85,6 +83,7 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
 
         public removeDialog = (id: string): boolean =>
         {
+            this.log("removeDialog", "Removing dialog with id '" + id + "'");
             if(this.state.dialogs[id] == undefined)
             {   return false;}
 
@@ -99,10 +98,11 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
 
         render()
         {   
+            this.log("render", "Start");
             return (
                 <View>
-                    {UtilityIndexable.toArray(this.state.dialogs).map(dialog => dialog)}
                     <WrappedComponent addDialog={this.addDialog} removeDialog={this.removeDialog} ref={this.onReference} {...this.props} />
+                    {UtilityIndexable.toArray(this.state.dialogs).map(dialog => dialog)}
                 </View>
             );
         }

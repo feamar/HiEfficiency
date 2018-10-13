@@ -61,19 +61,21 @@ export default class ListInterruptions extends Component<Props, State> implement
 
     getListItemFor = (_section: SectionType, item: InterruptionModelType, index: number): JSX.Element =>
     {
+        const timestamp = item.timestamp.toString();
         if(this.isStart(item))
-        {   return <ListItemStart {...this.createProps(item, index)} />;}
+        {   return <ListItemStart {...this.createProps(item, index, timestamp)} />;}
         else if(this.isInterruption(item))
-        {   return <ListItemInterruption {...this.createProps(item, index)} />;}
+        {   return <ListItemInterruption {...this.createProps(item, index, timestamp)} />;}
         else if(this.isProductive(item))
-        {   return <ListItemProductive {...this.createProps(item, index)} />;}
+        {   return <ListItemProductive {...this.createProps(item, index, timestamp)} />;}
         else 
-        {   return <ListItemFinish {...this.createProps(item, index)} />}
+        {   return <ListItemFinish {...this.createProps(item, index, timestamp)} />}
     }
 
-    public createProps = <Type extends {}> (item: Type, index: number) =>
+    public createProps = <Type extends {}> (item: Type, index: number, key: string) =>
     {
         return {
+            key: key,
             item: item,
             index: index, 
             onContextMenuItemSelected: this.props.onContextMenuItemSelected,

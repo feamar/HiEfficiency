@@ -38,7 +38,10 @@ export default <B extends ConcreteComponent,
             this.onActionClickedListeners.forEach(listener => 
             {   
                 if(this.wrapped != null)
-                {   listener(this.concrete, action);}
+                {
+
+                    listener(this.concrete, action);
+                }
             });
         }
 

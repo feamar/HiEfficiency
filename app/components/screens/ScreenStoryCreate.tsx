@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, ScrollView, StyleSheet} from "react-native";
+import {View, ScrollView, StyleSheet, ToastAndroid} from "react-native";
 import PreferenceCategory from "../preferences/PreferenceCategory";
 import StoryType from "../../enums/StoryType";
 import WithBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
@@ -14,7 +14,6 @@ import ReduxInspecting from "../../dtos/redux/ReduxInspecting";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import DocumentStory from "../../dtos/firebase/firestore/documents/DocumentStory";
 import AbstractPreference from "../preferences/field/AbstractPreference";
-import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from "../dialog/instances/DialogConfirmation";
 import PreferenceText from "../preferences/field/PreferenceText";
 import { Baseable } from "../../render_props/Baseable";
@@ -22,6 +21,7 @@ import { DialogPreferenceText_StorageValue } from "../dialog/preferences/DialogP
 import PreferenceSelectSpinner, { PreferenceSelectSpinner_StorageValue } from "../preferences/field/PreferenceSelectSpinner";
 import SelectOption from "../../dtos/options/SelectOption";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
+import ReduxStory from "../../dtos/redux/ReduxStory";
 
 const styles = StyleSheet.create({
     scrollView:{
@@ -41,7 +41,7 @@ type Props = ReduxStateProps & WithDatabaseProps & WithDialogContainerProps &
 
 type State =  
 {
-    story: AbstractFirestoreDocument<DocumentStory>,
+    story: ReduxStory,
     fabEnabled: boolean
 }
 
@@ -75,17 +75,22 @@ class ScreenStoryCreate extends Component<Props, State>
     {
         super(props);
   
-        var story: AbstractFirestoreDocument<DocumentStory> = 
+        var story: ReduxStory =
         {
-            id: undefined,
-            data:
+            loaded: true,
+            interruptions: {},
+            document:
             {
-                upvotes: 0,
-                startedOn: undefined,
-                finishedOn: undefined,
-                createdOn: new Date(),
-                name: "",
-                type: 0
+                id: undefined,
+                data:
+                {
+                    upvotes: 0,
+                    startedOn: undefined,
+                    finishedOn: undefined,
+                    createdOn: new Date(),
+                    name: "",
+                    type: 0
+                }
             }
         }
 
@@ -131,22 +136,22 @@ class ScreenStoryCreate extends Component<Props, State>
     onSelectValueChanged = (field: keyof DocumentStory) => (value: PreferenceSelectSpinner_StorageValue) =>
     {
         var story = this.state.story;
-        if(story.data[field] == value.selected.id)
+        if(story.document.data[field] == value.selected.id)
         {   return;}
 
         this.unsavedChanges = true ;
-        story = update(story, {data: {[field]: {$set: value.selected.id}}});
+        story = update(story, {document: {data: {[field]: {$set: value.selected.id}}}});
         this.setState({story: story, fabEnabled: true});
     }
 
     onTextValueChanged = (field: keyof DocumentStory) => (value: DialogPreferenceText_StorageValue) =>
     {
         var story = this.state.story;
-        if(story.data[field] == value.text)
+        if(story.document.data[field] == value.text)
         {   return;}
 
         this.unsavedChanges = true ;
-        story = update(story, {data: {[field]: {$set: value.text}}});
+        story = update(story, {document: {data: {[field]: {$set: value.text}}}});
         this.setState({story: story, fabEnabled: true});
     }
 
@@ -210,7 +215,7 @@ class ScreenStoryCreate extends Component<Props, State>
             case "Create":
                 await this.props.database.inDialog("dialog-creating-story", this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
                 {
-                    const crud = this.props.database.createStory(teamId!, this.state.story.data);
+                    const crud = this.props.database.createStory(teamId!, this.state.story.document.data);
                     crud.onCompleteListener = (successful: boolean) => 
                     {
                         if(successful)
@@ -222,19 +227,23 @@ class ScreenStoryCreate extends Component<Props, State>
                 break;
 
             case "Edit":
-                const old: AbstractFirestoreDocument<DocumentStory> = this.props.navigation.getParam("story");
-                const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story);
+                const old: ReduxStory = this.props.navigation.getParam("story");
+                const updates = UtilityUpdate.getUpdatesFromShallowObject(this.state.story.document.data);
                 
                 await this.props.database.inDialog("dialog-updating-story", this.props.addDialog, this.props.removeDialog, "Updating Story", async (execute) => 
                 {
-                    const update = this.props.database.updateStory(teamId!, old.id!, old.data, updates);
+                    const update = this.props.database.updateStory(teamId!, old.document.id!, old.document.data, updates);
                     const result = await execute(update, false);
 
                     if(result.successful)
                     {   
-                        const parent = this.props.navigation;
+                        if(result.dialogOpened == false)
+                        {   ToastAndroid.show("Story successfully updated!", ToastAndroid.LONG);}
+
+                        //For some reason, the function .dangerouslyGetParent has not been included in the type definition, but the contributors do tell us that it is part of the public API and is only called "dangerously" because it should not be overused.
+                        const parent = (this.props.navigation as any).dangerouslyGetParent();
                         if(parent)
-                        {   parent.setParams({ subtitle: this.state.story.data.name });}
+                        {   parent.setParams({ subtitle: this.state.story.document.data.name });}
                     }
                 });
                 this.unsavedChanges = false;
@@ -256,7 +265,8 @@ class ScreenStoryCreate extends Component<Props, State>
             //If the screen is encapsulated in a tab navigator, we'll need to perform the navigation event on the parent tab navigator.
             if(this.props.navigation.state.key == SCREEN_NAME_STORY_DETAILS_INFO)
             {
-                const parent = this.props.navigation;
+                //For some reason, the function .dangerouslyGetParent has not been included in the type definition, but the contributors do tell us that it is part of the public API and is only called "dangerously" because it should not be overused.
+                const parent = (this.props.navigation as any).dangerouslyGetParent();
                 parent.goBack();
             }
             else  
@@ -266,7 +276,7 @@ class ScreenStoryCreate extends Component<Props, State>
 
     render()
     { 
-        const data = this.state.story.data;
+        const data = this.state.story.document.data;
         const storyType: StoryType = StoryType.fromId(data.type) || StoryType.Feature;
         const storyPoints = data.points == undefined ? ""  : data.points.toString();
 

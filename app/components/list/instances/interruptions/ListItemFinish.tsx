@@ -5,9 +5,11 @@ import ActionOption from "../../../../dtos/options/ActionOption";
 import ActionType from "../../../../enums/ActionType";
 import UtilityTime from "../../../../utilities/UtilityTime";
 import { View } from "react-native";
-import {Icon, Text} from "react-native-paper";
+import {Text} from "react-native-paper";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import ModelFinish from "./models/ModelFinish";
 import { InterruptionListStyles } from "./ListInterruptions";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 type Props = AbstractListItemPropsVirtual<ModelFinish> & 
 {
@@ -44,7 +46,10 @@ export default class ListItemFinish extends Component<Props, State> implements B
     {   return UtilityTime.dateToHHMM(timestamp);} 
 
     getSubtitle = (item: ModelFinish) =>
-    {   return "At " + this.getTimeOfDay(item.finishedOn);}
+    {   
+        console.log("ITEM: " + UtilityObject.stringify(item));
+        return "At " + this.getTimeOfDay(item.finishedOn);
+    }
 
     getItemContent = (item: ModelFinish) =>
     { 

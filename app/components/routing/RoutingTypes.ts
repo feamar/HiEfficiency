@@ -1,7 +1,7 @@
 import { NavigationRoute, NavigationScreenProp } from "react-navigation";
 import DocumentTeam from "../../dtos/firebase/firestore/documents/DocumentTeam";
-import DocumentStory from "../../dtos/firebase/firestore/documents/DocumentStory";
 import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
+import ReduxStory from "../../dtos/redux/ReduxStory";
 
 
 //Dn't make it extend NavigationScreenProps
@@ -24,7 +24,7 @@ export interface CustomNavigationParams
   title: string,
   subtitle?: string,
   team: AbstractFirestoreDocument<DocumentTeam>,
-  story: AbstractFirestoreDocument<DocumentStory>,
+  story: ReduxStory,
   storyId: string, 
   onBackClicked?: () => boolean
 }

@@ -53,22 +53,17 @@ export default class AbstractHigherOrderComponent<B, C extends ConcreteOrHigher<
         if(this.wrapped == undefined)
         {   return undefined;}
 
-        if(this.isHigherOrderComponent(this.wrapped))
+        if(this.wrapped instanceof AbstractHigherOrderComponent)
         {   return this.wrapped.concrete;}
-        else if(this.isConcrete(this.wrapped))
+        else if(this.dangerouslyIsConcrete(this.wrapped))
         {   return this.wrapped;}
 
         return undefined;
     }
 
-    protected isHigherOrderComponent(obj: any) : obj is AbstractHigherOrderComponent<B, C, F, P>
-    {   return obj.constructor.name == AbstractHigherOrderComponent.name;}
-
-    protected isHigher (obj: any) : obj is HigherComponent<B, C, F, P>
-    {   return obj.constructor.name == AbstractHigherOrderComponent.name;}
-
-    protected isConcrete(obj: any) : obj is B
-    {   return this.isHigherOrderComponent(obj) == false;}
+    //Make sure you know what you're doing when calling this. This method type casts any object to the concrete type parameter B.
+    private dangerouslyIsConcrete = (_obj: any) : _obj is B =>
+    {   return true;}
 
     public forEachWrappedComponent = <ResultType> (closure: (component: ConcreteOrHigher<B, C, F, P>) => ResultType): Array<ResultType> => 
     {

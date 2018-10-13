@@ -5,6 +5,7 @@ import WithActions, { WithActionPropsInner } from "../hocs/WithActions";
 import {Text, Button, Dialog } from 'react-native-paper';
 import Theme from "../../../styles/Theme";
 import { Baseable, onBaseReference } from "../../../render_props/Baseable";
+import { AdjustedCallbackReference } from "../../../render_props/CallbackReference";
 
 const styles = StyleSheet.create({
     message:{
@@ -19,6 +20,7 @@ type DialogConfirmationProps = AbstractDialog_Props_Virtual &
     message: string,
     textNegative?: string,
     textPositive?: string
+    baseRef?: AdjustedCallbackReference<AbstractDialog>
 }
 
 interface State 
@@ -80,6 +82,12 @@ export class ConcreteDialogConfirmation extends React.Component<DialogConfirmati
 
     setActionText = (positive: string, negative: string)  =>
     {   this.setState({textPositive: positive, textNegative: negative});}
+
+    onBaseReference = (reference?: AbstractDialog): void =>
+    {
+        if(this.props.baseRef)
+        {   this.props.baseRef(reference);}
+    }
 
     render()
     {

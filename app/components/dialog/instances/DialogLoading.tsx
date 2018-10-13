@@ -238,6 +238,7 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
     {
         if(this.props.baseRef)
         {   this.props.baseRef(reference);}
+        
         if(reference)
         {
             if(reference.onOpenListeners.includes(this.onDialogOpen) == false)

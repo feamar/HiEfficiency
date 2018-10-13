@@ -52,7 +52,9 @@ export default <B extends ConcreteComponent & RequiredFunctions, C extends Concr
         {
             const concrete = this.concrete;
             if(concrete)
-            {   this.setShowOverflowMenu(concrete.shouldShowOverflowMenu());}
+            {
+                this.setShowOverflowMenu(concrete.shouldShowOverflowMenu());
+            }
         }
 
         componentDidUpdate = (_1: HocProps<B, P>, _2: HocState) =>
@@ -68,6 +70,9 @@ export default <B extends ConcreteComponent & RequiredFunctions, C extends Concr
 
         setShowOverflowMenu = (shouldShow: boolean) =>
         {
+            if(this.shouldShowOverflowMenu == shouldShow)
+            {   return;}
+            
             this.shouldShowOverflowMenu = shouldShow;
 
             if(shouldShow)

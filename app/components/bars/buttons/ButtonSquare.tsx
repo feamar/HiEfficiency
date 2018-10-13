@@ -86,7 +86,7 @@ export default class ButtonSquare extends Component<Props, State>
             <View style={styles.wrapper}>
                 <TouchableRipple style={styles.background} theme={Theme} onPress={this.props.onPress}>
                     <View style={styles.buttonWrapper}>
-                        <Icon style={styles.icon} size={this.state.iconSize} name={this.state.iconName} color={this.state.iconColor} />
+                        <Icon style={styles.icon} size={this.state.iconSize} name={this.state.iconName} color={this.state.iconColor.toHexadecimal()} />
                         <Text style={styles.title}>{this.state.title}</Text>
                     </View>
                 </TouchableRipple>

@@ -5,7 +5,8 @@ import ActionOption from "../../../../dtos/options/ActionOption";
 import ActionType from "../../../../enums/ActionType";
 import UtilityTime from "../../../../utilities/UtilityTime";
 import { View } from "react-native";
-import {Icon, Text} from "react-native-paper";
+import {Text} from "react-native-paper";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { InterruptionListStyles } from "./ListInterruptions";
 import ModelStart from "./models/ModelStart";
 
@@ -53,7 +54,7 @@ export default class ListItemStart extends Component<Props, State> implements Ba
             <View style={InterruptionListStyles.wrapper}>
                <Icon style={InterruptionListStyles.icon} size={30} name="location-on" />
                <View style={InterruptionListStyles.text_wrapper}>
-                   <Text style={InterruptionListStyles.text_title}>Finished</Text>
+                   <Text style={InterruptionListStyles.text_title}>Started</Text>
                    <Text style={InterruptionListStyles.text_subtitle}>{this.getSubtitle(item)}</Text>
                </View>
             </View>
