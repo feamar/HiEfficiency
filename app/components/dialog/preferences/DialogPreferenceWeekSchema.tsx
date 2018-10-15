@@ -180,9 +180,7 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         const enabled = this.isEnabled(index);
         const status = enabled ? "checked" : "unchecked";
 
-        console.log("INDEX: " + index);
         const dayName = this.days[index];
-        console.log("DAYNAME: "+ dayName);
         return (
             <View style={styles.item} key={index}>
                 <View style={styles.wrapper}>

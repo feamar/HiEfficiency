@@ -100,11 +100,11 @@ class ScreenStoryBoard extends Component<Props, State>
   { 
     var shouldBeLoading: boolean = false;
     if(props.user == undefined || props.user.teams == undefined || this.team == undefined || this.team.id == undefined)
-    {   shouldBeLoading = true;}
+    {   shouldBeLoading = true;  }
     else
     {
       var team = props.user.teams[this.team.id];
-      if(team == undefined || team.stories == undefined || team.loaded == false)
+      if(team == undefined || team.loaded == false)
       {   shouldBeLoading = true;}
     }
 

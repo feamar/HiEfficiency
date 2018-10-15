@@ -25,6 +25,7 @@ export default class UserLogin extends AbstractCrudOperation
 
     onRollback = async (_: Updatable) =>
     {
+        console.log("on Rollback!");
         FirebaseManager.Instance.loginHasBeenCanceled = true;
         this.attemptRollback(0, 10, async () => 
         {   
@@ -38,8 +39,6 @@ export default class UserLogin extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-
-
         try 
         {
             const auth = FirebaseAdapter.getAuth();
@@ -55,7 +54,7 @@ export default class UserLogin extends AbstractCrudOperation
         }
         catch(error)
         {  
-            //console.log("On error!: " + UtilityObject.stringify(error));
+            console.log("On error!: " + UtilityObject.stringify(error));
             switch(error.code)
             {
                 case "auth/invalid-email":

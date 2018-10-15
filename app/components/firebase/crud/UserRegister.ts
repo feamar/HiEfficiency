@@ -1,6 +1,8 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import ScreenProfile from "../../screens/ScreenProfile";
+import UtilityObject from "../../../utilities/UtilityObject";
+import EntitySchemaWeek from "../../../dtos/firebase/firestore/entities/EntitySchemaWeek";
 
 export default class UserRegister extends AbstractCrudOperation
 {
@@ -33,8 +35,10 @@ export default class UserRegister extends AbstractCrudOperation
             const user = {
                 name: this.email,
                 teams: [],
-                weekSchema: ScreenProfile.getDefaultSchema()
+                weekSchema: EntitySchemaWeek.default()
             };
+
+            console.log("SETTING USER: " + UtilityObject.stringify(user));
 
             await FirebaseAdapter.getUsers().doc(credentials.user.uid).set(user);
 

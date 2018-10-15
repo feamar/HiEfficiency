@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {View, StyleSheet} from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import Theme from "../../../styles/Theme";
-import UtilityObject from '../../../utilities/UtilityObject';
 
 export const AbstractPreferenceStyles = StyleSheet.create({
     root: {
@@ -99,7 +98,6 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
 
     validate = () =>
     {
-        console.log("VALIDATING: " + this.props.title);
         const storageValue = this.state.storageValue;
         if(this.props.required)
         {
@@ -110,7 +108,6 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
             }
 
             const satisfiesRequired = this.props.satisfiesRequired(storageValue);
-            console.log(UtilityObject.stringify(storageValue) + " :SatisfiesRequired: " + satisfiesRequired)
             if(satisfiesRequired == false)
             {
                 this.setState({error: "Please enter the " + this.props.title.toLowerCase() + "."});    

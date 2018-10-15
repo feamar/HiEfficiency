@@ -2,6 +2,7 @@ import {NetInfo} from 'react-native';
 import ReduxManager, { OnReduxStateChangedListener } from "../../../redux/ReduxManager";
 import { ConcreteDialogLoading } from '../../dialog/instances/DialogLoading';
 import { AnyAction } from 'redux';
+import AbstractDialog from '../../dialog/AbstractDialog';
 
 export const TIMEOUT_RESOLVE_NONE = 0;
 export const TIMEOUT_RESOLVE_ROLL_BACK = 1;
@@ -24,8 +25,11 @@ interface Cancelable
 interface Timeoutable
 {   isTimedOut: () => boolean}
 
+interface Completable
+{   setCompleted: () => void;}
+
 export type OnCompleteListener = (successful: boolean) => void;
-export type Updatable = Messagable & Sectionable & Warnable & Cancelable & Timeoutable;
+export type Updatable = Messagable & Sectionable & Warnable & Cancelable & Timeoutable & Completable;
 
 export default abstract class AbstractCrudOperation
 {
@@ -50,6 +54,7 @@ export default abstract class AbstractCrudOperation
         this.state = "Executed";
         dialog.setMessage(this.initialMessage);
         dialog.onTimeoutListeners.push(this.onDialogTimeout);
+        dialog.base!.onDismissListeners.push(this.onDialogDismiss);
 
         const isConnected = await NetInfo.isConnected.fetch();
         if(isConnected == false)
@@ -65,6 +70,12 @@ export default abstract class AbstractCrudOperation
             this.onError(dialog, "Something went wrong during the execution of the operation. Please try again.", error);
             return false;
         }      
+    }
+
+    public readonly onDialogDismiss = async (_dialog: AbstractDialog) =>
+    {
+        //if(this.successful == undefined)
+        //{   this.onRollback(undefined);}
     }
 
     public readonly onDialogTimeout = async (dialog: ConcreteDialogLoading, section: string) =>
@@ -119,6 +130,7 @@ export default abstract class AbstractCrudOperation
 
         updatable.setCancelable(true);
         updatable.setMessage(message);
+        updatable.setCompleted();
 
         this.reduxListeners.forEach((listener: OnReduxStateChangedListener) => 
         {   ReduxManager.Instance.removeListener(listener)});
@@ -140,6 +152,7 @@ export default abstract class AbstractCrudOperation
 
         updatable.setCancelable(true);
         updatable.setMessage(message);
+        updatable.setCompleted();
         
         if(error)
         {   updatable.setWarning(error.toString());}

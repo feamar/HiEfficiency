@@ -1,5 +1,4 @@
 import ColorChannel from "./ColorChannel";
-import UtilityObject from "../../utilities/UtilityObject";
 
 /**
  * A {@link Color} object stores the value of a four seperate {@link ColorChannel}s, representing a RGB(A) color model. The HSV(A) color model is currently not supported.
@@ -70,8 +69,6 @@ export default class Color
         const result: RegExpExecArray | null = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
         if(result == null)
         {   throw new Error("Please make sure the input string '" + hex + "' is in a proper hexadecimal format.");}
-
-        console.log("HEX COLOR: " + UtilityObject.stringify(result));
 
         return new Color(ColorChannel.fromHexValue(result[1]), ColorChannel.fromHexValue(result[2]), ColorChannel.fromHexValue(result[3]), ColorChannel.fromHexValue(result[4] || "FF"));
     }

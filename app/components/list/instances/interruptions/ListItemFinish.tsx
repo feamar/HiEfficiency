@@ -9,7 +9,6 @@ import {Text} from "react-native-paper";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ModelFinish from "./models/ModelFinish";
 import { InterruptionListStyles } from "./ListInterruptions";
-import UtilityObject from "../../../../utilities/UtilityObject";
 
 type Props = AbstractListItemPropsVirtual<ModelFinish> & 
 {
@@ -47,7 +46,6 @@ export default class ListItemFinish extends Component<Props, State> implements B
 
     getSubtitle = (item: ModelFinish) =>
     {   
-        console.log("ITEM: " + UtilityObject.stringify(item));
         return "At " + this.getTimeOfDay(item.finishedOn);
     }
 

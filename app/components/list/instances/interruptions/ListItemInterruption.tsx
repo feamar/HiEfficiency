@@ -37,10 +37,22 @@ export default class ListItemInterruption extends Component<Props, State> implem
 
     onBaseReference = async (reference?: AbstractListItem<ModelInterruption>) =>
     {
-        if(reference)
-        {   await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
+
+        if(reference && this.isInProgress(this.state.item) == false)
+        {  
+            await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));
+            await reference.addContextMenuItem(new ActionOption(ActionType.DELETE, "Delete"));
+        }
     }
 
+    componentWillReceiveProps = (props: Props) =>
+    {
+        if(this.state.item.duration == undefined && props.item.duration != undefined)
+        {   this.setState({item: props.item});}
+    }
+
+    isInProgress = (item: ModelInterruption) =>
+    {   return item.duration == undefined}
 
     getDuration = (item: ModelInterruption) =>
     {
@@ -55,11 +67,13 @@ export default class ListItemInterruption extends Component<Props, State> implem
 
     getSubtitle = (item: ModelInterruption) =>
     {
-        const durationString = this.getDuration(item);
-        if(durationString)
-        {   return "At " + this.getTimeOfDay(item.timestamp) + " for " + durationString;}
-        else
+        if(this.isInProgress(item))
         {   return "At " + this.getTimeOfDay(item.timestamp);}
+        else
+        {   
+            const durationString = this.getDuration(item);
+            return "At " + this.getTimeOfDay(item.timestamp) + " for " + durationString;
+        }
     }
 
     getItemContent = (item: ModelInterruption) =>

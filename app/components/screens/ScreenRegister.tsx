@@ -94,13 +94,13 @@ class ScreenRegister extends React.Component<Props, State>
 
   handleRegister = () => 
   {
-    if(this.state.email == undefined)
+    if(this.state.email == undefined || this.state.email == "")
     { 
       alert("Please enter an e-mail address.")
       return;
     }
 
-    if(this.state.password == undefined)
+    if(this.state.password == undefined || this.state.password == "")
     { 
       alert("Please enter a password.");
       return;

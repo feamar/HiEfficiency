@@ -107,8 +107,10 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
             );
         }
 
-        log = (method: string, message: string) =>
-        {   console.log("WithDialogContainer - " + method + " - " + message);}
+        log = (_method: string, _Fsemessage: string) =>
+        {   
+            //console.log("WithDialogContainer - " + method + " - " + message);
+        }
     }
     
 

@@ -50,7 +50,6 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
 
         setLoading = (loading: boolean) => 
         {
-            console.log("Set loading: " + loading + " AND " + this.state.loading);
             if(this.state.loading == loading)
             {   return;}
 

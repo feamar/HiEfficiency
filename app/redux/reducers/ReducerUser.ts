@@ -105,6 +105,7 @@ export default (user: ReduxUser | undefined | null, action: AnyAction): ReduxUse
     if(UtilityRedux.actionIs<ActionInterruptionsOfStoryLoaded>(action, ActionInterruptionsOfStoryLoaded.TYPE))
     {
         var team: ReduxTeam | undefined = user.teams[action.teamId];
+
         if(team != undefined)
         {
             var story: ReduxStory | undefined = team.stories[action.storyId];
@@ -123,8 +124,11 @@ export default (user: ReduxUser | undefined | null, action: AnyAction): ReduxUse
                 {   map[interruption.id!] = new ReduxInterruptions(interruption);}
             });
 
+
+
             story = update(story, {interruptions: {$merge: map}, loaded: {$set: true}});
             team = update(team, {stories: {[action.storyId]: {$set:story}}});
+
 
             return update(user, {teams: {[action.teamId]: {$set: team}}});
         }

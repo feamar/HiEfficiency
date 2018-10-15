@@ -74,11 +74,14 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 {
     public base: AbstractDialog | undefined;
     public readonly onTimeoutListeners: Array<OnTimeOutListener>;
+    private mounted: boolean = false;
 
+        private hash: number;
     constructor(props: DialogLoadingPropsAndInjected)
     {
         super(props);
         
+        this.hash = Math.floor(Math.random() * 100);
         this.state = 
         {
             message: props.message,
@@ -97,6 +100,16 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         const presetListener: OnTimeOutListener | undefined= this.props.onTimeout;
         if(presetListener)
         {   this.onTimeoutListeners.push(presetListener);}
+    }
+
+    componentDidMount = () =>
+    {
+        this.mounted = true;
+    }
+
+    componentWillUnmount = () =>
+    {
+        this.mounted = false;
     }
 
     componentWillReceiveProps = (props: DialogLoadingPropsAndInjected) =>
@@ -118,10 +131,15 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
 
     setCompleted = (): boolean  =>
     {
+        console.log(this.hash + " - SETTING FROM " + this.state.lifecycle + " TO Completed");
         if(this.state.lifecycle == "Completed")
         {   return false;}
+        console.log(this.hash + " - 2 - SETTING FROM " + this.state.lifecycle + " TO Completed");
 
-        this.setState({lifecycle: "Completed", shouldShowButtonOk: true});
+        if(this.mounted)
+        {   this.setState({lifecycle: "Completed", shouldShowButtonOk: true});}
+        else
+        {   this.state = {...this.state, lifecycle: "Completed", shouldShowButtonOk: true};}
 
         if(this.base)
         {
@@ -189,8 +207,10 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         const seconds: number = Math.floor(left / 1000);
         const remainder: number = left % 1000;
 
+        console.log(this.hash + " - LEFT: " + left + " AND " + this.state.lifecycle);
         if(seconds < 0)
         {
+            console.log(this.hash + " - ROLLING BACK");
             this.onTimeoutListeners.forEach(listener => 
             {   listener(this, this.state.section)});
             this.setState({lifecycle: "Timed Out", timeLeft: seconds, shouldShowButtonOk: true});

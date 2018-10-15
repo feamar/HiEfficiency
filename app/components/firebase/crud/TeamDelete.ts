@@ -53,68 +53,49 @@ export default class TeamDelete extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-        console.log("TeamDelete 1");
         const index = this.currentTeams.indexOf(this.teamId);
         //console.log("Index; " + index + ", teamId: " + this.teamId + " and currentTeams: " + UtilityObject.stringify(this.currentTeams));
         if(index >= 0)
         {   
-        console.log("TeamDelete 2");
-
             try
             {
-                console.log("TeamDelete 3");
                 const newData = update(this.currentTeams, {$splice: [[index, 1]]});
-                console.log("TeamDelete 4");
                 await this.sendUpdates(updatable, ActionUserLeftTeam.TYPE, async () => 
                 {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
-                console.log("TeamDelete 5");
             }
             catch(error)
             {   
-                console.log("TeamDelete 6");
                 this.onError(updatable, "Something went wrong while leaving the team.", error);
                 return;
             }
 
-            console.log("TeamDelete 7");
             if(updatable.isTimedOut())
             {   return;}
         }
 
-        console.log("TeamDelete 8");
         const stories = await FirebaseAdapter.getStories(this.teamId).get();
-        console.log("TeamDelete 9");
         const promises = stories.docs.map(async (story) => 
         {
-            console.log("TeamDelete 10");
             const interruptions = await FirebaseAdapter.getInterruptionsFromStoryRef(story.ref).get();
-            console.log("TeamDelete 11");
             await Promise.all(interruptions.docs.map(interruption => 
             {   return interruption.ref.delete();}));
 
-            console.log("TeamDelete 12");
             return story.ref.delete();
         });
 
-        console.log("TeamDelete 13");
         await Promise.all(promises);
-        console.log("TeamDelete 14");
 
         try
         {
-            console.log("TeamDelete 15");
             const doc = FirebaseAdapter.getTeams().doc(this.teamId);
 
-            console.log("TeamDelete 16");
             await this.sendUpdates(updatable, ActionTeamDeleted.TYPE, async () => 
             {   await doc.delete();});
 
-            console.log("TeamDelete 17");
             this.onSuccess(updatable, "You have successfully left and deleted the team.");
         }
         catch(error)
         {
-            console.log("TeamDelete 18");
             this.onError(updatable, "Team could not be deleted, please try again.", error);
         }
     }

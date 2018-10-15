@@ -126,7 +126,6 @@ export default class FirestoreFacade
 
         const onReference = (ref: ConcreteDialogLoading | undefined) => 
         {
-            console.log("In Dialog - On Reference - " + ref);
             if(ref != undefined)
             {
                 const executor = execute(ref);

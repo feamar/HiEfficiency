@@ -30,7 +30,6 @@ export default class InterruptionDelete extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-        //console.log("DELETING INTERRUPTION: " + this.teamId + " and " + this.storyId + " and " + this.userId  + " at index: " + this.indexToDelete + " with interruptions: " + UtilityObject.stringify(this.currentInterruptions));
         const document = FirebaseAdapter.getInterruptionsFromTeam(this.teamId, this.storyId).doc(this.userId);
         const newInterruptions = this.currentInterruptions.removeInterruptionImmutable(this.currentInterruptions.interruptions[this.indexToDelete]);
 

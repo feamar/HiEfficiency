@@ -10,6 +10,10 @@ const styles = StyleSheet.create({
     input: {
         marginLeft: 25,
         marginRight: 25
+    },
+    error: {
+        marginLeft: 25,
+        marginRight: 25
     }
 });
 
@@ -74,7 +78,7 @@ export default class DialogPreferenceText extends React.Component<Props, State> 
         return ( 
             <View>
                 <TextInput autoFocus={true} style={styles.input} label={this.state.label} value={storageValue.text} onChangeText={this.onTextChanged} multiline={this.state.multiline} numberOfLines={this.state.numberOfLines}/>
-                <InputError error={error} />
+                <InputError margin={true} error={error} />
             </View>
         );
     }

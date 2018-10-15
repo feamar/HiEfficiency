@@ -35,8 +35,6 @@ export default class InterruptionUpdate extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-        //console.log("UPDATING INTERRUPTION FOR " + this.teamId + " and " + this.storyId + " and " + this.userId + " with old: " + UtilityObject.stringify(this.oldInterruption)  + " and updates: " + UtilityObject.stringify(this.updates) + " and current interruptions is a collection of : " + UtilityObject.stringify(this.currentInterruptions));
-        
         const index = this.currentInterruptions.interruptions.indexOf(this.oldInterruption);
         if(index < 0)
         {   

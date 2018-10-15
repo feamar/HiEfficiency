@@ -1,11 +1,11 @@
 export default class AbstractInterruptionModel
 {
     public timestamp: Date;
-    public duration: number;
+    public duration?: number;
 
     constructor(timestamp: Date, duration?: number)
     {   
         this.timestamp = timestamp;
-        this.duration = duration || 0;
+        this.duration = duration;
     }
 }

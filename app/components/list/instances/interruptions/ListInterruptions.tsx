@@ -63,13 +63,13 @@ export default class ListInterruptions extends Component<Props, State> implement
     {
         const timestamp = item.timestamp.toString();
         if(this.isStart(item))
-        {   return <ListItemStart {...this.createProps(item, index, timestamp)} />;}
+        {   return <ListItemStart {...this.createProps(item, index, "start-" + timestamp)} />;}
         else if(this.isInterruption(item))
-        {   return <ListItemInterruption {...this.createProps(item, index, timestamp)} />;}
+        {   return <ListItemInterruption {...this.createProps(item, index, "interruption-" + timestamp)} />;}
         else if(this.isProductive(item))
-        {   return <ListItemProductive {...this.createProps(item, index, timestamp)} />;}
+        {   return <ListItemProductive {...this.createProps(item, index, "productive-" + timestamp)} />;}
         else 
-        {   return <ListItemFinish {...this.createProps(item, index, timestamp)} />}
+        {   return <ListItemFinish {...this.createProps(item, index, "finish-" + timestamp)} />}
     }
 
     public createProps = <Type extends {}> (item: Type, index: number, key: string) =>

@@ -6,8 +6,6 @@ import Icon  from "react-native-vector-icons/MaterialIcons";
 import UtilityTime from "../../../../utilities/UtilityTime";
 import ModelProductive from "./models/ModelProductive";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
-import ActionOption from "../../../../dtos/options/ActionOption";
-import ActionType from "../../../../enums/ActionType";
 import { InterruptionListStyles } from "./ListInterruptions";
 
 type Props = AbstractListItemPropsVirtual<ModelProductive> & 
@@ -53,12 +51,6 @@ export default class ListItemProductive extends React.Component<Props, State> im
         );
     }
 
-    onBaseReference = async (reference?: AbstractListItem<ModelProductive>) =>
-    {
-        if(reference)
-        {   await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));}
-    }
-    
     render()
     {
         return (

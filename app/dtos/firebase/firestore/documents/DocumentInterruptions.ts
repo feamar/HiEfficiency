@@ -13,7 +13,7 @@ export default class DocumentInterruptions
         if(snapshot.exists == false)
         {   return undefined;}
 
-        const document: DocumentInterruptions =  snapshot.data() as DocumentInterruptions;
+        const document: DocumentInterruptions = snapshot.data() as DocumentInterruptions;
         document.interruptions = document.interruptions.map(interruption => EntityInterruption.fromJsonObject(interruption));
 
         return document;
@@ -23,9 +23,10 @@ export default class DocumentInterruptions
     {
         const ofUser = reduxInterruptions[userId];
         if(ofUser == undefined)
-        {   return DocumentInterruptions.create();}
-
-        return ofUser.document.data;
+        {
+            return DocumentInterruptions.create();
+        }
+        return new DocumentInterruptions(ofUser.document.data.interruptions);
     }
 
     public interruptions: Array<EntityInterruption>;

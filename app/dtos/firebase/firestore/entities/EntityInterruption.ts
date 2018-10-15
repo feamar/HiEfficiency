@@ -15,6 +15,9 @@ export default class EntityInterruption
         this.category = category;
         this.timestamp = timestamp;
         this.duration = duration;
+
+        if(duration == undefined || duration == null || duration.toString() == "null")
+        {   this.duration = undefined;}
     }
 
 }

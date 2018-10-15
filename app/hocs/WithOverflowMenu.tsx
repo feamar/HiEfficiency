@@ -1,17 +1,21 @@
 import React from "react";
-import { Menu, MenuOptions, MenuTrigger, MenuOptionProps } from "react-native-popup-menu";
+import { Menu, MenuOptions, MenuTrigger, MenuOptionProps, MenuOption } from "react-native-popup-menu";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
 import WithStaticFields from "./WithStaticFields";
 import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent, ConcreteRef } from "./AbstractHigherOrderComponent";
 
-const styles = {
-    menuOptions: {
-            optionWrapper:{
+const styles = 
+{
+    menuOptions: 
+    {
+        optionWrapper:
+        {
             padding:15,
         }
     },
-    menuTrigger: {
+    menuTrigger: 
+    {
         triggerWrapper:  
         {
             padding:6 
@@ -19,12 +23,11 @@ const styles = {
     }
 };
 
-
 type RequiredFunctions = WithOverflowMenu_RequiredFunctions;
 export interface WithOverflowMenu_RequiredFunctions
 {
     shouldShowOverflowMenu: () => boolean
-    getOverflowMenuItems: () => Array<MenuOptionProps & {key?: string}> | undefined
+    getOverflowMenuItems: () => Array<MenuOptionProps & {key: string}> | undefined
 }
 
 type HocProps<B, P> = ConcreteRef<B> & P  & 
@@ -39,7 +42,7 @@ interface HocState
 
 //export default WithOverflowMenu<ScreenProfile, Props>(ScreenProfile);
 
-export default <B extends ConcreteComponent & RequiredFunctions, C extends ConcreteOrHigher<B, C, RequiredFunctions, P>, P> (WrappedComponent: ConcreteOrHigherConstructor<B, C, RequiredFunctions, P>) =>
+export default <B extends ConcreteComponent & RequiredFunctions, C extends ConcreteOrHigher<B, C, RequiredFunctions, P>, P> (WrappedComponent: ConcreteOrHigherConstructor<B, C, RequiredFunctions, P>, isInsideTab: boolean = true) =>
 {
     const hoc = class WithOverflowMenu extends AbstractHigherOrderComponent<B, C, RequiredFunctions, P, HocProps<B, P>, HocState>
     {
@@ -70,15 +73,19 @@ export default <B extends ConcreteComponent & RequiredFunctions, C extends Concr
 
         setShowOverflowMenu = (shouldShow: boolean) =>
         {
+            console.log("SET SHOULD SHOW OVERFLOW MENU - START - " + shouldShow);
             if(this.shouldShowOverflowMenu == shouldShow)
             {   return;}
             
             this.shouldShowOverflowMenu = shouldShow;
+            console.log("SET SHOULD SHOW OVERFLOW MENU - MID - " + shouldShow);
+
+            const navigator: HiEfficiencyNavigator = isInsideTab ? (this.props.navigation as any).dangerouslyGetParent() : this.props.navigation;
 
             if(shouldShow)
-            {   this.props.navigation.setParams({header_right_injection: this.getOverflowMenu});}
+            {   navigator.setParams({header_right_injection: this.getOverflowMenu});}
             else
-            {   this.props.navigation.setParams({header_right_injection: undefined});}
+            {   navigator.setParams({header_right_injection: undefined});}
         }
 
         getOverflowMenu = (): JSX.Element | undefined =>
@@ -98,7 +105,7 @@ export default <B extends ConcreteComponent & RequiredFunctions, C extends Concr
                     </MenuTrigger>
                     <MenuOptions customStyles={styles.menuOptions}>
                         {items.map(item => 
-                        {   return item;})}
+                        {   return <MenuOption {...item} />;})}
                     </MenuOptions>
                 </Menu>
             );

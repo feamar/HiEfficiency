@@ -268,6 +268,9 @@ const getNavigationOptions = (title: string, actionLeft?: (navigation: HiEfficie
       if(headerRightInjection)
       {   headerRight = headerRightInjection();}
 
+      console.log("Header Right Injection: " + headerRightInjection);
+      console.log("Header Right: " + headerRight);
+
       const options = {
         header: <CustomHeader left={headerLeft} title={navigation.getParam(PARAM_NAME_TITLE) || title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
       }

@@ -11,7 +11,6 @@ import { Baseable, onBaseReference } from '../../../../render_props/Baseable';
 import Theme from '../../../../styles/Theme';
 import UtilityTime from '../../../../utilities/UtilityTime';
 import InputDateTimeSeparate from '../../../inputs/InputDateTimeSeparate';
-import UtilityObject from '../../../../utilities/UtilityObject';
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -82,8 +81,6 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
     constructor(props: DialogInterruptionEditProps)
     {
         super(props);
-
-        console.log("Interruption Edit Storage Value: " + UtilityObject.stringify(props.storageValue));
 
         this.state = 
         {

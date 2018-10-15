@@ -37,15 +37,16 @@ export default class InterruptionCreate extends AbstractCrudOperation
         try
         {
             var closure = undefined;
-            if(Object.keys(newInterruptions).length == 1)
-            {   
-                closure = async () => 
-                {   await document.set(newInterruptions);};
-            }
-            else
+            const snapshot = await document.get();
+            if(snapshot.exists)
             {
                 closure = async () => 
                 {   await document.update(newInterruptions);};
+            }
+            else
+            {   
+                closure = async () => 
+                {   await document.set(newInterruptions);};
             }
 
             await this.sendUpdates(updatable, ActionInterruptionsOfStoryLoaded.TYPE, closure);

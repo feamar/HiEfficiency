@@ -1,16 +1,13 @@
 
-export const asTime = (date) => {
+export const asTime = (date: Date) => {
 	return date.toLocaleTimeString().substring(0, 5);
 }
 
-export const asDate = (date) => {
-  if(date == undefined)
-  {   return undefined;}
-  
+export const asDate = (date: Date) => {
 	return date.toDateString().slice(4, 15);
 }
 
-export const difference = (start, finish) => {
+export const difference = (start: any, finish: any) => {
 	if (start == undefined || finish == undefined) {
 		return "";
 	}
@@ -18,18 +15,18 @@ export const difference = (start, finish) => {
 	var second = (finish.constructor !== undefined && finish.constructor.name == 'Date') ? finish.getTime() / 1000 : finish;
 
   var difference = second - first;
-  seconds = difference % 60;
+  var seconds = difference % 60;
   difference -= seconds;
   difference /= 60;
-  minutes = difference % 60;
+  var minutes = difference % 60;
   difference -= minutes;
   difference /= 60;
-  hours = difference % 24;
+  var hours = difference % 24;
   difference -= hours;
   difference /= 24;
-  days = difference;
+  var days = difference;
  
-  result = '';
+  var result = '';
   if (days > 0) {
     result += days + 'd';
   }

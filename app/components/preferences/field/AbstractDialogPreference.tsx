@@ -41,10 +41,8 @@ export default class AbstractDialogPreference<StorageValue extends {}> extends R
 
     onPreferencePress = () =>
     {
-        console.log("On Preference Press Internal");
         if(this.dialog)
         {   
-        console.log("On Preference Press Internal 1");
 
             const base = this.dialog.base;
             if(base)

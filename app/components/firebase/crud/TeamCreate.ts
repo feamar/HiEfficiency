@@ -39,38 +39,28 @@ export default class TeamCreate extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-        console.log("TeamCreate 1");
         this.newDocument =  await FirebaseAdapter.getTeams().add(this.team);
-        console.log("TeamCreate 2");
 
         if(updatable.isTimedOut())
         {
             this.onRollback(updatable);
             return;
         }
-        console.log("TeamCreate 3");
 
         if(this.newDocument == undefined)
         {   throw new Error("Fatal stat exception.");}
-        console.log("TeamCreate 4");
 
         updatable.setMessage("Team created, now joining new team.");
-        console.log("TeamCreate 5");
         const newData = update(this.currentTeams, {$push: [this.newDocument.id!]});
-        console.log("TeamCreate 6");
         try
         {
-            console.log("TeamCreate 7");
             await this.sendUpdates(updatable, ActionUserJoinedTeam.TYPE, async () => 
             {   await FirebaseAdapter.getUsers().doc(this.userId).update({teams: newData});});
-            console.log("TeamCreate 8");
 
             this.onSuccess(updatable, "You have successfully created and joined the new team.");
-            console.log("TeamCreate 9");
         }
         catch(error)
         {   
-            console.log("TeamCreate 10");
             this.onError(updatable, "Team could not be created, please try again.", error);
         }
     }

@@ -94,7 +94,7 @@ export default class CustomDrawer extends Component<Props, State>
         return (
             <View>
                 <TouchableRipple style={styles.touchable} onPress={onPress}> 
-                    <Text>{title}</Text>
+                    <Text style={this.getItemStyle(false).title}>{title}</Text>
                 </TouchableRipple>
             </View>
         );        

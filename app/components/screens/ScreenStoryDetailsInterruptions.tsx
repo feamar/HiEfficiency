@@ -157,7 +157,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     constructor(props: Props)
     {
         super(props);
-        this.story = props.navigation.getParam("story");
+
+        this.story = props.user.teams[props.inspecting.team!].stories[props.inspecting.story!];
 
         this.state = 
         {
@@ -213,10 +214,10 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     componentWillUnmount = () =>
     {   this.props.onInspectStoryEnd();}
 
-    getOverflowMenuItems = (): Array<MenuOptionProps> =>
+    getOverflowMenuItems = (): Array<MenuOptionProps & {key: string}> =>
     {
         return [
-            {text: "Unstart Story", onSelect: () => this.onOverflowMenuItemSelected(ActionType.UNSTART)}
+            {text: "Unstart Story", onSelect: () => this.onOverflowMenuItemSelected(ActionType.UNSTART), key: "Unstart Story"}
         ];
     }
 
@@ -226,7 +227,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     onStartStory = async () => 
     {   
-        console.log("on Start Story");
         if(this.story == undefined)
         {   return;}
 
@@ -234,7 +234,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         {
             await this.props.database.inDialog("dialog-starting-story", this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
             {
-                console.log("UPDATING");
                 const update = this.props.database.updateStory(this.props.inspecting.team!, this.story.document.id!, this.story.document.data, {startedOn: {$set: new Date()}});
                 await execute(update, false);
             });
@@ -249,7 +248,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         if(timestamp == undefined)
         {   timestamp = new Date();}
 
-        const interruption = EntityInterruption.create(category.dbId, timestamp);
+        const interruption: EntityInterruption = EntityInterruption.create(category.dbId, timestamp);
         const inspecting = this.props.inspecting;
         
         await this.props.database.inDialog("dialog-adding-interruption", this.props.addDialog, this.props.removeDialog, "Adding Interruption", async (execute) => 
@@ -262,7 +261,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     
     getFirstInterruption = () =>
     {
-        if(this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions.size).length == 0)
+        if(this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)
         {   return undefined;}
 
         const interruptions = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
@@ -271,7 +270,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     getLastInterruption = () =>
     {
-        if(this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions.size).length == 0)
+        if(this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)
         {   return undefined;}
 
         const interruptions = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
@@ -466,11 +465,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     showConfirmationDialog = (title: string, message: string, positiveText: string, onConfirm: () => any) =>
     {
-        console.log("Show confirmation dialog");
         const listener = async (_baseComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
         {
-            console.log("Show confirmation dialog - in listneer");
-
             if(action != "Positive")
             {   return ;}
 
@@ -480,17 +476,14 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         const id = "confirmation-dialog";
         const removeDialog = () =>
         {
-            console.log("Show confirmation dialog - Remove dialog");
             this.props.removeDialog(id);
         }
 
         const addDialog = (ref: AdjustedCallbackReference<AbstractDialog>) => 
         {   
-            console.log("Show confirmation dialog - Add dialog");
             return <DialogConfirmation key={id} visible={true} baseRef={ref} title={title} message={message} textPositive={positiveText} onActionClickListener={listener} onClose={removeDialog} />
         };
 
-        console.log("ADDING! ");
         this.props.addDialog(addDialog, id);
     }
 
@@ -745,6 +738,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         const data = story.document.data;
         const document = DocumentInterruptions.fromReduxInterruptions(story.interruptions, this.props.user.document.id!);
 
+
         var sections: Array<AbstractListCollapsible_SectionType<InterruptionModelType>> = [];
         var previousDate = null;
         var section: AbstractListCollapsible_SectionType<InterruptionModelType> | null = null;
@@ -803,7 +797,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
                 
                 const productive = new ModelProductive(new Date(productiveTimestamp), currentInterruption.timestamp.getTime() - productiveTimestamp,);
 
-                if(productive.duration > 0)
+                if(productive.duration && productive.duration > 0)
                 {   newItems.push(productive);}
 
                 newItems.push(currentInterruption);
@@ -832,7 +826,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             else
             {   
                 const lastInterruption = section!.items[section!.items.length - 1];
-                const productiveTimestamp = new Date(lastInterruption.timestamp.getTime() + lastInterruption.duration);
+                const productiveTimestamp = new Date(lastInterruption.timestamp.getTime() + lastInterruption.duration!);
                 const productiveDuration = data.finishedOn.getTime() - productiveTimestamp.getTime();
 
                 const productive: ModelProductive = new ModelProductive(productiveTimestamp, productiveDuration);

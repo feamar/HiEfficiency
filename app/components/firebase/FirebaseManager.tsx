@@ -217,14 +217,16 @@ export default class FirebaseManager
           } 
         } 
 
-        if(documents.length > 0)
-        {   this.store!.dispatch(new ActionStoriesOfTeamLoaded(teamId, documents));}
+        this.store!.dispatch(new ActionStoriesOfTeamLoaded(teamId, documents));
     }
 
     onInterruptionsDocumentChanged = (teamId: string, storyId: string) => async (snapshot: RNFirebase.firestore.QuerySnapshot) =>
     {   
         const documents: Array<AbstractFirestoreDocument<DocumentInterruptions>> = snapshot.docs.map(row => 
-        {   return new AbstractFirestoreDocument<DocumentInterruptions>(DocumentInterruptions.create((row.data as any).interruptions), row.id!);});
+        {   
+            const document = DocumentInterruptions.fromSnapshot(row)!;
+            return new AbstractFirestoreDocument<DocumentInterruptions>(document, row.id!);
+        });
 
         this.store!.dispatch(new ActionInterruptionsOfStoryLoaded(teamId, storyId, documents));
     }
@@ -249,6 +251,9 @@ export default class FirebaseManager
     
     onUserInspectingTeamStart = async (teamId: string) =>
     {
+        if(this.interruptionUnsubscriber)
+        {   this.interruptionUnsubscriber();}
+
         const state = this.store!.getState();
         const user = state.user;
         

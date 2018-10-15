@@ -37,7 +37,6 @@ export default class UtilityTime
         const minuteString = UtilityNumber.pad(minutes, 2);
         const hourString = UtilityNumber.pad(hours, 2);
 
-        console.log("HOURS: " + hourString + " and MINuTES: " + minuteString)
 
         return hourString + separator + minuteString;
     }

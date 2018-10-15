@@ -4,7 +4,6 @@ import Theme from '../../../styles/Theme';
 import AbstractDialog, { AbstractDialog_Props_Virtual } from '../AbstractDialog';
 import update, {Spec} from "immutability-helper";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
-import UtilityObject from '../../../utilities/UtilityObject';
 
 interface AbstractPreferenceDialog_Props_Sealed<StorageValue> 
 {
@@ -40,7 +39,6 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
     {
         super(props);
 
-        console.log("Storage Value: " + UtilityObject.stringify(this.props.storageValue));
         this.state = 
         {
             storageValue: this.props.storageValue,

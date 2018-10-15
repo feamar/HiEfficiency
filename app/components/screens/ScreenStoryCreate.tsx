@@ -163,7 +163,7 @@ class ScreenStoryCreate extends Component<Props, State>
                 if(value.text)
                 {
                     const intValue = parseInt(value.text);
-                    if(intValue % 1 != 0)
+                    if(isNaN(Number(value.text)) || intValue % 1 != 0)
                     {   return "Please enter an integer value.";}
                 }
                 

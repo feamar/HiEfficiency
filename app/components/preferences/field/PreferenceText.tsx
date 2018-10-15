@@ -45,7 +45,6 @@ export default class PreferenceText extends React.Component<Props, State> implem
     
     satisfiesRequired = (storageValue: StorageValue) =>
     {   
-        console.log("Storagevalue.text: " + storageValue.text + " WHILE " + storageValue.text != undefined);
         return storageValue.text != undefined && storageValue.text != "";
     }
 
