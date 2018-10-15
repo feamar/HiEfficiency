@@ -48,6 +48,12 @@ export default class InputTimeRange extends React.Component<Props, State>
         }
     }
 
+    componentWillReceiveProps = (props: Props) =>
+    {
+        if(props.disabled != this.state.disabled && props.disabled != undefined)
+        {   this.setState({disabled: props.disabled})}
+    }
+
     onSelectedFrom = (timestamp: Date) =>
     {
         if(timestamp > this.state.end)
