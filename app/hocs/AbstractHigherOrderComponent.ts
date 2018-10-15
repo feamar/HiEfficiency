@@ -3,10 +3,10 @@ import React from "react";
 export type ConcreteOrHigher<B, C extends ConcreteOrHigher<B, C, F, P>, F, P> = ConcreteComponent<P> & F | HigherComponent<B, C, F, P> & Partial<F>
 export type ConcreteOrHigherConstructor<B, C extends ConcreteOrHigher<B, C, F, P>, F, P> = ConcreteComponentConstructor<F, P> | HigherComponentConstructor<B, C, F, P>
 
-interface ConcreteComponentConstructor<F, P> extends React.ComponentClass<P>
+export interface ConcreteComponentConstructor<F, P> extends React.ComponentClass<P>
 {   new (props: P, context?: any): ConcreteComponent<P> & F}
 
-interface HigherComponentConstructor<B, C extends ConcreteOrHigher<B, C, F, P>, F, P> extends React.ComponentClass<Partial<P>>
+export interface HigherComponentConstructor<B, C extends ConcreteOrHigher<B, C, F, P>, F, P> extends React.ComponentClass<Partial<P>>
 {
     new (props: Partial<P>, content?: any): HigherComponent<B, C, F, P> & Partial<F>
 }

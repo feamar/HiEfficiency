@@ -3,6 +3,8 @@ import AbstractList, { AbstractListPropsVirtual } from "../../abstractions/list/
 import ListItemTeam from "./ListItemTeam";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ReduxTeam from "../../../../dtos/redux/ReduxTeam";
+import WithEmptyListFiller from "../../../../hocs/WithEmptyListFiller";
+import ListFillerOption from "../../../../dtos/options/ListFillerOption";
 
 type Props = AbstractListPropsVirtual<ReduxTeam> & 
 {
@@ -14,7 +16,7 @@ interface State
     
 }
 
-export default class ListTeams extends Component<Props, State> implements Baseable<AbstractList<ReduxTeam>>
+class ListTeams extends Component<Props, State> implements Baseable<AbstractList<ReduxTeam>>
 {
     public base: AbstractList<ReduxTeam> | undefined = undefined;
 
@@ -30,6 +32,14 @@ export default class ListTeams extends Component<Props, State> implements Baseab
             index={index} />
     }
 
+    shouldShowEmptyListFiller = () =>
+    {
+        if(this.base == undefined)
+        {   return true;}
+
+        return this.base.state.items.length == 0;
+    }
+
     render()
     {
         return (
@@ -37,3 +47,7 @@ export default class ListTeams extends Component<Props, State> implements Baseab
         );
     }
 } 
+
+
+const hoc1 = WithEmptyListFiller<ListTeams, ListTeams, Props>(ListTeams, ListFillerOption.Awkward);
+export default hoc1;

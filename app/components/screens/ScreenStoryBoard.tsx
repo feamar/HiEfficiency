@@ -21,6 +21,9 @@ import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActio
 import ReduxTeam from "../../dtos/redux/ReduxTeam";
 import ListStories from "../list/instances/stories/ListStories";
 import ActionOption from "../../dtos/options/ActionOption";
+import WithEmptyListFiller from "../../hocs/WithEmptyListFiller";
+import ListFillerOption from "../../dtos/options/ListFillerOption";
+import { AbstractListPropsVirtual } from "../list/abstractions/list/AbstractList";
 
 interface ReduxStateProps
 {
@@ -274,13 +277,31 @@ class ScreenStoryBoard extends Component<Props, State>
 
     return result;
   }
+
+  getListComponent = (mode: StoryboardMode) =>
+  {
+    var Hoc = ListStories;
+    switch(mode)
+    { 
+      case "Todo":
+        Hoc = WithEmptyListFiller<ListStories, ListStories, AbstractListPropsVirtual<ReduxStory>>(ListStories, ListFillerOption.Bored);
+        break;
+
+      case "Doing":
+        Hoc = WithEmptyListFiller<ListStories, ListStories, AbstractListPropsVirtual<ReduxStory>>(ListStories, ListFillerOption.Happy);
+        break;
+      
+    }
+
+    return <Hoc containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+  }
   
   render()   
   {
     return (
       <View style={{height: "100%"}}>
           <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmDelete = i}  visible={false} message="Are you sure you want to delete this user story?" onActionClickListener={this.onDialogActionPressed} />
-          <ListStories containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+          {this.getListComponent(this.props.mode)}
           {this.props.mode == "Todo" && <FAB.Group color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open: {open: boolean}) => this.setState(open)} />}
       </View>
     );

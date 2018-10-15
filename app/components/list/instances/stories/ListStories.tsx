@@ -29,6 +29,16 @@ export default class ListStories extends Component<Props, State> implements Base
             index={index} />
     }
 
+    
+    shouldShowEmptyListFiller = () =>
+    {
+        if(this.base == undefined)
+        {   return true;}
+
+        return this.base.state.items.length == 0;
+    }
+
+
     render()
     {
         return (
