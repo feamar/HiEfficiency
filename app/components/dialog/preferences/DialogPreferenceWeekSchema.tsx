@@ -91,13 +91,27 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
                 //Ugly, ugly hack to work around reference issues.
                 switch(index)
                 {
-                    case 0: sv.monday.enabled = !sv.monday.enabled;
-                    case 1: sv.tuesday.enabled = !sv.tuesday.enabled;
-                    case 2: sv.wednesday.enabled = !sv.wednesday.enabled;
-                    case 3: sv.thursday.enabled = !sv.thursday.enabled;
-                    case 4: sv.friday.enabled = !sv.friday.enabled;
-                    case 5: sv.saturday.enabled = !sv.saturday.enabled;
-                    case 6: sv.sunday.enabled = !sv.sunday.enabled;
+                    case 0: 
+                        sv.monday.enabled = !sv.monday.enabled;
+                        break;
+                    case 1: 
+                        sv.tuesday.enabled = !sv.tuesday.enabled;
+                        break;
+                    case 2: 
+                        sv.wednesday.enabled = !sv.wednesday.enabled;
+                        break;
+                    case 3:
+                        sv.thursday.enabled = !sv.thursday.enabled;
+                        break;
+                    case 4: 
+                        sv.friday.enabled = !sv.friday.enabled;
+                        break;
+                    case 5: 
+                        sv.saturday.enabled = !sv.saturday.enabled;
+                        break;
+                    case 6: 
+                        sv.sunday.enabled = !sv.sunday.enabled;
+                        break;
                 }
 
                 this.base.setStorageValue(sv);
