@@ -223,7 +223,10 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     shouldShowOverflowMenu = () =>
     {   
-        return this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)}
+        const should = this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)
+        console.log("SHOULD SHOW OVERFLOW MENU: " + should);
+        return should;
+    }
 
     onStartStory = async () => 
     {   
@@ -376,6 +379,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         const first = this.getFirstInterruption();
         if(first)
         {   
+            console.log("Validate Time Started: First Timestamp: " + first.timestamp + " AND Start Timestamp: " + storageValue.timestamp);
             if(storageValue.timestamp > first.timestamp)
             {   return "The start time of a story can not be after the start time of the first interruption.";}
         }

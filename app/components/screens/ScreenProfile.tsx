@@ -30,7 +30,7 @@ type State =
     user: ReduxUser,
     newData: Spec<DocumentUser, never>,
     fabEnabled: boolean,
-    
+    profile: DocumentUser
 }
 
 type Props = WithDatabaseProps & WithDialogContainerProps & WithBackButtonInterceptorProps & WithLoadingProps & 
@@ -70,7 +70,8 @@ class ScreenProfile extends React.Component<Props, State>
     this.state = {
       user: user,
       newData: {weekSchema: {$set: weekSchema}},
-      fabEnabled: true,
+      profile: update(props.user.document.data, {weekSchema: {$set: weekSchema}}),
+      fabEnabled: false,
     }
 
     this.props.setLoading(false);
@@ -87,16 +88,17 @@ class ScreenProfile extends React.Component<Props, State>
   {
     this.unsavedChanges = true;
     const newData = {...this.state.newData, [field]: {$set: value.text}};
-
-    this.setState({newData: newData});
+    const newProfile = update(this.state.profile, {[field]: {$set: value.text}});
+    this.setState({newData: newData, fabEnabled: true, profile: newProfile});
   }
 
   onWeekSchemaValueChanged = (field: keyof DocumentUser) => async (value: EntitySchemaWeek) =>
   {
     this.unsavedChanges = true;
     const newData = {...this.state.newData, [field]: {$set: value}};
+    const newProfile = update(this.state.profile, {[field]: {$set: value}});
 
-    this.setState({newData: newData});
+    this.setState({newData: newData, fabEnabled: true, profile: newProfile});
   }
 
   onFabPress = async () =>
@@ -111,7 +113,6 @@ class ScreenProfile extends React.Component<Props, State>
         if(result.successful && result.dialogOpened == false)
         {   ToastAndroid.show("Successfully updated your profile.", ToastAndroid.SHORT);}
 
-        this.setState({fabEnabled: true});
         this.unsavedChanges = false;
     });
   }
@@ -153,11 +154,11 @@ class ScreenProfile extends React.Component<Props, State>
       <View style={styles.content}>
         <View>
           <PreferenceCategory title="Demographics">
-            <PreferenceText title="Nickname" label="Nickname" storageValue={{text: this.state.user.document.data.name}} onValueChanged={this.onTextValueChanged("name")}/>
-            <PreferenceText title="Initials" label="Initials" storageValue={{text: this.state.user.document.data.initials}} onValueChanged={this.onTextValueChanged("initials")} />
+            <PreferenceText title="Nickname" label="Nickname" storageValue={{text: this.state.profile.name}} onValueChanged={this.onTextValueChanged("name")}/>
+            <PreferenceText title="Initials" label="Initials" storageValue={{text: this.state.profile.initials}} onValueChanged={this.onTextValueChanged("initials")} />
           </PreferenceCategory>
           <PreferenceCategory title="Job">
-            <PreferenceWeekSchema title="Week Schema" storageValue={this.state.user.document.data.weekSchema} onValueChanged={this.onWeekSchemaValueChanged("weekSchema")} />
+            <PreferenceWeekSchema title="Week Schema" storageValue={this.state.profile.weekSchema} onValueChanged={this.onWeekSchemaValueChanged("weekSchema")} />
           </PreferenceCategory> 
         </View>
         <InputFloatingActionButton enabled={this.state.fabEnabled} icon="save" onPress={this.onFabPress}  />

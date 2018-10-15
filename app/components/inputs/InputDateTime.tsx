@@ -54,6 +54,12 @@ export default class InputDateTime extends Component<Props, State>
         }
     }
 
+    componentWillReceiveProps = (props: Props) =>
+    {
+        if(props.timestamp != this.props.timestamp)
+        {   this.setState({timestamp: props.timestamp});}   
+    }
+
     onCancel = () =>
     {   this.close();}
 

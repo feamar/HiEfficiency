@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, ViewStyle} from "react-native";
 import InputDateTime from "./InputDateTime";
 import { Text } from "react-native-paper";
+import InputError from "./InputError";
 
 
 const styles = StyleSheet.create({
@@ -14,7 +15,7 @@ const styles = StyleSheet.create({
     },
     hyphen:
     {
-        paddingTop: 7
+        paddingTop: 8
     }
 });
 
@@ -30,7 +31,8 @@ interface State
 {
     start: Date,
     end: Date,
-    disabled: boolean
+    disabled: boolean,
+    error?: string
 }
 
 export default class InputTimeRange extends React.Component<Props, State>
@@ -48,13 +50,23 @@ export default class InputTimeRange extends React.Component<Props, State>
 
     onSelectedFrom = (timestamp: Date) =>
     {
+        if(timestamp > this.state.end)
+        {   this.setState({ error: "The start time of a workday can not be after the end time."});}
+        else
+        {   this.setState({error: undefined});}
+
         this.setState({start: timestamp});
         this.props.onRangeChange("start", timestamp);
     }
     
     onSelectedTo = (timestamp: Date) =>
     {
-        this.setState({start: timestamp});
+        if(timestamp < this.state.start)
+        {   this.setState({error: "The end time of a workday can not be before the start time."});}
+        else
+        {   this.setState({error: undefined});}
+
+        this.setState({end: timestamp});
         this.props.onRangeChange("end", timestamp);
     }
 
@@ -78,10 +90,13 @@ export default class InputTimeRange extends React.Component<Props, State>
     render()
     {
         return (
-            <View style={this.getRootStyle()}>
-                <InputDateTime style={styles.input} disabled={this.state.disabled} timestamp={this.state.start} mode="time" onSelected={this.onSelectedFrom}/>
-                <Text style={styles.hyphen}> - </Text>
-                <InputDateTime style={styles.input} disabled={this.state.disabled} timestamp={this.state.end} mode="time" onSelected={this.onSelectedTo}/>
+            <View>
+                <View style={this.getRootStyle()}>
+                    <InputDateTime style={styles.input} disabled={this.state.disabled} timestamp={this.state.start} mode="time" onSelected={this.onSelectedFrom}/>
+                    <Text style={styles.hyphen}> - </Text>
+                    <InputDateTime style={styles.input} disabled={this.state.disabled} timestamp={this.state.end} mode="time" onSelected={this.onSelectedTo}/>
+                </View>
+                <InputError error={this.state.error} />
             </View>
         );
     }

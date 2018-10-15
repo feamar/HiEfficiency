@@ -74,7 +74,12 @@ export default class InputDateTimeSeparate extends Component<Props, State>
         this.setState({time: timestamp, timeComponent: timeComponent}, () => 
         {
             if(this.props.onSelected)
-            {   this.props.onSelected(new Date(this.state.dateComponent + this.state.timeComponent))};
+            {   
+                console.log("ON TIME SELECTED: " + new Date(this.state.dateComponent + this.state.timeComponent));
+                console.log("DATE COMPONENT: " + new Date(this.state.dateComponent) + " FROM " + this.state.dateComponent);
+                console.log("TIME COMPONENT: "+ new Date(this.state.timeComponent) + " FROM " + this.state.timeComponent);
+                this.props.onSelected(new Date(this.state.dateComponent + this.state.timeComponent))
+            };
         });
     }
 
@@ -83,15 +88,26 @@ export default class InputDateTimeSeparate extends Component<Props, State>
         const ms = timestamp.getTime();
         const remainder = ms % 86400000;
 
-        return ms - remainder;
+        return ms - remainder - (timestamp.getTimezoneOffset() * 60 * 1000 * -1);
     }
 
     getTimeComponentFrom = (timestamp: Date): number=>
     {
-        const ms = timestamp.getTime();
-        const remainder = ms % 86400000;
+        console.log("GET TIME COMPONENT: " + timestamp + " FROM " + timestamp.getTime() + " AND WITH OFFSET: " + (timestamp.getTime() + timestamp.getTimezoneOffset() * 60 * 1000));
+        //const ms = timestamp.getTime() + (timestamp.getTimezoneOffset() * 60 * 1000);
+        //const remainder = ms % 86400000;
+        //return remainder;
 
-        return remainder;
+        const hours = timestamp.getHours() * 60 * 60 * 1000;
+        const minutes = timestamp.getMinutes() * 60 * 1000;
+        const timezone = 0;// timestamp.getTimezoneOffset() * 60 * 1000 * -1;
+        var total = hours + minutes - timezone;
+
+        if(total < 0)
+        {   total = 86400000 - total;}
+
+        console.log("Total: " + total + " AND hours: " + hours + " AND minutes: " + minutes + " AND timezone: " + timezone);
+        return total;
     }
 
     render() 

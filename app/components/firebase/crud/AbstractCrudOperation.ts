@@ -34,7 +34,7 @@ export type Updatable = Messagable & Sectionable & Warnable & Cancelable & Timeo
 export default abstract class AbstractCrudOperation
 {
     private readonly initialMessage: string;
-    private state: "Unexecuted" | "Executed" | "Shown" | "Finished";
+    private state: "Unexecuted" | "Executed" | "Finished";
     private successful?: boolean;
     private readonly reduxListeners: Array<OnReduxStateChangedListener>;
     public onCompleteListener?: OnCompleteListener;
@@ -54,7 +54,7 @@ export default abstract class AbstractCrudOperation
         this.state = "Executed";
         dialog.setMessage(this.initialMessage);
         dialog.onTimeoutListeners.push(this.onDialogTimeout);
-        dialog.base!.onDismissListeners.push(this.onDialogDismiss);
+        //dialog.base!.onDismissListeners.push(this.onDialogDismiss);
 
         const isConnected = await NetInfo.isConnected.fetch();
         if(isConnected == false)

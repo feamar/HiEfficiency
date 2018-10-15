@@ -10,7 +10,7 @@ import { AdjustedCallbackReference } from "../render_props/CallbackReference";
 export interface WithDialogContainerProps
 {
     addDialog: AddDialogCallback,
-    removeDialog: (id: string) => boolean;
+    removeDialog: (id: string) => boolean,
 }
 
 interface State
@@ -23,8 +23,6 @@ interface HocProps
 {   }
 
 export type AddDialogCallback = (getDialog: (ref: AdjustedCallbackReference<AbstractDialog>) => JSX.Element, id: string) => boolean;
-
-
 
 export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}, P>, P extends WithDialogContainerProps> (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, P>) =>
 {
@@ -107,9 +105,9 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, {}
             );
         }
 
-        log = (_method: string, _Fsemessage: string) =>
+        log = (_method: string, _message: string) =>
         {   
-            //console.log("WithDialogContainer - " + method + " - " + message);
+            console.log("WithDialogContainer - " + _method + " - " + _message);
         }
     }
     

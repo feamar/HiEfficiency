@@ -101,27 +101,49 @@ export default class FirestoreFacade
         const execute = (dialog: ConcreteDialogLoading) => async (crud: AbstractCrudOperation, hasNextOperation: boolean = false): Promise<InDialogResult> =>
         {   
             var resolved: boolean = false;
+            var successful: boolean | undefined = undefined;
             setTimeout(() => 
             {
-                if(resolved == false && dialog.base)
+                if((resolved == false || successful == false) && dialog.base)
                 {   dialog.base.setVisible(true);}
             }, showDelay);
 
-            const successful = await crud.execute(dialog);
+            successful = await crud.execute(dialog);
             resolved = true;
 
-            if(hasNextOperation == false)
+            /*if(dialog.base == undefined)
             {
-                if(successful == false)
-                {   
-                    if(dialog.base && dialog.base.state.visible == false)
-                    {   dialog.base.setVisible(true);}
+                console.log("STARTING AWAIT");
+                await dialog.baseable();
+                console.log("FINISHED AWAIT");
+            }*/
+
+            console.log("HERE 0");
+            console.log("HERE: " + dialog.base);
+            if(successful == false)
+            {   
+                if(dialog.base)
+                {
+                    console.log("HERE 1: " + dialog.base + " AND " + dialog.base.state.visible);
                 }
-
-                dialog.setCompleted();
+                if(dialog.base && dialog.base.state.visible == false)
+                {
+                    console.log("HERE 2");
+                    dialog.base.setVisible(true);
+                }
             }
+            
+            if(hasNextOperation == false)
+            {   dialog.setCompleted();}
 
-            return {successful: successful, dialogOpened: dialog.base != undefined && dialog.base.state.visible};
+            
+
+            const result = {successful: successful, dialogOpened: dialog.base != undefined && dialog.base.state.visible};
+
+            if(result.dialogOpened == false)
+            {   removeDialogCallback(id);}
+
+            return result;
         }
 
         const onReference = (ref: ConcreteDialogLoading | undefined) => 
@@ -133,10 +155,13 @@ export default class FirestoreFacade
             }
         }
 
+        console.log("HAI 1");
         return new Promise(resolve => 
         {
+            console.log("HAI 2");
             const getDialog = (ref: AdjustedCallbackReference<AbstractDialog>) =>
             {
+                console.log("HAI 3");
                 return  <DialogLoading 
                     concreteRef = {onReference}
                     title={title}
@@ -149,7 +174,7 @@ export default class FirestoreFacade
                     warning={undefined} 
                     onTimeout={() => {}}
                     baseRef={ref}
-                    onClose={() => {removeDialogCallback(id); resolve();}} />
+                    onClose={() => {console.log("ON CLOSE DIALOG!"); removeDialogCallback(id); resolve();}} />
             }
 
             addDialogCallback(getDialog, id);

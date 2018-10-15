@@ -9,6 +9,7 @@ import UtilityTime from '../../../utilities/UtilityTime';
 import UtilityNumber from '../../../utilities/UtilityNumber';
 import InputError from '../../inputs/InputError';
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
+import UtilityObject from '../../../utilities/UtilityObject';
 
 export const VALUE_SEPARATOR = "|";
 
@@ -73,30 +74,49 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
 
     onCheckboxPress = (index: number) => () => 
     {
+        console.log("onCheckboxPress!");
         if(this.base)
         {
+
             const field: keyof EntitySchemaWeek | undefined = EntitySchemaWeek.getPropertyByIndex(index);
+            console.log("onCheckboxPress 1: field");    
             if(field != undefined)
             {
                 const sv = this.base.getCurrentStorageValue();
+                console.log("onCheckboxPress 2: " + sv);    
+
                 if(sv == null)
                 {   return;}
 
-                const day: EntitySchemaDay = sv[field] as EntitySchemaDay;
-                this.base.onValueChange({[field]: {enabled: {$set: !day.enabled}}});
+                //Ugly, ugly hack to work around reference issues.
+                switch(index)
+                {
+                    case 0: sv.monday.enabled = !sv.monday.enabled;
+                    case 1: sv.tuesday.enabled = !sv.tuesday.enabled;
+                    case 2: sv.wednesday.enabled = !sv.wednesday.enabled;
+                    case 3: sv.thursday.enabled = !sv.thursday.enabled;
+                    case 4: sv.friday.enabled = !sv.friday.enabled;
+                    case 5: sv.saturday.enabled = !sv.saturday.enabled;
+                    case 6: sv.sunday.enabled = !sv.sunday.enabled;
+                }
+
+                this.base.setStorageValue(sv);
             }
         }
     }
 
     onValueValidation = (storageValue: EntitySchemaWeek): string | undefined =>
     {
-        const array = storageValue.toArray();
         var error: string | undefined;
-        array.forEach(day => 
+        console.log("ON VALUE VALIDATRION INTERNAL: " + UtilityObject.stringify(storageValue));
+
+        storageValue.forEachDay((day, _index) => 
         {
+            console.log("START " + day.start + " AND END: " + day.end);
             if(this.isBefore(day.end, day.start))
             {   error = "Please make sure the end of your workday is after the start of your workday."}
         });
+        console.log("ON VALUE VALIDATRION INTERNAL: " + error);
 
         return error;
     }
@@ -140,7 +160,11 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         if(value == null)
         {   return false;}
 
-        return value.getByIndex(index).enabled;
+        const day = value.getByIndex(index);
+        if(day == undefined)
+        {   return false;}
+
+        return day.enabled;
     }
 
     getCurrentStorageValue = () =>
@@ -164,14 +188,50 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
 
     onRangeChange = (index: number) => (component: "start" | "end", timestamp: Date) =>
     {
+        console.log("onRangeChange: " + this.base);
         if(this.base == undefined)
         {   return;}
+
+        console.log("onRangechange: " + component + ": " + timestamp.getHours() + ":" + timestamp.getMinutes());
 
         const display = this.toDisplayValue(timestamp);
         const field = EntitySchemaWeek.getPropertyByIndex(index);
 
+        console.log("INdex: " + index + " AND " + field);
         if(field)
-        {   this.base.onValueChange({[field]: {[component]: {$set: display}}});}
+        {   
+            const sv = this.base.getCurrentStorageValue() || EntitySchemaWeek.default();
+
+            //Ugly, ugly hack to work around reference issues.
+            if(component == "start")
+            {
+                switch(index)
+                {
+                    case 0: sv.monday.start = display;
+                    case 1: sv.tuesday.start = display;
+                    case 2: sv.wednesday.start = display;
+                    case 3: sv.thursday.start = display;
+                    case 4: sv.friday.start = display;
+                    case 5: sv.saturday.start = display;
+                    case 6: sv.sunday.start = display;
+                }
+            }
+            else
+            {
+                switch(index)
+                {
+                    case 0: sv.monday.end = display;
+                    case 1: sv.tuesday.end = display;
+                    case 2: sv.wednesday.end = display;
+                    case 3: sv.thursday.end = display;
+                    case 4: sv.friday.end = display;
+                    case 5: sv.saturday.end = display;
+                    case 6: sv.sunday.end = display;
+                }
+            }
+            
+            this.base.setStorageValue(sv);
+        }
     }
 
     getTimespanFor = (item: EntitySchemaDay, index: number) => {
@@ -179,7 +239,7 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         //Check whether the current value array contains the current index.
         const enabled = this.isEnabled(index);
         const status = enabled ? "checked" : "unchecked";
-
+        console.log("STATUS: " + index + ": " + status);
         const dayName = this.days[index];
         return (
             <View style={styles.item} key={index}>
@@ -196,11 +256,11 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
 
     getDialogContent = (storageValue: EntitySchemaWeek, error: string | undefined) =>
     {
+        const timespans = storageValue.forEachDay(this.getTimespanFor);
         return (
             <View>
-                {storageValue.toArray().map((item, index) => 
-                {   return this.getTimespanFor(item, index); })}
-                <InputError error={error} />
+                {timespans}
+                <InputError margin={true} error={error} />
             </View>
         );
     }

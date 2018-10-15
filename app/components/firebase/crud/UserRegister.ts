@@ -1,6 +1,5 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
-import ScreenProfile from "../../screens/ScreenProfile";
 import UtilityObject from "../../../utilities/UtilityObject";
 import EntitySchemaWeek from "../../../dtos/firebase/firestore/entities/EntitySchemaWeek";
 
