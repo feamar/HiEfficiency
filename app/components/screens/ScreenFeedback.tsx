@@ -117,7 +117,7 @@ export default class ScreenFeedback extends React.Component<Props, State>
 
     sendFeedback = (body: string): Promise<void> =>
     {
-        const to = ["teun.kooijman@gmail.com"];
+        const to = ["info@hi-efficiency.net"];
         return email(to, {subject: "I'd like to give you guys some feedback!", body: body})
         .catch((error: Error) => 
         {
