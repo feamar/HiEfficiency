@@ -73,7 +73,7 @@ export default class DialogMultiSelect extends React.Component<Props, State> imp
 
         return (
             <View style={styles.item} key={index}>
-                <Text style={styles.title}>{item}</Text>
+                <Text style={styles.title}>{item.value}</Text>
                 <Checkbox status={status} onPress={this.onCheckboxPress(index)} />
             </View>
         );

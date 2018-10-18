@@ -4,7 +4,7 @@ import Theme from '../../../styles/Theme';
 import AbstractDialog, { AbstractDialog_Props_Virtual } from '../AbstractDialog';
 import update, {Spec} from "immutability-helper";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
-
+ 
 interface AbstractPreferenceDialog_Props_Sealed<StorageValue> 
 {
     getDialogContent: (storageValue: StorageValue, currentError: string | undefined) => JSX.Element,

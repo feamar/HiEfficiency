@@ -40,12 +40,7 @@ type Props =
 
 export default class InputFloatingActionButton extends Component<Props, State>
 {
-    public static defaultProps: Partial<Props> = 
-    {
-        color: Color.fromName("white"),
-        shouldHaveBottomMargin: false
-    }
-    handelingPress: boolean;
+    private handelingPress: boolean;
 
     constructor(props: Props)
     {

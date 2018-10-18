@@ -27,6 +27,7 @@ import CustomDrawer from './CustomDrawer';
 import CustomHeader from './CustomHeader';
 import { TouchableRipple } from '../../../node_modules/react-native-paper';
 import {  CustomNavigationParams, HiEfficiencyNavigator } from './RoutingTypes';
+import ScreenFeedback from '../screens/ScreenFeedback';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -37,6 +38,7 @@ export const STACK_NAME_STORY_BOARD = "StoryBoard";
 export const STACK_NAME_STORY_DETAILS = "StoryDetails";
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
+export const SCREEN_NAME_FEEDBACK = "Feedback";
 
 export const SCREEN_NAME_STORY_BOARD_TODO = 'Todo';
 export const SCREEN_NAME_STORY_BOARD_DOING = "Doing";
@@ -104,6 +106,10 @@ export default class Router
         {
           screen: Router.createProfileRouter(),
         },
+        [SCREEN_NAME_FEEDBACK]:
+        {
+          screen: ScreenFeedback
+        }
         /*[SCREEN_NAME_DEVELOPER]:
         {
           screen: ScreenDeveloper

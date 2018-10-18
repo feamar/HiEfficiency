@@ -15,7 +15,7 @@ interface State
 {
 }
 
-export default class PreferenceMultiSelect extends React.Component<Props, State> implements Baseable<AbstractDialogPreference<StorageValue>>
+export default class PreferenceSelectList extends React.Component<Props, State> implements Baseable<AbstractDialogPreference<StorageValue>>
 {
     public base: AbstractDialogPreference<StorageValue> | undefined;
 
