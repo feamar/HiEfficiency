@@ -36,4 +36,47 @@ export default class EntitySchemaDay
 
         return endAmount - startAmount;
     }
+
+    getMillisecondsOnDay = (day: Date, mode: "End" | "Start") =>
+    {
+        const milliseconds = day.getTime() % 86400000;
+        const start = this.getStartAsMilliseconds();
+        const end = this.getEndAsMilliseconds();
+
+        if(mode == "Start")
+        {
+            if(milliseconds > end)
+            {   return 0;}
+            
+            if(milliseconds < start)
+            {   return end - start;}
+    
+            return end - milliseconds; 
+        }
+        else
+        {
+            if(milliseconds < start)
+            {   return 0;}
+
+            if(milliseconds > end)
+            {   return end - start;}
+
+            return milliseconds - start;
+        }
+    }
+
+    getStartAsMilliseconds = () =>
+    {   return this.getAsMilliseconds(this.start);}
+
+    getEndAsMilliseconds = () =>
+    {   return this.getAsMilliseconds(this.end);}
+
+    private getAsMilliseconds = (value: string) =>
+    {
+        const split = value.split(":");
+        const hours = parseInt(split[0]) * 60 * 60 * 1000;
+        const minutes = parseInt(split[1]) * 60 * 1000;
+
+        return hours + minutes;
+    }
 }

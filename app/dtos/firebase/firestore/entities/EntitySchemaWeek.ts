@@ -40,6 +40,12 @@ export default class EntitySchemaWeek
         this.sunday = sunday;
     }
 
+    getDayOfDate = (date: Date) =>
+    {
+        const index = (date.getDay() + 1) % 7;
+        return this.getByIndex(index);
+    }
+
     getTotalHours = () =>
     {
         var accrued = 0;

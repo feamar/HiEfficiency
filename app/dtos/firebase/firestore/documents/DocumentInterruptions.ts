@@ -36,6 +36,9 @@ export default class DocumentInterruptions
         this.interruptions = interruptions;
     }
 
+    getTotalInterruptionTime = () =>
+    {   return this.interruptions.reduce((cummulative: number, current: EntityInterruption) => cummulative + current.duration!, 0);}
+
     addInterruption = (interruption: EntityInterruption) : boolean =>
     {
         if(this.interruptions.indexOf(interruption) >= 0)

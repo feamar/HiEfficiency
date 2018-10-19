@@ -20,7 +20,7 @@ import ActionStartInspectStory from "../../redux/actions/inspection/ActionStartI
 import ActionStopInspectStory from "../../redux/actions/inspection/ActionStopInspectStory";
 import { Dispatch } from "redux";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
-import ReduxStory from "../../dtos/redux/ReduxStory";
+import ReduxStory, { StoryLifecycle } from "../../dtos/redux/ReduxStory";
 import ListInterruptions, { InterruptionModelType } from "../list/instances/interruptions/ListInterruptions";
 import WithLoading, { WithLoadingProps } from "../../hocs/WithLoading";
 import DocumentInterruptions from "../../dtos/firebase/firestore/documents/DocumentInterruptions";
@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
     }
 });
 
-type Lifecycle = "Loading" | "Unstarted" | "Uninterrupted" | "Interrupted" | "Finished";
 
 interface ReduxStateProps
 {
@@ -121,7 +120,7 @@ type Props = ReduxStateProps & ReduxDispatchProps & WithLoadingProps & WithDatab
 
 type State =  
 {
-    lifecycle: Lifecycle,
+    lifecycle: StoryLifecycle | "Loading",
     sections: Array<AbstractListCollapsible_SectionType<InterruptionModelType>>,
     open: boolean,
     user: ReduxUser
@@ -714,23 +713,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         if(story == undefined)
         {   return "Loading";}
 
-        const data = story.document.data;
-        if(data.startedOn == undefined)
-        {   return "Unstarted";}
-        else if (data.finishedOn != undefined)
-        {   return "Finished";}
-        else 
-        {
-            const document = DocumentInterruptions.fromReduxInterruptions(story.interruptions, this.props.user.document.id!);
-            if(document.interruptions.length == 0)
-            {   return "Uninterrupted";}
-
-            const last = document.getLastInterruption();
-            if(last == undefined || last.duration != undefined)
-            {   return "Uninterrupted";}
-            else
-            {   return "Interrupted";}
-        }
+        return story.getLifeCycle(this.props.user.document.id!);
     }
 
     getSectionsFromStory = (story: ReduxStory | undefined): Array<AbstractListCollapsible_SectionType<InterruptionModelType>> =>
