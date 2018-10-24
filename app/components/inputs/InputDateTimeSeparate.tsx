@@ -75,9 +75,6 @@ export default class InputDateTimeSeparate extends Component<Props, State>
         {
             if(this.props.onSelected)
             {   
-                console.log("ON TIME SELECTED: " + new Date(this.state.dateComponent + this.state.timeComponent));
-                console.log("DATE COMPONENT: " + new Date(this.state.dateComponent) + " FROM " + this.state.dateComponent);
-                console.log("TIME COMPONENT: "+ new Date(this.state.timeComponent) + " FROM " + this.state.timeComponent);
                 this.props.onSelected(new Date(this.state.dateComponent + this.state.timeComponent))
             };
         });
@@ -93,7 +90,6 @@ export default class InputDateTimeSeparate extends Component<Props, State>
 
     getTimeComponentFrom = (timestamp: Date): number=>
     {
-        console.log("GET TIME COMPONENT: " + timestamp + " FROM " + timestamp.getTime() + " AND WITH OFFSET: " + (timestamp.getTime() + timestamp.getTimezoneOffset() * 60 * 1000));
         //const ms = timestamp.getTime() + (timestamp.getTimezoneOffset() * 60 * 1000);
         //const remainder = ms % 86400000;
         //return remainder;
@@ -106,7 +102,6 @@ export default class InputDateTimeSeparate extends Component<Props, State>
         if(total < 0)
         {   total = 86400000 - total;}
 
-        console.log("Total: " + total + " AND hours: " + hours + " AND minutes: " + minutes + " AND timezone: " + timezone);
         return total;
     }
 

@@ -1,6 +1,5 @@
 import EntitySchemaDay from "./EntitySchemaDay";
 import UtilityType from "../../../../utilities/UtilityType";
-import UtilityObject from "../../../../utilities/UtilityObject";
 
 export default class EntitySchemaWeek
 {
@@ -60,7 +59,6 @@ export default class EntitySchemaWeek
         for(var i = 0 ; i < 7 ; i ++)
         {
             const current = this.getByIndex(i);
-            console.log("CURRENT: " + UtilityObject.stringify(current!));
             const result = closure(current!, i);
             results.push(result);
         }
@@ -86,7 +84,6 @@ export default class EntitySchemaWeek
 
     static getPropertyByIndex = (i: number) : keyof EntitySchemaWeek | undefined =>
     {
-        console.log("GET PROPERTY BY INDEX: " + i);
         switch(i)
         {
             case 0: return UtilityType.nameof<EntitySchemaWeek>("monday");

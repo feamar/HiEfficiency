@@ -21,6 +21,8 @@ import ScreenStoryBoard from '../screens/ScreenStoryBoard';
 import ScreenStoryDetailsInterruptions from '../screens/ScreenStoryDetailsInterruptions';
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 import ScreenTeamEdit from '../screens/ScreenTeamEdit';
+import ScreenStoryAnalysis from '../screens/ScreenStoryAnalysis';
+
 
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
@@ -28,23 +30,28 @@ import CustomHeader from './CustomHeader';
 import { TouchableRipple } from '../../../node_modules/react-native-paper';
 import {  CustomNavigationParams, HiEfficiencyNavigator } from './RoutingTypes';
 import ScreenFeedback from '../screens/ScreenFeedback';
+import ScreenAbout from '../screens/ScreenAbout';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
 export const STACK_NAME_STORIES = 'Stories';
 export const STACK_NAME_PROFILE = "Profile";
 export const STACK_NAME_TEAMS = "Teams";
+export const STACK_NAME_FEEDBACK = "Feedback";
+export const STACK_NAME_ABOUT = "About";
 export const STACK_NAME_STORY_BOARD = "StoryBoard";
 export const STACK_NAME_STORY_DETAILS = "StoryDetails";
 export const SCREEN_NAME_AUTH_LOGIN = 'Login';
 export const SCREEN_NAME_AUTH_REGISTER = 'Register';
 export const SCREEN_NAME_FEEDBACK = "Feedback";
+export const SCREEN_NAME_ABOUT = "About";
 
 export const SCREEN_NAME_STORY_BOARD_TODO = 'Todo';
 export const SCREEN_NAME_STORY_BOARD_DOING = "Doing";
 export const SCREEN_NAME_STORY_BOARD_DONE = "Done";
 export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Interruptions';
 export const SCREEN_NAME_STORY_DETAILS_INFO = 'Info';
+export const SCREEN_NAME_STORY_ANALYSIS = 'Analysis';
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
 export const SCREEN_NAME_SPLASH = "Splash";
 export const SCREEN_NAME_PROFILE = "Profile";
@@ -106,9 +113,13 @@ export default class Router
         {
           screen: Router.createProfileRouter(),
         },
-        [SCREEN_NAME_FEEDBACK]:
+        [STACK_NAME_FEEDBACK]:
         {
-          screen: ScreenFeedback
+          screen: Router.createFeedbackRouter()
+        },
+        [STACK_NAME_ABOUT]:
+        {
+          screen: Router.createAboutRouter()
         }
         /*[SCREEN_NAME_DEVELOPER]:
         {
@@ -120,6 +131,32 @@ export default class Router
         contentComponent: (props) => <CustomDrawer {...props} />,
       }
     );
+  }
+
+  static createFeedbackRouter = () =>
+  {
+    return createStackNavigator({
+      [SCREEN_NAME_FEEDBACK]:
+      {
+        screen: ScreenFeedback,
+        navigationOptions: getNavigationOptions("Feedback", getHamburgerIcon())
+      }
+    }, {
+      initialRouteName: SCREEN_NAME_FEEDBACK
+    });
+  }
+
+  static createAboutRouter = () =>
+  {
+    return createStackNavigator({
+      [SCREEN_NAME_ABOUT]:
+      {
+        screen: ScreenAbout,
+        navigationOptions: getNavigationOptions("About", getHamburgerIcon())
+      }
+    }, {
+      initialRouteName: SCREEN_NAME_ABOUT
+    });
   }
 
   static createProfileRouter = () =>
@@ -206,7 +243,12 @@ export default class Router
       {
         screen: ScreenStoryCreate,
         navigationOptions: getNavigationOptions("Information", getBackIcon())
-      } 
+      } ,
+      [SCREEN_NAME_STORY_ANALYSIS]:
+      {
+        screen: ScreenStoryAnalysis,
+        navigationOptions: getNavigationOptions("Information", getBackIcon())
+      }
     },
     {
       initialRouteName: SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS,
@@ -274,8 +316,6 @@ const getNavigationOptions = (title: string, actionLeft?: (navigation: HiEfficie
       if(headerRightInjection)
       {   headerRight = headerRightInjection();}
 
-      console.log("Header Right Injection: " + headerRightInjection);
-      console.log("Header Right: " + headerRight);
 
       const options = {
         header: <CustomHeader left={headerLeft} title={navigation.getParam(PARAM_NAME_TITLE) || title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />

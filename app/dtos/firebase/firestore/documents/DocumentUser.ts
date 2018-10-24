@@ -1,5 +1,6 @@
 import { RNFirebase } from "react-native-firebase";
 import EntitySchemaWeek from "../entities/EntitySchemaWeek";
+import UtilityObject from "../../../../utilities/UtilityObject";
 
 export default class DocumentUser
 {
@@ -9,9 +10,22 @@ export default class DocumentUser
         {   return undefined;}
 
         const document: DocumentUser = snapshot.data() as DocumentUser;
+        document.uid = snapshot.id as string;
         document.weekSchema = EntitySchemaWeek.fromJsonObject(document.weekSchema);
 
         return document;
+    }
+
+    static asMap = (users: Array<DocumentUser>) =>
+    {
+        const map = new Map<string, DocumentUser>();
+        users.forEach(user => 
+        {   
+            console.log("AS MAP: " + user.uid + " AND " + UtilityObject.stringify(user));
+            map.set(user.uid, user);
+        });
+
+        return map;
     }
 
     public uid: string;

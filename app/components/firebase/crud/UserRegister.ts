@@ -37,8 +37,6 @@ export default class UserRegister extends AbstractCrudOperation
                 weekSchema: EntitySchemaWeek.default()
             };
 
-            console.log("SETTING USER: " + UtilityObject.stringify(user));
-
             await FirebaseAdapter.getUsers().doc(credentials.user.uid).set(user);
 
             this.onSuccess(updatable, "You have successfully registered your account.");

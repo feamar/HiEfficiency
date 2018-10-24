@@ -75,24 +75,8 @@ class ScreenStoryCreate extends Component<Props, State>
     {
         super(props);
   
-        var story: ReduxStory =
-        {
-            loaded: true,
-            interruptions: {},
-            document:
-            {
-                id: undefined,
-                data:
-                {
-                    upvotes: 0,
-                    startedOn: undefined,
-                    finishedOn: undefined,
-                    createdOn: new Date(),
-                    name: "",
-                    type: 0
-                }
-            }
-        }
+        var story: ReduxStory = ReduxStory.default();
+       
 
         const existingStory = props.navigation.getParam("story");
         this.mode = "Create";

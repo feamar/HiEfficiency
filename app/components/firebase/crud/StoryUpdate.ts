@@ -30,7 +30,6 @@ export default class StoryUpdate extends AbstractCrudOperation
 
     perform = async (updatable: Updatable) => 
     {
-        console.log("Updating story: teamId: " + this.teamId + " and storyId: " + this.storyId + " and oldStory: " + UtilityObject.stringify(this.oldStory) + " and updates: " + UtilityObject.stringify(this.updates));
         try 
         {
             const newStory = update(this.oldStory, this.updates);

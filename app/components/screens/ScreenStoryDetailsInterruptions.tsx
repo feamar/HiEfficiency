@@ -38,6 +38,7 @@ import ModelProductive from "../list/instances/interruptions/models/ModelProduct
 import ActionOption from "../../dtos/options/ActionOption";
 import { AdjustedCallbackReference } from "../../render_props/CallbackReference";
 import AbstractDialog from "../dialog/AbstractDialog";
+import UtilityObject from "../../utilities/UtilityObject";
 
 const isEqual = require("react-fast-compare");
 
@@ -172,6 +173,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     
     componentWillReceiveProps = (props: Props) =>
     {
+        //console.log("WILL RECEIVE PROPS: " + UtilityObject.stringify(props.user.teams[props.inspecting.team!].stories[props.inspecting.story!]));
         const teamId = props.inspecting.team;
         if(teamId == undefined)
         {   return;}
@@ -187,7 +189,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         if(story == undefined)
         {   return;}
 
-        if(isEqual(this.story, story) == false)
+        if(this.story != story)
         {
             if((this.story == undefined && story != undefined) || isEqual(this.story.document.data.name, story.document.data.name) == false)
             {   this.props.navigation.setParams({ subtitle: story.document.data.name });}
@@ -198,6 +200,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             this.setState({sections: sections, lifecycle: lifecycle});
             this.story = story;
         }
+
         this.setLoading(props);
     }
 
@@ -223,7 +226,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     shouldShowOverflowMenu = () =>
     {   
         const should = this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)
-        console.log("SHOULD SHOW OVERFLOW MENU: " + should);
         return should;
     }
 
@@ -378,7 +380,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         const first = this.getFirstInterruption();
         if(first)
         {   
-            console.log("Validate Time Started: First Timestamp: " + first.timestamp + " AND Start Timestamp: " + storageValue.timestamp);
             if(storageValue.timestamp > first.timestamp)
             {   return "The start time of a story can not be after the start time of the first interruption.";}
         }
@@ -712,8 +713,25 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     {
         if(story == undefined)
         {   return "Loading";}
+        
+        const data = story.document.data;
+        if(data.startedOn == undefined)
+        {   return "Unstarted";}
+        else if (data.finishedOn != undefined)
+        {   return "Finished";}
+        else 
+        {
+            console.log("GET LIFECYCLE: " + UtilityObject.stringify(story.interruptions));
+            const document = DocumentInterruptions.fromReduxInterruptions(story.interruptions, this.props.user.document.id!);
+            if(document.interruptions.length == 0)
+            {   return "Uninterrupted";}
 
-        return story.getLifeCycle(this.props.user.document.id!);
+            const last = document.getLastInterruption();
+            if(last == undefined || last.duration != undefined)
+            {   return "Uninterrupted";}
+            else
+            {   return "Interrupted";}
+        }
     }
 
     getSectionsFromStory = (story: ReduxStory | undefined): Array<AbstractListCollapsible_SectionType<InterruptionModelType>> =>

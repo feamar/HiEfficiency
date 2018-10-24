@@ -19,7 +19,6 @@ import FabAction from "../../dtos/options/FabAction";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 import DialogPreferenceTextMulti, { TextElement, DialogPreferenceTextMulti_StorageValue } from "../dialog/preferences/DialogPreferenceTextMulti";
 import ActionOption from "../../dtos/options/ActionOption";
-import UtilityObject from "../../utilities/UtilityObject";
 
 
 interface ReduxStateProps 
@@ -161,16 +160,13 @@ class ScreenTeams extends Component<Props, State>
  
   onLeaveDialogActionPressed = (_concreteComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
   {
-    console.log("onLeaveDialogActionPressed: " + action);
     switch(action)
     {
       case "Positive":
         this.props.database.inDialog("dialog-leaving-team", this.props.addDialog, this.props.removeDialog, "Leaving Team", async (execute) => 
         {
-          console.log("INSIDE CRUD: ");
           const leave = this.props.database.leaveTeam(this.currentlyLeavingTeam!.document.id!, this.state.user.document.id!, this.state.user.document.data.teams);
-          const result = await execute(leave, false);
-          console.log("RESULT: " + UtilityObject.stringify(result));
+          await execute(leave, false);
         });
         break;
     }

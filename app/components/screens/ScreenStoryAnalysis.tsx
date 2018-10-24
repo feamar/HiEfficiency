@@ -11,9 +11,16 @@ import WithEmptyListFiller from "../../hocs/WithEmptyListFiller";
 import ListFillerOption from "../../dtos/options/ListFillerOption";
 import FillerBored from "../svg/fillers/FillerBored";
 import EfficiencyEngine from "../../engine/EfficiencyEngine";
-import FirebaseAdapter from "../firebase/FirebaseAdapter";
-import { RNFirebase } from "react-native-firebase";
-import DocumentUser from "../../dtos/firebase/firestore/documents/DocumentUser";
+import ProcessEfficiency from "../../engine/dtos/ProccessEfficiency";
+import { View, StyleSheet } from "react-native";
+import TextGroup from "../text/TextGroup";
+
+const styles = StyleSheet.create({
+    root: {
+        marginLeft: 20,
+        marginRight: 20,
+    }
+});
 
 type Props = ReduxStateProps & WithLoadingProps & WithDatabaseProps &
 {
@@ -22,7 +29,7 @@ type Props = ReduxStateProps & WithLoadingProps & WithDatabaseProps &
 interface State
 {
     lifecycle: StoryLifecycle | "Loading",
-    efficiency?: number
+    efficiency?: ProcessEfficiency
 }
 
 interface ReduxStateProps
@@ -55,23 +62,41 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
         }
     }
 
+    componentWillReceiveProps = (props: Props) =>
+    {
+        const newStory = props.user.teams[props.inspecting.team!].stories[props.inspecting.story!];
+        if(this.story != newStory)
+        {
+            this.story = newStory;
+            this.setState({lifecycle: this.getLifecycleFromStory(this.story)});
+        }
+
+        this.getEfficiency().then(efficiency => 
+        {   
+            this.setState({efficiency: efficiency}, () => { this.setLoading(this.props);});
+        });
+
+        this.setLoading(props);
+    }
+
     componentWillMount = () =>
     {
         this.getEfficiency().then(efficiency => 
-        {   this.setState({efficiency: efficiency});});
+        {   
+            this.setState({efficiency: efficiency}, () => { this.setLoading(this.props);});
+        });
     }
     
     getEfficiency = async () =>
     {
-        const query: RNFirebase.firestore.Query = FirebaseAdapter.getUsers().where("teams", "array-contains", this.props.inspecting.team!);
-        const snapshot = await query.get();
-
-        const users = snapshot.docs.map(document => DocumentUser.fromSnapshot(document)!);
-        return EfficiencyEngine.getProcessEfficiency(this.story, users);
+        return await EfficiencyEngine.getProcessEfficiency(this.story);
     }
     
     setLoading = (_props: Props) =>
-    {   this.props.setLoading(this.story == undefined || this.story.interruptions == undefined || this.story.loaded == false || this.state.efficiency == undefined);}
+    {  
+        const shouldLoad = this.story == undefined || this.story.interruptions == undefined || this.story.loaded == false || this.state.efficiency == undefined;
+        this.props.setLoading(shouldLoad);
+    }
 
     getLifecycleFromStory = (story: ReduxStory | undefined) =>
     {
@@ -86,8 +111,32 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
 
     render()
     {
+        if(this.state.efficiency == undefined)
+        {   return null;}
+
+
+        const participants = this.state.efficiency.usernames.length == 0 ? "None" : this.state.efficiency.usernames;
+        const processEfficiency = (this.state.efficiency.processEfficiency * 100);
+        const processEfficiencyString = isNaN(processEfficiency) ? "Uncalculatable" : processEfficiency.toFixed(2) + "%";
+        
         return(
-            <Text>Process Efficiency: {this.state.efficiency}</Text>
+            <View style={styles.root}>
+                <TextGroup title="Participants">
+                    <Text>{participants}</Text>
+                </TextGroup>
+                <TextGroup title="Productive Time">
+                    <Text>{this.state.efficiency.productiveTime / 60000} minutes.</Text>
+                </TextGroup>
+                <TextGroup title="Interruption Time">
+                    <Text>{this.state.efficiency.interruptionTime / 60000} minutes.</Text>
+                </TextGroup>
+                <TextGroup title="Total Time">
+                    <Text>{this.state.efficiency.totalTime / 60000} minutes.</Text>
+                </TextGroup>
+                <TextGroup title="Process Efficiency">
+                    <Text>{processEfficiencyString}</Text>
+                </TextGroup>
+            </View>
         );
     }
 }

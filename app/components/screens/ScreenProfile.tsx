@@ -2,7 +2,6 @@ import React from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
 import { ToastAndroid, View } from "react-native";
 import {STACK_NAME_TEAMS} from '../routing/Router';
-import UtilityObject from '../../utilities/UtilityObject';
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import WithDialogContainer, { WithDialogContainerProps } from '../../hocs/WithDialogContainer';
 import update, { Spec } from '../../../node_modules/immutability-helper';
@@ -109,7 +108,6 @@ class ScreenProfile extends React.Component<Props, State>
         const update: UserUpdate = this.props.database.updateUser(this.state.user.document.id!, this.state.user.document.data, this.state.newData);
         const result = await execute(update, false);
 
-        console.log("RESULT: " + UtilityObject.stringify(result));
         if(result.successful && result.dialogOpened == false)
         {   ToastAndroid.show("Successfully updated your profile.", ToastAndroid.SHORT);}
 

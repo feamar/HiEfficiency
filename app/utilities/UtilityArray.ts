@@ -1,5 +1,10 @@
 export default class UtilityArray 
 {
+    static asDefinedType = <T> (array: Array<T | undefined>) =>
+    {
+        return array.filter(t => t != undefined) as Array<T>;
+    }
+
     static move = <T> (array: T[], from: number, count: number, to: number) =>
     {
         if(from == to)

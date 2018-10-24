@@ -73,12 +73,10 @@ export default <B extends ConcreteComponent & RequiredFunctions, C extends Concr
 
         setShowOverflowMenu = (shouldShow: boolean) =>
         {
-            console.log("SET SHOULD SHOW OVERFLOW MENU - START - " + shouldShow);
             if(this.shouldShowOverflowMenu == shouldShow)
             {   return;}
             
             this.shouldShowOverflowMenu = shouldShow;
-            console.log("SET SHOULD SHOW OVERFLOW MENU - MID - " + shouldShow);
 
             const navigator: HiEfficiencyNavigator = isInsideTab ? (this.props.navigation as any).dangerouslyGetParent() : this.props.navigation;
 

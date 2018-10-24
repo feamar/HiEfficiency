@@ -25,7 +25,6 @@ export default class UserLogin extends AbstractCrudOperation
 
     onRollback = async (_: Updatable) =>
     {
-        console.log("on Rollback!");
         FirebaseManager.Instance.loginHasBeenCanceled = true;
         this.attemptRollback(0, 10, async () => 
         {   
@@ -48,13 +47,11 @@ export default class UserLogin extends AbstractCrudOperation
             const snapshot = await FirebaseAdapter.getUsers().doc(credentials.user.uid).get();
             const document = DocumentUser.fromSnapshot(snapshot);
 
-            console.log("UserLogin - Document: " + UtilityObject.stringify(document!));
             this.onSuccess(updatable, "You have successfully logged in.");
             this.dispatch(new ActionUserLoggedIn(new AbstractFirestoreDocument<DocumentUser>(document!, credentials.user.uid)));
         }
         catch(error)
         {  
-            console.log("On error!: " + UtilityObject.stringify(error));
             switch(error.code)
             {
                 case "auth/invalid-email":

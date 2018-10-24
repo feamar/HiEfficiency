@@ -111,24 +111,10 @@ export default class FirestoreFacade
             successful = await crud.execute(dialog);
             resolved = true;
 
-            /*if(dialog.base == undefined)
-            {
-                console.log("STARTING AWAIT");
-                await dialog.baseable();
-                console.log("FINISHED AWAIT");
-            }*/
-
-            console.log("HERE 0");
-            console.log("HERE: " + dialog.base);
             if(successful == false)
             {   
-                if(dialog.base)
-                {
-                    console.log("HERE 1: " + dialog.base + " AND " + dialog.base.state.visible);
-                }
                 if(dialog.base && dialog.base.state.visible == false)
                 {
-                    console.log("HERE 2");
                     dialog.base.setVisible(true);
                 }
             }

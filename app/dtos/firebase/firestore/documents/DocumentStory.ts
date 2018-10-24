@@ -2,6 +2,9 @@ import { RNFirebase } from "react-native-firebase";
 
 export default class DocumentStory
 {
+    static default = () =>
+    {   return new DocumentStory("", 0, new Date(), 0);}
+    
     static create(name: string, type: number)
     {   return new DocumentStory(name, type, new Date());}
 
