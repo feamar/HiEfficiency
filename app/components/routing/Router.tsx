@@ -49,7 +49,7 @@ export const SCREEN_NAME_ABOUT = "About";
 export const SCREEN_NAME_STORY_BOARD_TODO = 'Todo';
 export const SCREEN_NAME_STORY_BOARD_DOING = "Doing";
 export const SCREEN_NAME_STORY_BOARD_DONE = "Done";
-export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Interruptions';
+export const SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS = 'Timeline';
 export const SCREEN_NAME_STORY_DETAILS_INFO = 'Info';
 export const SCREEN_NAME_STORY_ANALYSIS = 'Analysis';
 export const SCREEN_NAME_STORY_CREATE = "StoryCreate";
@@ -247,7 +247,7 @@ export default class Router
       [SCREEN_NAME_STORY_ANALYSIS]:
       {
         screen: ScreenStoryAnalysis,
-        navigationOptions: getNavigationOptions("Information", getBackIcon())
+        navigationOptions: getNavigationOptions("Analysis", getBackIcon())
       }
     },
     {
