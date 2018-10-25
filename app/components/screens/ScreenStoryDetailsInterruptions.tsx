@@ -219,10 +219,30 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
 
     shouldShowOverflowMenu = () =>
     {   
-        const should = this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)
-        console.log("Should overflow menu show: " + should);
-        console.log("Determined through: " + this.state.lifecycle+ ", and " + UtilityObject.stringify(this.story.interruptions));
-        return should;
+        var shouldShow = false;
+        if(this.state.lifecycle == "Uninterrupted")
+        {
+            if(this.story == undefined || this.story.interruptions == undefined)
+            {   shouldShow = true;}
+            else
+            {
+                const keys = Object.keys(this.story.interruptions);
+                if(keys.length == 0)
+                {   shouldShow = true;}
+                else
+                {
+                    const foundOneWithInterruptions = keys.some(key => 
+                    {
+                        const value = this.story.interruptions[key];
+                        return value.document.data.interruptions.length > 0;
+                    });
+
+                    shouldShow = ! foundOneWithInterruptions;
+                }
+            }
+        }
+
+        return shouldShow;
     }
 
     onStartStory = async () => 

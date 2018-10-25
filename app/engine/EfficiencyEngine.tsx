@@ -10,6 +10,9 @@ export default class EfficiencyEngine
 {
     static getProcessEfficiency = async (story: ReduxStory): Promise<ProcessEfficiency>  =>
     {
+        if(story.document.data.startedOn == undefined)
+        {   return new ProcessEfficiency(0, 0, []);}
+
         const users = await EfficiencyEngine.getUsers(story);
         return EfficiencyEngine.calculateProcessEfficiency(story, users);
     }
