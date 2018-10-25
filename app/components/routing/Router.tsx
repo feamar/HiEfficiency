@@ -316,10 +316,6 @@ const getNavigationOptions = (title: string, actionLeft?: (navigation: HiEfficie
       if(headerRightInjection)
       {   headerRight = headerRightInjection();}
 
-<<<<<<< HEAD:app/components/routing/Router.js
-=======
-
->>>>>>> feature-typescript:app/components/routing/Router.tsx
       const options = {
         header: <CustomHeader left={headerLeft} title={navigation.getParam(PARAM_NAME_TITLE) || title} subtitle={navigation.getParam(PARAM_NAME_SUBTITLE)} right={headerRight} {...props} />
       }
