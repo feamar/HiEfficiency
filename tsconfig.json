@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "jsx": "react",
+        "noEmit": true,
+        "allowJs": true,
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "removeComments": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "allowSyntheticDefaultImports": true,
+        "lib":[
+            "es7", 
+            "dom"
+        ]
+
+
+
+    },
+    "exclude": [
+      "node_modules",
+    ],
+  }
