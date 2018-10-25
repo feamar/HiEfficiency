@@ -115,6 +115,7 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
             }
         }
 
+        this.setState({error: undefined});
         return true;
     }
 

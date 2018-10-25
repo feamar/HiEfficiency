@@ -1,6 +1,6 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import update, { Spec } from "immutability-helper";
-import UtilityObject from '../../../utilities/UtilityObject';
+import equal from "deep-equal";
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentStory from '../../../dtos/firebase/firestore/documents/DocumentStory';
 import ActionStoriesOfTeamLoaded from "../../../redux/actions/user/ActionStoriesOfTeamLoaded";
@@ -33,6 +33,13 @@ export default class StoryUpdate extends AbstractCrudOperation
         try 
         {
             const newStory = update(this.oldStory, this.updates);
+            if(equal(newStory, this.oldStory))
+            {
+                this.onSuccess(updatable, "No necessary updates were detected.");
+                return;
+            }
+
+
             await this.sendUpdates(updatable, ActionStoriesOfTeamLoaded.TYPE, async () => 
             {   await FirebaseAdapter.getStories(this.teamId).doc(this.storyId).update(newStory);});
             this.onSuccess(updatable, "Successfully updated the story.");

@@ -14,6 +14,7 @@ import EfficiencyEngine from "../../engine/EfficiencyEngine";
 import ProcessEfficiency from "../../engine/dtos/ProccessEfficiency";
 import { View, StyleSheet } from "react-native";
 import TextGroup from "../text/TextGroup";
+import UtilityTime from "../../utilities/UtilityTime";
 
 const styles = StyleSheet.create({
     root: {
@@ -114,24 +115,27 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
         if(this.state.efficiency == undefined)
         {   return null;}
 
-
         const participants = this.state.efficiency.usernames.length == 0 ? "None" : this.state.efficiency.usernames;
         const processEfficiency = (this.state.efficiency.processEfficiency * 100);
         const processEfficiencyString = isNaN(processEfficiency) ? "Uncalculatable" : processEfficiency.toFixed(2) + "%";
         
+        const productiveTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.productiveTime);
+        const interruptionTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.interruptionTime);
+        const totalTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.totalTime);
+
         return(
             <View style={styles.root}>
                 <TextGroup title="Participants">
                     <Text>{participants}</Text>
                 </TextGroup>
                 <TextGroup title="Productive Time">
-                    <Text>{this.state.efficiency.productiveTime / 60000} minutes.</Text>
+                    <Text>{productiveTime}</Text>
                 </TextGroup>
                 <TextGroup title="Interruption Time">
-                    <Text>{this.state.efficiency.interruptionTime / 60000} minutes.</Text>
+                    <Text>{interruptionTime}</Text>
                 </TextGroup>
                 <TextGroup title="Total Time">
-                    <Text>{this.state.efficiency.totalTime / 60000} minutes.</Text>
+                    <Text>{totalTime}</Text>
                 </TextGroup>
                 <TextGroup title="Process Efficiency">
                     <Text>{processEfficiencyString}</Text>

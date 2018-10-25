@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
-import {View} from 'react-native';
+import {View, ToastAndroid} from 'react-native';
 import withBackButtonInterceptor, { WithBackButtonInterceptorProps } from "../../hocs/WithBackButtonInterceptor";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import UtilityUpdate from '../../utilities/UtilityUpdate';
@@ -112,9 +112,30 @@ class ScreenTeamEdit extends Component<Props, State>
         }
     }
 
+
+    validateInput = () =>
+    {
+        if(this.state.team.data.name == undefined || this.state.team.data.name == "")
+        {   
+            ToastAndroid.show("Please enter a team name first.", ToastAndroid.LONG);
+            return false;
+        }
+
+        if(this.state.team.data.code == undefined || this.state.team.data.code == "")
+        {
+            ToastAndroid.show("Please enter a security code first.", ToastAndroid.LONG);
+            return false;
+        }
+
+        return true;
+    }
+
     onFabPress = async () =>
     {
         this.setState({fabEnabled: false});
+
+        if(this.validateInput() == false)
+        {   return;}
 
         if(this.mode == "Create")
         {

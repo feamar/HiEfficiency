@@ -5,7 +5,6 @@ import ActionUserLoggedIn from "../../../redux/actions/user/ActionUserLoggedIn";
 import  { RNFirebase } from "react-native-firebase";
 import AbstractFirestoreDocument from "../../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
 import DocumentUser from "../../../dtos/firebase/firestore/documents/DocumentUser";
-import UtilityObject from "../../../utilities/UtilityObject";
 import Migration_2018_10_11_WeekSchema from "../../../migrations/Migration_2018_10_11_WeekSchema";
 
 export default class UserLogin extends AbstractCrudOperation

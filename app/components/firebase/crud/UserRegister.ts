@@ -1,6 +1,5 @@
 import FirebaseAdapter from "../FirebaseAdapter";
 import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
-import UtilityObject from "../../../utilities/UtilityObject";
 import EntitySchemaWeek from "../../../dtos/firebase/firestore/entities/EntitySchemaWeek";
 
 export default class UserRegister extends AbstractCrudOperation
@@ -60,7 +59,7 @@ export default class UserRegister extends AbstractCrudOperation
                     break;
 
                 default:
-                    this.onError(updatable, "Something went wrong while trying to log in, please try again.", error);
+                    this.onError(updatable, "Something went wrong while trying to register the account or trying to log in the newly created account, please try again.", error);
             }
         }
     }

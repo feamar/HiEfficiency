@@ -17,7 +17,6 @@ import { ReduxState } from "../../redux/ReduxState";
 import ReduxUser from "../../dtos/redux/ReduxUser";
 import ReduxInspecting from "../../dtos/redux/ReduxInspecting";
 import ActionStartInspectStory from "../../redux/actions/inspection/ActionStartInspectStory";
-import ActionStopInspectStory from "../../redux/actions/inspection/ActionStopInspectStory";
 import { Dispatch } from "redux";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import ReduxStory, { StoryLifecycle } from "../../dtos/redux/ReduxStory";
@@ -111,7 +110,6 @@ interface ReduxStateProps
 interface ReduxDispatchProps
 {
     onInspectStoryStart: (storyId: string) => ActionStartInspectStory,
-    onInspectStoryEnd: () => ActionStopInspectStory
 }
 
 type Props = ReduxStateProps & ReduxDispatchProps & WithLoadingProps & WithDatabaseProps & WithDialogContainerProps &
@@ -139,7 +137,6 @@ const mapDispatchToProps = (dispatch: Dispatch): ReduxDispatchProps =>
 {
     return {
         onInspectStoryStart: (storyId: string) => dispatch(new ActionStartInspectStory(storyId)),
-        onInspectStoryEnd: () => dispatch(new ActionStopInspectStory())
     }
 } 
 
@@ -213,9 +210,6 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     componentDidMount() 
     {   this.props.onInspectStoryStart(this.story.document.id!);}
 
-    componentWillUnmount = () =>
-    {   this.props.onInspectStoryEnd();}
-
     getOverflowMenuItems = (): Array<MenuOptionProps & {key: string}> =>
     {
         return [
@@ -226,6 +220,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     shouldShowOverflowMenu = () =>
     {   
         const should = this.state.lifecycle != "Finished" && this.state.lifecycle != "Unstarted" && (this.story == undefined || this.story.interruptions == undefined || Object.keys(this.story.interruptions).length == 0)
+        console.log("Should overflow menu show: " + should);
+        console.log("Determined through: " + this.state.lifecycle+ ", and " + UtilityObject.stringify(this.story.interruptions));
         return should;
     }
 

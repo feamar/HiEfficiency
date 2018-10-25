@@ -4,6 +4,7 @@ import AbstractCrudOperation, { Updatable } from './AbstractCrudOperation';
 import DocumentUser from '../../../dtos/firebase/firestore/documents/DocumentUser';
 import ActionUserDataChanged from "../../../redux/actions/user/ActionUserDataChanged";
 import { RNFirebase } from "react-native-firebase";
+import equal from "deep-equal";
 
 export default class UserUpdate extends AbstractCrudOperation
 {
@@ -31,6 +32,12 @@ export default class UserUpdate extends AbstractCrudOperation
         try 
         {
             const newUser: DocumentUser = update(this.oldUser, this.updates);
+            if(equal(newUser, this.oldUser))
+            {
+                this.onSuccess(updatable, "No necessary updates were detected.");
+                return;
+            }
+
 
             const document: RNFirebase.firestore.DocumentReference = FirebaseAdapter.getUsers().doc(this.userId);
             const snapshot: RNFirebase.firestore.DocumentSnapshot = await document.get();

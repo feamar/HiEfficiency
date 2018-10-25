@@ -237,7 +237,7 @@ export default class Router
       [SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS]:
       {
         screen: ScreenStoryDetailsInterruptions,
-        navigationOptions: getNavigationOptions("Interruptions", getBackIcon())
+        navigationOptions: getNavigationOptions("Timeline", getBackIcon())
       },
       [SCREEN_NAME_STORY_DETAILS_INFO]:
       {

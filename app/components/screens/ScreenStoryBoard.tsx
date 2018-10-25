@@ -9,7 +9,6 @@ import { ReduxState } from "../../redux/ReduxState";
 import ReduxUser from "../../dtos/redux/ReduxUser";
 import { Dispatch } from "redux";
 import ActionStartInspectTeam from "../../redux/actions/inspection/ActionStartInspectTeam";
-import ActionStopInspectTeam from "../../redux/actions/inspection/ActionStopInspectTeam";
 import ActionStartInspectStory from "../../redux/actions/inspection/ActionStartInspectStory";
 import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import AbstractFirestoreDocument from "../../dtos/firebase/firestore/documents/AbstractFirestoreDocument";
@@ -33,7 +32,6 @@ interface ReduxStateProps
 interface ReduxDispatchProps
 {
   onInspectTeamStart: (teamId: string) => ActionStartInspectTeam,
-  onInspectTeamEnd: () => ActionStopInspectTeam
   onInspectStoryStart: (storyId: string) => ActionStartInspectStory
 }
 
@@ -60,7 +58,6 @@ const mapDispatchToProps = (dispatch: Dispatch): ReduxDispatchProps =>
 {
   return {
     onInspectTeamStart: (teamId: string) => dispatch(new ActionStartInspectTeam(teamId)),
-    onInspectTeamEnd: () => dispatch(new ActionStopInspectTeam()),
     onInspectStoryStart: (storyId: string) => dispatch(new ActionStartInspectStory(storyId))
   }
 }
@@ -143,9 +140,6 @@ class ScreenStoryBoard extends Component<Props, State>
   {   
     this.props.onInspectTeamStart(this.team.id!); 
   }
-
-  componentWillUnmount()
-  {   this.props.onInspectTeamEnd();}
 
   onItemSelected = async (item: ReduxStory, _index: number, selectedTabScreenName?: string) =>
   {   
