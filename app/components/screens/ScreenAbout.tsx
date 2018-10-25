@@ -1,12 +1,16 @@
 import React from "react";
 import TextGroup from "../text/TextGroup";
-import { View, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
+import { StyleSheet, ToastAndroid, ScrollView } from "react-native";
 import { Text } from "react-native-paper";
 import UtilityUrl from "../../utilities/UtilityUrl";
 
 const styles = StyleSheet.create({
     root: {
-        margin: 20
+        padding: 20
+    },
+    alineaEnd:
+    {
+        marginBottom: 10
     },
     url:
     {
@@ -27,6 +31,7 @@ interface State
 
 export default class ScreenAbout extends React.Component<Props, State>
 {
+    //TODO: Remove if it turns out this is no longer needed when the content of the About screen is settled.
     onSmashIconsLinkPressed = async () =>
     {
         const success = await UtilityUrl.goToUrl("https://smashicons.com");
@@ -37,16 +42,24 @@ export default class ScreenAbout extends React.Component<Props, State>
     render()
     {
         return(
-            <View style={styles.root}>
-                <TextGroup title="Privacy Statement"> 
-                
+            <ScrollView style={styles.root}>
+                <TextGroup title="Your Data"> 
+                    <Text>We care about your data greatly.</Text>
+                    <Text style={styles.alineaEnd}>We will not sell your personal data, ever.</Text>
+
+                    <Text>We will use your data to do analysis about process efficiency.</Text>
+                    <Text>We will use your data to do aggregate analyses about process efficiency over multiple teams.</Text>
+                    <Text style={styles.alineaEnd}>We will use these analyses to make anonymized publications for a PhD study <Text style={styles.url}>www.hi-efficiency.net/research</Text>.</Text>
+
+                    <Text>We will provide you with insight into your process efficiency, for free.</Text>
+                    <Text style={styles.alineaEnd}>We will provide you with tools that can help improve your process efficiency, for free (in the near future).</Text>
+
+                    <Text>Your data will help both you, and the whole of the IT sector by giving us measurement based improvement.</Text>
                 </TextGroup>
                 <TextGroup title="Proprietary Licensing"> 
-                    <TouchableOpacity onPress={this.onSmashIconsLinkPressed}>
-                        <Text>This application uses artwork created by Smashicons, please see <Text style={styles.url}>https://smashicons.com</Text> for more information.</Text>
-                    </TouchableOpacity>
+                    <Text>This application is developed by a small team. Since we have limited resources, we make use of work created by others. We think that's smart and efficient. We've made use of artwork created by Smashicons as well as numerous opensource libraries.</Text>
                 </TextGroup>
-            </View>
+            </ScrollView>
         );
     }
 }
