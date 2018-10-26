@@ -141,13 +141,10 @@ export default class FirestoreFacade
             }
         }
 
-        console.log("HAI 1");
         return new Promise(resolve => 
         {
-            console.log("HAI 2");
             const getDialog = (ref: AdjustedCallbackReference<AbstractDialog>) =>
             {
-                console.log("HAI 3");
                 return  <DialogLoading 
                     concreteRef = {onReference}
                     title={title}

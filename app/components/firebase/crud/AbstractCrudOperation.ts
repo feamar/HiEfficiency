@@ -99,7 +99,7 @@ export default abstract class AbstractCrudOperation
 
     protected readonly sendUpdates = async <T> (updatable: Updatable, expectedReduxAction: string, closure: () => Promise<T>): Promise<T> =>
     {
-        return new Promise<T>(async (resolve, _) => 
+        return new Promise<T>((resolve, _) => 
         {
             var result: T;
             const listener: OnReduxStateChangedListener = (action: AnyAction): void =>
@@ -116,8 +116,7 @@ export default abstract class AbstractCrudOperation
             updatable.setSection(SECTION_WAITING_FOR_CONFIRMATION);
             ReduxManager.Instance.registerListener(listener);
 
-            result = await closure();
-            return result;
+            return closure();
         });
     }
 

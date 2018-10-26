@@ -137,13 +137,6 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         else
         {   this.state = {...this.state, lifecycle: "Completed", shouldShowButtonOk: true};}
 
-        /*
-        if(this.base)
-        {
-            if(this.base.state.visible == false)
-            {   this.base.notifyListeners(this.base.onCloseListeners, "onCloseListeners from ConcreteDialogLoading");}
-        }*/
-
         return true;
     }
 
