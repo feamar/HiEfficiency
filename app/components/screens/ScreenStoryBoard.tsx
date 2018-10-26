@@ -87,12 +87,6 @@ class ScreenStoryBoard extends Component<Props, State>
     }
   }  
 
-  shouldComponentUpdate = (_nextProps: Readonly<Props>, _nextState: Readonly<State>, _nextContext: Readonly<any>) =>
-  {
-
-    return true;
-  }
-
   componentWillReceiveProps = (props: Props) =>
   {
     //console.log("NEW PROPS FOR STORYBOARD: " + UtilityObject.stringify(props));
@@ -115,6 +109,7 @@ class ScreenStoryBoard extends Component<Props, State>
       {   shouldBeLoading = true;}
     }
 
+    console.log("Should Load: " + shouldBeLoading);
     return this.props.setLoading(shouldBeLoading);
   }
 

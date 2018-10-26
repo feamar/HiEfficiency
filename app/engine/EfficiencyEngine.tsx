@@ -31,7 +31,10 @@ export default class EfficiencyEngine
 
         const keys = Object.keys(story.interruptions);
         if(keys.length == 0)
-        {   return new ProcessEfficiency(new Date().getTime() - story.document.data.startedOn!.getTime(), 0, []);}
+        {  
+            const end = story.document.data.finishedOn || new Date();
+            return new ProcessEfficiency(end.getTime() - story.document.data.startedOn!.getTime(), 0, []);
+        }
 
         var foundInterruptions = false;
         var errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
@@ -53,7 +56,10 @@ export default class EfficiencyEngine
         });
 
         if(foundInterruptions == false)
-        {   return new ProcessEfficiency(new Date().getTime() - story.document.data.startedOn!.getTime(), 0, []);}
+        {   
+            const end = story.document.data.finishedOn || new Date();
+            return new ProcessEfficiency(end.getTime() - story.document.data.startedOn!.getTime(), 0, []);
+        }
 
         if(errors.hasAny())
         {   return errors;}
