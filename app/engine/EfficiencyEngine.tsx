@@ -27,9 +27,18 @@ export default class EfficiencyEngine
         var totalProductiveTime: number = 0;
         var totalInterruptionTime: number = 0;
 
+        const keys = Object.keys(story.interruptions);
+        if(keys.length == 0)
+        {   return new ProcessEfficiency(new Date().getTime() - story.document.data.startedOn!.getTime(), 0, []);}
+
+        var foundInterruptions = false;
         var errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
-        Object.keys(story.interruptions).forEach(key => 
+        keys.forEach(key => 
         {
+            const value = story.interruptions[key];
+            if(value.document.data.interruptions.length > 0)
+            {   foundInterruptions = true;}
+
             const processEfficiencyOrError = EfficiencyEngine.calculateUserProcessEfficiency(story, story.interruptions[key], usersById.get(key));
 
             if(processEfficiencyOrError instanceof ProcessEfficiency)
@@ -40,6 +49,9 @@ export default class EfficiencyEngine
             else
             {   errors = errors.merge(processEfficiencyOrError);}
         });
+
+        if(foundInterruptions == false)
+        {   return new ProcessEfficiency(new Date().getTime() - story.document.data.startedOn!.getTime(), 0, []);}
 
         if(errors.hasAny())
         {   return errors;}

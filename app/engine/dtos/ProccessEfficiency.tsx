@@ -10,11 +10,11 @@ export default class ProcessEfficiency
     public get totalTime()
     {   return this.productiveTime + this.interruptionTime;}
 
-    constructor(totalTime: number, interruptionTime: number, usernames: Array<string>)
+    constructor(productiveTime: number, interruptionTime: number, usernames: Array<string>)
     {
         //TODO: Prohibit incorrect input in user interface.
 
-        this.productiveTime = totalTime;
+        this.productiveTime = productiveTime;
         this.interruptionTime = interruptionTime;
         this.usernames = usernames;
     }
