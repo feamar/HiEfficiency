@@ -54,6 +54,7 @@ interface State
 {
   user: ReduxUser,
   open: boolean,
+  joinTeamInputBackup: DialogPreferenceTextMulti_StorageValue
 }
 
 type JoinTeamStorageValue = {
@@ -80,6 +81,7 @@ class ScreenTeams extends Component<Props, State>
     {
       user: this.props.user,
       open: false,
+      joinTeamInputBackup: {code: "", name: ""}
     } 
 
     this.setLoading(this.props);
@@ -149,13 +151,20 @@ class ScreenTeams extends Component<Props, State>
   onJoinDialogSubmitted = (storageValue: DialogPreferenceTextMulti_StorageValue | null) => 
   {   
     if(storageValue == null)
-    { return;}
+    {   return false;}
     
     this.props.database.inDialog("dialog-joining-team", this.props.addDialog, this.props.removeDialog, "Joining Team", async (execute) => 
     {
       const join = this.props.database.joinTeam(storageValue.name!, storageValue.code!, this.props.user.document.id!, this.props.user.document.data.teams);
-      await execute(join, false);
+      const result = await execute(join, false);
+
+      if(result.successful == false)
+      {   this.setState({joinTeamInputBackup: storageValue});}
+      else
+      {   this.setState({joinTeamInputBackup: {name: "", code: ""}});}
     });
+
+    return true;
   }
  
   onLeaveDialogActionPressed = (_concreteComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
@@ -194,7 +203,7 @@ class ScreenTeams extends Component<Props, State>
     return (  
       <View style={{height: "100%"}}>  
         <ListTeams containerHasFab={true} items={UtilityIndexable.toArray(this.state.user.teams)} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
-        <DialogPreferenceTextMulti<JoinTeamStorageValue> storageValue={{name: "", code: ""}} title="Join Team" onSubmit={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
+        <DialogPreferenceTextMulti<JoinTeamStorageValue> storageValue={this.state.joinTeamInputBackup} title="Join Team" onSubmit={this.onJoinDialogSubmitted} ref={instance => this.dialogJoinTeam = instance} elements={[new TextElement("name", "Name", true), new TextElement("code", "Security Code", true)]} />
         <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmLeave = i}   visible={false} message="Are you sure you want to leave this team?" onActionClickListener={this.onLeaveDialogActionPressed} />
         <DialogConfirmation title="Deleting Team" concreteRef={i => this.dialogConfirmDelete = i} visible={false} message="Are you sure you want to delete this team? This cannot be undone and will delete all data, including stories and interruptions!" onActionClickListener={this.onDeleteDialogActionPressed} textPositive={"Delete"} textNegative={"No, Cancel!"} />
 

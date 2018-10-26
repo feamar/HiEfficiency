@@ -4,6 +4,7 @@ import Theme from '../../../styles/Theme';
 import AbstractDialog, { AbstractDialog_Props_Virtual } from '../AbstractDialog';
 import update, {Spec} from "immutability-helper";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
+import UtilityObject from '../../../utilities/UtilityObject';
  
 interface AbstractPreferenceDialog_Props_Sealed<StorageValue> 
 {
@@ -15,7 +16,7 @@ interface AbstractPreferenceDialog_Props_Sealed<StorageValue>
 export type AbstractPreferenceDialog_Props_Virtual<StorageValue> = AbstractDialog_Props_Virtual & 
 {
     storageValue: StorageValue,
-    onSubmit: (storageValue: StorageValue) => any,
+    onSubmit: (storageValue: StorageValue) => Promise<boolean> | boolean | undefined,
     required?: boolean,
     onValueValidation?: (storageValue: StorageValue) => string | undefined,
 }
@@ -34,17 +35,26 @@ interface State<StorageValue>
 export default class AbstractPreferenceDialog<StorageValue extends object> extends React.Component<Props<StorageValue>, State<StorageValue>> implements Baseable<AbstractDialog>
 {
     public base: AbstractDialog | undefined;
+    private inputBackup?: StorageValue;
+    private hash: number;
 
     constructor(props: Props<StorageValue>) 
     {
         super(props);
 
+        this.hash = Math.floor(Math.random() * 100);
         this.state = 
         {
             storageValue: this.props.storageValue,
             error: undefined,
             required: this.props.required || false
         }
+    }
+
+    componentWillMount = () =>
+    {
+        if(this.inputBackup)
+        {   this.setStorageValue(this.inputBackup);}
     }
 
     componentWillReceiveProps = (props: Props<StorageValue>) =>
@@ -64,7 +74,7 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
 
     getOriginalStorageValue = (): StorageValue | null =>
     {
-        return this.props.storageValue;
+        return this.inputBackup || this.props.storageValue;
     }
 
     getInputValidationError = (storageValue: StorageValue | null): string | undefined =>
@@ -106,6 +116,9 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
         {
             if(reference.onCloseListeners.includes(this.onDialogClosed) == false)
             {   reference.onCloseListeners.push(this.onDialogClosed);}
+
+            if(reference.onDismissListeners.includes(this.onDialogClosed) == false)
+            {   reference.onDismissListeners.push(this.onDialogDismissed);}
         }
     }
     
@@ -123,7 +136,26 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
         }
 
         if(this.props.onSubmit)
-        {   this.props.onSubmit(this.state.storageValue);}
+        {
+            const result = this.props.onSubmit(this.state.storageValue);
+
+            if(result != undefined)
+            {
+                if(result instanceof Promise)
+                {
+                    result.then(successful => 
+                    {
+                        if(successful == false)
+                        {   this.inputBackup = this.state.storageValue;}   
+                    });
+                }
+                else
+                {
+                    if(result == false)
+                    {   this.inputBackup = this.state.storageValue;}
+                }
+            }
+        }
 
         this.setState({error: undefined});
 
@@ -135,15 +167,25 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
     {
         if(this.base)
         {   this.base.onDismiss();}
+
+        this.inputBackup = undefined;
     }
 
     onDialogClosed = () =>
     {       
+        console.log(this.hash + " - onDialogClosed: " + UtilityObject.stringify(this.state.storageValue));
         setTimeout(() => this.setState({error: undefined, storageValue: this.getOriginalStorageValue() || {} as StorageValue}), 500);
+    }
+
+    onDialogDismissed = () =>
+    {
+        console.log(this.hash + " - onDialogDismissed: " + UtilityObject.stringify(this.state.storageValue));
+        this.inputBackup = this.state.storageValue;
     }
 
     setStorageValue = (storageValue: StorageValue) =>
     {
+        console.log(this.hash + " - setStorageValue: " + UtilityObject.stringify(storageValue));
         this.setState({storageValue: storageValue});
     }
 

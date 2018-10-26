@@ -6,6 +6,8 @@ import ReduxInterruptions from "../dtos/redux/ReduxInterruptions";
 import ProcessEfficiencyError from "./dtos/ProcessEfficiencyError";
 import { ProcessEfficiencyErrorType } from "./dtos/ProcessEfficiencyErrorType";
 import ProcessEfficiencyErrors from "./dtos/ProcessEfficiencyErrors";
+import UtilityDate from "../utilities/UtilityDate";
+import EntitySchemaDay from "../dtos/firebase/firestore/entities/EntitySchemaDay";
 
 export default class EfficiencyEngine
 {
@@ -103,7 +105,7 @@ export default class EfficiencyEngine
         {   return new ProcessEfficiency(userProductiveTime, userInterruptionTime, [user.name]);}
     }
 
-    static dateDiff = (_schema: EntitySchemaWeek, earlierDate: Date, laterDate: Date, username: string): number | ProcessEfficiencyError =>
+    static dateDiff = (schema: EntitySchemaWeek, earlierDate: Date, laterDate: Date, username: string): number | ProcessEfficiencyError =>
     {
         const earlier = earlierDate.getTime();
         const later = laterDate.getTime();
@@ -111,6 +113,47 @@ export default class EfficiencyEngine
         if(earlier > later)
         {   return new ProcessEfficiencyError(ProcessEfficiencyErrorType.IncorrectOrder, [username]);}
 
-        return laterDate.getTime() - earlierDate.getTime();
+        var result = 0;
+        if(UtilityDate.areOnSameDay(earlierDate, laterDate))
+        {   return laterDate.getTime() - earlierDate.getTime();}
+
+        const first = schema.getDayOfDate(earlierDate);
+        const millisecondsOfDayStart = earlierDate.getTime() % 86400000;
+        if(millisecondsOfDayStart < first.getEndAsMilliseconds())
+        {   result += first.getEndAsMilliseconds() - millisecondsOfDayStart;}
+
+        const last = schema.getDayOfDate(laterDate);
+        const millisecondsOfDayEnd = laterDate.getTime() % 86400000;
+        if(millisecondsOfDayEnd > last.getStartAsMilliseconds())
+        {   result += millisecondsOfDayEnd - last.getStartAsMilliseconds()}
+
+        EfficiencyEngine.forEachDayBetweenDates(schema, earlierDate, laterDate, (day, index, amountOfDays) => 
+        {   
+            if(index != 0 && index != amountOfDays - 1)
+            {   result += day.getHours() * 60 * 60 * 1000;}
+        });
+    
+        return result;
+    }
+
+
+    static forEachDayBetweenDates = (schema: EntitySchemaWeek, started: Date, finished: Date, closure: (day: EntitySchemaDay, index: number, amountOfDays: number) => void) =>
+    {
+        var index = (started.getDay() + 1 ) % 7;
+        const amountOfDays = EfficiencyEngine.getDaysBetweenDates(started, finished);
+        for(var i = 0 ; i < amountOfDays ; i ++)
+        {
+            const day = schema.getByIndex(index);
+            closure(day!, i, amountOfDays);
+            index = (index + 1) % 7;
+        }
+    }
+
+    static getDaysBetweenDates = (started: Date, finished: Date) =>
+    {
+        const difference = Math.abs(finished.getTime() - started.getTime());
+        const amount = Math.floor(difference / 86400000);
+
+        return amount;
     }
 }

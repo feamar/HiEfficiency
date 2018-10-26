@@ -466,7 +466,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     onEditTimeStart = async (storageValue: DialogPreferenceDateTime_StorageValue | null) =>
     {
         if(this.story == undefined || storageValue == null || storageValue.timestamp == undefined || storageValue.timestamp == this.story.document.data.startedOn)
-        {   return;}
+        {   return false;}
 
         const inspecting = this.props.inspecting;
 
@@ -475,12 +475,14 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             const update = this.props.database.updateStory(inspecting.team!, inspecting.story!, this.story.document.data, {startedOn: {$set: storageValue.timestamp}});
             await execute(update, false);
         });
+
+        return true;
     }
 
     onEditTimeFinish = async (storageValue: DialogPreferenceDateTime_StorageValue | null) =>
     {
         if(this.story == undefined || storageValue == null || storageValue.timestamp == undefined || storageValue == this.story.document.data.finishedOn)
-        {   return;}
+        {   return false;}
 
         const inspecting = this.props.inspecting;
 
@@ -489,6 +491,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             const update = this.props.database.updateStory(inspecting.team!, inspecting.story!, this.story.document.data, {finishedOn: {$set: storageValue.timestamp}});
             await execute(update, false);
         });
+
+        return true;
     }
 
     onOverflowMenuItemSelected = async (action: ActionType) => 
@@ -627,13 +631,13 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         if(this.story == undefined || storageValue == null)
         {
             this.log("onInterruptionEdited", "Early exit due to undefined storage value or story.");
-            return;
+            return false;
         }
 
         if(storageValue.end == undefined || storageValue.start == undefined)
         {
             this.log("onInterruptionEdited", "Early exit due to empty storage value fields.");
-            return;
+            return false;
         }
 
         const document = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
@@ -647,6 +651,8 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
             const update = this.props.database.updateInterruption(inspecting.team!, inspecting.story!, this.props.user.document.id!, document, current, updates);
             await execute(update, false);
         });
+
+        return true;
     }
 
     getListComponent = () => 

@@ -136,6 +136,21 @@ export default class UtilityTime
     }
 
     /**
+     * Converts an amount of milliseconds to an amount of hours.
+     * @param ms - The amount of milliseconds to convert.
+     * @param wholeNumbers - Whether or not to modulus the result to the closest floor integer.
+     */
+    public getHoursFromMilliseconds = (ms: number, wholeNumbers: boolean) =>
+    {
+        const hours = ms / 3600000;
+
+        if(wholeNumbers == false)
+        {   return hours;}
+        else
+        {   return Math.floor(hours);}
+    }
+
+    /**
      * Determines whether to use a singular or plural form, based on an inserted quantity.
      * @param singular - The string to use for singular cases.
      * @param plural - The string to use for plural cases.

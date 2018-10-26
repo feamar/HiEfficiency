@@ -42,7 +42,7 @@ export default class EntitySchemaWeek
     getDayOfDate = (date: Date) =>
     {
         const index = (date.getDay() + 1) % 7;
-        return this.getByIndex(index);
+        return this.getByIndex(index)!;
     }
 
     getTotalHours = () =>
