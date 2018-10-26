@@ -28,7 +28,7 @@ export default class UserRegister extends AbstractCrudOperation
             const auth = FirebaseAdapter.getAuth();
             const credentials = await auth.createUserAndRetrieveDataWithEmailAndPassword(this.email, this.password);
 
-            credentials.user.sendEmailVerification();
+            //credentials.user.sendEmailVerification();
 
             const user = {
                 name: this.email,
