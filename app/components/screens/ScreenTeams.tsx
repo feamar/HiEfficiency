@@ -81,7 +81,8 @@ class ScreenTeams extends Component<Props, State>
     {
       user: this.props.user,
       open: false,
-      joinTeamInputBackup: {code: "", name: ""}
+      joinTeamInputBackup: {code: "", name: ""},
+      
     } 
 
     this.setLoading(this.props);

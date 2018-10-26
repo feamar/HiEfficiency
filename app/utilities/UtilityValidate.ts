@@ -3,7 +3,7 @@ export default class UtilityValidate
     /**
      * A default legal character set, that is a subset of the ASCII scheme. 
      */
-    public static readonly DEFAULT_LEGAL_CHARACTERS = "[]{}ÁÉÚÍÓÀÈÌÙÒÄËÜÖÏÂÊÛÎÔçáéúíóàèìòùâêûîôäëüïöABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-=!@#$%^&*()_+€|:\";',./<>?~ ";
+    public static readonly DEFAULT_LEGAL_CHARACTERS = "\n[]{}ÁÉÚÍÓÀÈÌÙÒÄËÜÖÏÂÊÛÎÔçáéúíóàèìòùâêûîôäëüïöABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-=!@#$%^&*()_+€|:\";',./<>?~ ";
 
     /**
      * A utility method that checks an input string for the occurrence of illegal characters, given a string containing white-listed/legal characters.
