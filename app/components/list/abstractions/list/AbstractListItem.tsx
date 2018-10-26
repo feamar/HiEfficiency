@@ -6,6 +6,7 @@ import { Divider } from "react-native-paper";
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from "react-native-popup-menu";
 import ActionOption from "../../../../dtos/options/ActionOption";
 import update from "immutability-helper";
+import equal from "deep-equal";
 
 const styles = StyleSheet.create({
     listItem:{ 
@@ -75,6 +76,14 @@ export default class AbstractListItem<ModelType> extends Component<Props<ModelTy
 
     componentWillUnmount = () =>
     {   this.isMounted = false;}
+
+    shouldComponentUpdate = (nextProps: Readonly<Props<ModelType>>, nextState: Readonly<State<ModelType>>, _nextContext: Readonly<any>) =>
+    {
+        if(equal(nextProps, this.props) && equal(nextState, this.state))
+        {   return false;}
+
+        return true;
+    }
 
     componentWillReceiveProps = (props: Props<ModelType>) =>
     {   

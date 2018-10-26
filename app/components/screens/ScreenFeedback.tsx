@@ -132,7 +132,7 @@ export default class ScreenFeedback extends React.Component<Props, State>
             <View style={styles.screen}>
                 <PreferenceCategory title="Feedback">
                     <PreferenceSelectList required title="About" options={SelectOption.FEEDBACK} storageValue={this.state.about} onValueChanged={this.onAboutSelected} />
-                    <PreferenceText required title="Details" label="Details" storageValue={this.state.details} onValueChanged={this.onDetailsChanged} />
+                    <PreferenceText required multiline={true} numberOfLines={10} title="Details" label="Details" storageValue={this.state.details} onValueChanged={this.onDetailsChanged} />
                 </PreferenceCategory>
                 <InputFloatingActionButton icon="send" enabled={this.state.fabEnabled} onPress={this.onFabPressed} />
             </View>

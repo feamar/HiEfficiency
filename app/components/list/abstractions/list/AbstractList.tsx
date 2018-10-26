@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {View, FlatList} from "react-native";
 import ActionOption from "../../../../dtos/options/ActionOption";
+import equal from "deep-equal";
 
 export interface AbstractListPropsVirtual<ModelType>
 {
@@ -12,6 +13,11 @@ export interface AbstractListPropsVirtual<ModelType>
 
 interface AbstractListPropsSealed<ModelType>
 {
+    getItemLayout?: (data: ModelType[] | null, index: number) => {
+        length: number,
+        offset: number,
+        index: number
+      };
     getListItemFor: (item: ModelType, index: number) => JSX.Element,
     getItemKey: (item: ModelType) => string
 }
@@ -37,6 +43,16 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
         }
     }
 
+
+    shouldComponentUpdate = (nextProps: Readonly<Props<ModelType>>, nextState: Readonly<State<ModelType>>, _nextContext: Readonly<any>) =>
+    {
+        if(equal(nextProps, this.props) && equal(nextState, this.state))
+        {   return false;}
+
+        return true;
+    }
+
+
     componentWillReceiveProps(props: Props<ModelType>) 
     {   this.setState({items: props.items, containerHasFab: props.containerHasFab || false});}
 
@@ -49,10 +65,12 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
     }
 
 
+
+    
     render() 
     {
         return(
-            <FlatList data={this.state.items} keyExtractor={this.props.getItemKey} renderItem={(data) => this.props.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
+            <FlatList getItemLayout={this.props.getItemLayout} updateCellsBatchingPeriod={100} removeClippedSubviews={true} data={this.state.items} keyExtractor={this.props.getItemKey} renderItem={(data) => this.props.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
         ); 
     }    
 }

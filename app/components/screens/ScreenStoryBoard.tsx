@@ -72,6 +72,7 @@ class ScreenStoryBoard extends Component<Props, State>
   private dialogConfirmDelete?: ConcreteDialogConfirmation
   private itemToDelete?: ReduxStory;
 
+
   constructor(props: Props)
   {
     super(props);
@@ -85,6 +86,12 @@ class ScreenStoryBoard extends Component<Props, State>
       storyListItems: this.getStoryListItems(props),
     }
   }  
+
+  shouldComponentUpdate = (_nextProps: Readonly<Props>, _nextState: Readonly<State>, _nextContext: Readonly<any>) =>
+  {
+
+    return true;
+  }
 
   componentWillReceiveProps = (props: Props) =>
   {
@@ -268,7 +275,6 @@ class ScreenStoryBoard extends Component<Props, State>
         result = result.sort((a, b) => {  return b.document.data.finishedOn!.getTime() - a.document.data.finishedOn!.getTime()}); //Sort on "finishedOn" in descending order.
         break;
     }
-
     return result;
   }
 
@@ -287,18 +293,20 @@ class ScreenStoryBoard extends Component<Props, State>
       
     }
 
-    return <Hoc containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+    const component = <Hoc containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+    return component;
   }
   
   render()   
   {
-    return (
-      <View style={{height: "100%"}}>
-          <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmDelete = i}  visible={false} message="Are you sure you want to delete this user story?" onActionClickListener={this.onDialogActionPressed} />
-          {this.getListComponent(this.props.mode)}
-          {this.props.mode == "Todo" && <FAB.Group color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open: {open: boolean}) => this.setState(open)} />}
-      </View>
-    );
+    const component = <View style={{height: "100%"}}>
+                        <DialogConfirmation title="Confirmation" concreteRef={i => this.dialogConfirmDelete = i}  visible={false} message="Are you sure you want to delete this user story?" onActionClickListener={this.onDialogActionPressed} />
+                        {this.getListComponent(this.props.mode)}
+                        {this.props.mode == "Todo" && <FAB.Group color="white" open={this.state.open} icon='more-vert' actions={this.getFabGroupActions()} onStateChange={(open: {open: boolean}) => this.setState(open)} />}
+                      </View>;
+
+    return component;
+  
   } 
 }
 

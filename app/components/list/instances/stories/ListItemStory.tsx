@@ -9,6 +9,7 @@ import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ActionOption from "../../../../dtos/options/ActionOption";
 import ReduxStory from "../../../../dtos/redux/ReduxStory";
 import StoryType from "../../../../enums/StoryType";
+import equal from "deep-equal";
 
 const styles = StyleSheet.create({
     teamName: {
@@ -63,6 +64,14 @@ export default class ListItemStory extends React.Component<Props, State> impleme
                 </View>
             </View>
         );
+    }
+
+    shouldComponentUpdate = (nextProps: Readonly<Props>, nextState: Readonly<State>, _nextContext: Readonly<any>) =>
+    {
+        if(equal(nextProps, this.props) && equal(nextState, this.state))
+        {   return false;}
+
+        return true;
     }
 
     getItemIndicatorStyle = (type: StoryType ) =>

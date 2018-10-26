@@ -10,6 +10,7 @@ const Theme = {
         accent: "#284b63",
         background: "transparent",
         selectedBackground: "#EFEFEF",
+        error: "#cc0000",
         typography:{
             title: "#434343",
             subtitle: "#A1A1A1",

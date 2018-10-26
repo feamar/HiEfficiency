@@ -15,11 +15,18 @@ import ProcessEfficiency from "../../engine/dtos/ProccessEfficiency";
 import { View, StyleSheet } from "react-native";
 import TextGroup from "../text/TextGroup";
 import UtilityTime from "../../utilities/UtilityTime";
+import ProcessEfficiencyErrors from "../../engine/dtos/ProcessEfficiencyErrors";
+import UtilityMap from "../../utilities/UtilityMap";
+import Theme from "../../styles/Theme";
 
 const styles = StyleSheet.create({
     root: {
         marginLeft: 20,
         marginRight: 20,
+    },
+    error:
+    {
+        color: Theme.colors.error
     }
 });
 
@@ -30,7 +37,7 @@ type Props = ReduxStateProps & WithLoadingProps & WithDatabaseProps &
 interface State
 {
     lifecycle: StoryLifecycle | "Loading",
-    efficiency?: ProcessEfficiency
+    efficiency?: ProcessEfficiency | ProcessEfficiencyErrors
 }
 
 interface ReduxStateProps
@@ -115,33 +122,64 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
         if(this.state.efficiency == undefined)
         {   return null;}
 
-        const participants = this.state.efficiency.usernames.length == 0 ? "None" : this.state.efficiency.usernames;
-        const processEfficiency = (this.state.efficiency.processEfficiency * 100);
-        const processEfficiencyString = isNaN(processEfficiency) ? "Uncalculatable" : processEfficiency.toFixed(2) + "%";
-        
-        const productiveTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.productiveTime);
-        const interruptionTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.interruptionTime);
-        const totalTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.totalTime);
+        if(this.state.efficiency instanceof ProcessEfficiency)
+        {
+            const participants = this.state.efficiency.usernames.length == 0 ? "None" : this.state.efficiency.usernames;
+            const processEfficiency = (this.state.efficiency.processEfficiency * 100);
+            const processEfficiencyString = isNaN(processEfficiency) ? "Uncalculatable" : processEfficiency.toFixed(2) + "%";
+            
+            const productiveTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.productiveTime);
+            const interruptionTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.interruptionTime);
+            const totalTime = UtilityTime.millisecondsToLongDuration(this.state.efficiency.totalTime);
+    
+            return(
+                <View style={styles.root}>
+                    <TextGroup title="Participants">
+                        <Text>{participants}</Text>
+                    </TextGroup>
+                    <TextGroup title="Productive Time">
+                        <Text>{productiveTime}</Text>
+                    </TextGroup>
+                    <TextGroup title="Interruption Time">
+                        <Text>{interruptionTime}</Text>
+                    </TextGroup>
+                    <TextGroup title="Total Time">
+                        <Text>{totalTime}</Text>
+                    </TextGroup>
+                    <TextGroup title="Process Efficiency">
+                        <Text>{processEfficiencyString}</Text>
+                    </TextGroup>
+                </View>
+            );
+        }
+        else
+        {
+            const plurality = this.state.efficiency.length > 1 ? this.state.efficiency.length + " errors" : this.state.efficiency.length + " error";
+            const thisOrThese = this.state.efficiency.length > 1 ? "these errors" : "this error";
 
-        return(
-            <View style={styles.root}>
-                <TextGroup title="Participants">
-                    <Text>{participants}</Text>
-                </TextGroup>
-                <TextGroup title="Productive Time">
-                    <Text>{productiveTime}</Text>
-                </TextGroup>
-                <TextGroup title="Interruption Time">
-                    <Text>{interruptionTime}</Text>
-                </TextGroup>
-                <TextGroup title="Total Time">
-                    <Text>{totalTime}</Text>
-                </TextGroup>
-                <TextGroup title="Process Efficiency">
-                    <Text>{processEfficiencyString}</Text>
-                </TextGroup>
-            </View>
-        );
+            return (
+                <View style={styles.root}>
+                    <TextGroup title="What Happened">
+                        <Text>We've encountered {plurality} while calculating your process efficiency. Please address {thisOrThese} in order to see your process efficiency.</Text>
+                    </TextGroup>
+                    {this.state.efficiency.hasGlobalErrors() && 
+                        <TextGroup title="Global Errors">
+                            {this.state.efficiency.global().map(error => 
+                            {   return <Text key={"global-" + error.type} style={styles.error}>{error.type.toString()}</Text>})}
+                        </TextGroup>
+                    }
+                    {this.state.efficiency.hasUserSpecificErrors() && 
+                        UtilityMap.map(this.state.efficiency.userSpecific(), (key, value) =>
+                        {
+                            return  <TextGroup key={key} title={key}>
+                                        {value.map(type => <Text key={"key-" + type} style={styles.error}>{type}</Text>)}
+                                    </TextGroup>
+                        })
+                    }
+                    
+                </View>
+            );
+        }
     }
 }
 

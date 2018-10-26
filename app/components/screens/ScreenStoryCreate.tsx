@@ -230,10 +230,10 @@ class ScreenStoryCreate extends Component<Props, State>
                         {   parent.setParams({ subtitle: this.state.story.document.data.name });}
                     }
                 });
-                this.unsavedChanges = false;
                 break;
         }
 
+        this.unsavedChanges = false;
         this.setState({fabEnabled: true});
     }
 

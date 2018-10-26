@@ -5,13 +5,16 @@ import ProcessEfficiency from "./dtos/ProccessEfficiency";
 import FirebaseAdapter from "../components/firebase/FirebaseAdapter";
 import UtilityArray from "../utilities/UtilityArray";
 import ReduxInterruptions from "../dtos/redux/ReduxInterruptions";
+import ProcessEfficiencyError from "./dtos/ProcessEfficiencyError";
+import { ProcessEfficiencyErrorType } from "./dtos/ProcessEfficiencyErrorType";
+import ProcessEfficiencyErrors from "./dtos/ProcessEfficiencyErrors";
 
 export default class EfficiencyEngine
 {
-    static getProcessEfficiency = async (story: ReduxStory): Promise<ProcessEfficiency>  =>
+    static getProcessEfficiency = async (story: ReduxStory): Promise<ProcessEfficiency | ProcessEfficiencyErrors>  =>
     {
         if(story.document.data.startedOn == undefined)
-        {   return new ProcessEfficiency(0, 0, []);}
+        {       return new ProcessEfficiencyErrors([new ProcessEfficiencyError(ProcessEfficiencyErrorType.StoryUnstarted)]);}
 
         const users = await EfficiencyEngine.getUsers(story);
         return EfficiencyEngine.calculateProcessEfficiency(story, users);
@@ -31,24 +34,34 @@ export default class EfficiencyEngine
         return UtilityArray.asDefinedType(users);
     }
 
-    static calculateProcessEfficiency = (story: ReduxStory, users: Array<DocumentUser>): ProcessEfficiency   =>
+    static calculateProcessEfficiency = (story: ReduxStory, users: Array<DocumentUser>): ProcessEfficiency | ProcessEfficiencyErrors =>
     {
         const usersById = DocumentUser.asMap(users);
         var totalProductiveTime: number = 0;
         var totalInterruptionTime: number = 0;
-      
+
+        var errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
         Object.keys(story.interruptions).forEach(key => 
         {
-            const ofUser = EfficiencyEngine.calculateUserProcessEfficiency(story, story.interruptions[key], usersById.get(key));
-            totalProductiveTime += ofUser.productiveTime!;
-            totalInterruptionTime += ofUser.interruptionTime!;
+            const processEfficiencyOrError = EfficiencyEngine.calculateUserProcessEfficiency(story, story.interruptions[key], usersById.get(key));
+
+            if(processEfficiencyOrError instanceof ProcessEfficiency)
+            {
+                totalProductiveTime += processEfficiencyOrError.productiveTime!;
+                totalInterruptionTime += processEfficiencyOrError.interruptionTime!;
+            }
+            else
+            {   errors = errors.merge(processEfficiencyOrError);}
         });
 
-        return new ProcessEfficiency(totalProductiveTime, totalInterruptionTime, users.map(user => user.name));
+        if(errors.hasAny())
+        {   return errors;}
+        else
+        {   return new ProcessEfficiency(totalProductiveTime, totalInterruptionTime, users.map(user => user.name));}
     }
 
     //User could be undefined if the user entered an interruption on the story, and then removed his account from the database.
-    static calculateUserProcessEfficiency = (story: ReduxStory, interruptions: ReduxInterruptions, user: DocumentUser | undefined): Partial<ProcessEfficiency>  =>
+    static calculateUserProcessEfficiency = (story: ReduxStory, interruptions: ReduxInterruptions, user: DocumentUser | undefined): ProcessEfficiency | ProcessEfficiencyErrors  =>
     {
         if(user == undefined) return new ProcessEfficiency(0, 0, []);
 
@@ -59,25 +72,46 @@ export default class EfficiencyEngine
         var userProductiveTime: number = 0;
         var userInterruptionTime: number = 0;
 
+        var errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
+
         interruptions.document.data.interruptions.forEach(interruption => 
         {
-            userProductiveTime += EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, interruption.timestamp);
-            userInterruptionTime += interruption.duration || 0;
+            const differenceOrError = EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, interruption.timestamp, user.name);
+            if(differenceOrError instanceof ProcessEfficiencyError)
+            {
+                errors.addNoDuplicate(differenceOrError);
+            }
+            else
+            {
+                userProductiveTime += differenceOrError;
+                userInterruptionTime += interruption.duration || 0;
+            }
             
             previousFrom = interruption.duration ? new Date(interruption.timestamp.getTime() + interruption.duration) : storyFinished;
         });
 
-        userProductiveTime += EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, storyFinished);
-        return new ProcessEfficiency(userProductiveTime, userInterruptionTime, [user.name]);
+        const differenceOrError = EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, storyFinished, user.name);
+        if(differenceOrError instanceof ProcessEfficiencyError)
+        {
+            errors.addNoDuplicate(differenceOrError);
+        }
+        else
+        {   userProductiveTime += differenceOrError;}
+
+        if(errors.hasAny())
+        {   return errors;}
+        else
+        {   return new ProcessEfficiency(userProductiveTime, userInterruptionTime, [user.name]);}
     }
 
-    calculateInterruptionTime = () =>
+    static dateDiff = (_schema: EntitySchemaWeek, earlierDate: Date, laterDate: Date, username: string): number | ProcessEfficiencyError =>
     {
+        const earlier = earlierDate.getTime();
+        const later = laterDate.getTime();
+        
+        if(earlier > later)
+        {   return new ProcessEfficiencyError(ProcessEfficiencyErrorType.IncorrectOrder, [username]);}
 
-    }
-
-    static dateDiff = (_schema: EntitySchemaWeek, earlierDate: Date, laterDate: Date) =>
-    {
         return laterDate.getTime() - earlierDate.getTime();
     }
 }

@@ -1,5 +1,15 @@
 export default class UtilityMap
 {
+    static map = <K, V, R> (map: Map<K, V>, closure: (key: K, value: V) => R) =>
+    {
+        const results: Array<R> = [];
+        for(var [key, value] of map)
+        {   
+            results.push(closure(key, value));
+        }
+        return results;
+    }
+
     static getRemoved = <K, V> (original: Map<K, V>, next: Map<K, V>) =>
     {
         const removed = [];
