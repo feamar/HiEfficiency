@@ -208,6 +208,7 @@ class ScreenStoryCreate extends Component<Props, State>
                     await execute(crud, false);
                 });
 
+                this.unsavedChanges = false;
                 break;
 
             case "Edit":
@@ -230,6 +231,7 @@ class ScreenStoryCreate extends Component<Props, State>
                         {   parent.setParams({ subtitle: this.state.story.document.data.name });}
                     }
                 });
+                this.unsavedChanges = false;
                 break;
         }
 

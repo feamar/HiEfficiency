@@ -97,7 +97,7 @@ export default abstract class AbstractCrudOperation
     protected abstract onRollback (updatable: Updatable) : void;
     protected abstract perform(updatable: Updatable) : void;
 
-    protected readonly sendUpdates = async <T> (updatable: Updatable, expectedReduxAction: string, closure: () => Promise<T>): Promise<T> =>
+    protected readonly sendUpdates = <T> (updatable: Updatable, expectedReduxAction: string, closure: () => Promise<T>): Promise<T> =>
     {
         return new Promise<T>((resolve, _) => 
         {
