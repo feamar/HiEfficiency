@@ -38,6 +38,7 @@ import ActionOption from "../../dtos/options/ActionOption";
 import { AdjustedCallbackReference } from "../../render_props/CallbackReference";
 import AbstractDialog from "../dialog/AbstractDialog";
 import UtilityObject from "../../utilities/UtilityObject";
+import DocumentUser from "../../dtos/firebase/firestore/documents/DocumentUser";
 
 const isEqual = require("react-fast-compare");
 
@@ -325,6 +326,36 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
                 if(this.story == undefined)
                 {   return;}
 
+                const now = new Date();
+                if(this.story.document.data.startedOn == undefined || this.story.document.data.startedOn > now)
+                {
+                    alert("The story cannot be finished while the start time is in the future.");
+                    return;
+                }
+
+                const keys = Object.keys(this.story.interruptions);
+                const usersWithFutureInterruptions: Array<string> = [];
+                const users = await DocumentUser.getAllAsMap(this.story);
+                keys.forEach(key => 
+                {
+                    const interruptionsOfUser = this.story.interruptions[key];
+                    interruptionsOfUser.document.data.interruptions.forEach(interruption => 
+                    {
+                       if(interruption.timestamp > now)
+                       {    
+                           const user = users.get(key);
+                           if(user)
+                           {    usersWithFutureInterruptions.push(user.name);}
+                       }
+                    });
+                });
+
+                if(usersWithFutureInterruptions.length > 0)
+                {
+                    alert("The following users have interruptions that lie in the future. This means the story cannot be finished:\n\n" + usersWithFutureInterruptions.join(", ") + ".");
+                    return;
+                }
+
                 this.showConfirmationDialog("Finish Story", "Are you sure you want to finish this story?", "Finish", async() => 
                 {
                     const document = DocumentInterruptions.fromReduxInterruptions(this.story.interruptions, this.props.user.document.id!);
@@ -334,7 +365,7 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
                         if(last && last.duration == undefined)
                         {
                             const inspecting = this.props.inspecting;
-                            const updates = {duration: {$set: new Date().getTime() - last.timestamp.getTime()}};
+                            const updates = {duration: {$set: now.getTime() - last.timestamp.getTime()}};
 
                             const update =  this.props.database.updateInterruption(inspecting.team!, inspecting.story!, this.props.user.document.id!, document, last, updates);
                             const result = await execute(update, true);;

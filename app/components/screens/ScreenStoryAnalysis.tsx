@@ -160,7 +160,7 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
             return (
                 <View style={styles.root}>
                     <TextGroup title="What Happened">
-                        <Text>We've encountered {plurality} while calculating your process efficiency. Please address {thisOrThese} in order to see your process efficiency.</Text>
+                        <Text>We've encountered {plurality} while calculating your process efficiency. Please address {thisOrThese} in order to see the correct results of the calculations.</Text>
                     </TextGroup>
                     {this.state.efficiency.hasGlobalErrors() && 
                         <TextGroup title="Global Errors">

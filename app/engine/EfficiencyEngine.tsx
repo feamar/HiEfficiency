@@ -2,8 +2,6 @@ import ReduxStory from "../dtos/redux/ReduxStory";
 import DocumentUser from "../dtos/firebase/firestore/documents/DocumentUser";
 import EntitySchemaWeek from "../dtos/firebase/firestore/entities/EntitySchemaWeek";
 import ProcessEfficiency from "./dtos/ProccessEfficiency";
-import FirebaseAdapter from "../components/firebase/FirebaseAdapter";
-import UtilityArray from "../utilities/UtilityArray";
 import ReduxInterruptions from "../dtos/redux/ReduxInterruptions";
 import ProcessEfficiencyError from "./dtos/ProcessEfficiencyError";
 import { ProcessEfficiencyErrorType } from "./dtos/ProcessEfficiencyErrorType";
@@ -14,24 +12,13 @@ export default class EfficiencyEngine
     static getProcessEfficiency = async (story: ReduxStory): Promise<ProcessEfficiency | ProcessEfficiencyErrors>  =>
     {
         if(story.document.data.startedOn == undefined)
-        {       return new ProcessEfficiencyErrors([new ProcessEfficiencyError(ProcessEfficiencyErrorType.StoryUnstarted)]);}
+        {   return new ProcessEfficiencyErrors([new ProcessEfficiencyError(ProcessEfficiencyErrorType.StoryUnstarted)]);}
 
-        const users = await EfficiencyEngine.getUsers(story);
+        if(story.document.data.startedOn > new Date())
+        {   return new ProcessEfficiencyErrors([new ProcessEfficiencyError(ProcessEfficiencyErrorType.StoryStartInFuture)])}
+
+        const users = await DocumentUser.getAllAsArray(story);
         return EfficiencyEngine.calculateProcessEfficiency(story, users);
-    }
-
-    //TODO: Switch to dependency injection for database interface.
-    static getUsers = async (story: ReduxStory): Promise<Array<DocumentUser>>  =>
-    {
-        const keys = Object.keys(story.interruptions);
-        const promises = keys.map(async key => 
-        {
-            const document = await FirebaseAdapter.getUsers().doc(key).get();
-            return DocumentUser.fromSnapshot(document);
-        });
-        const users = await Promise.all(promises);
-
-        return UtilityArray.asDefinedType(users);
     }
 
     static calculateProcessEfficiency = (story: ReduxStory, users: Array<DocumentUser>): ProcessEfficiency | ProcessEfficiencyErrors =>

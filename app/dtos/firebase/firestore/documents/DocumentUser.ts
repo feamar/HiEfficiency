@@ -1,6 +1,9 @@
 import { RNFirebase } from "react-native-firebase";
 import EntitySchemaWeek from "../entities/EntitySchemaWeek";
 import UtilityObject from "../../../../utilities/UtilityObject";
+import ReduxStory from "../../../redux/ReduxStory";
+import FirebaseAdapter from "../../../../components/firebase/FirebaseAdapter";
+import UtilityArray from "../../../../utilities/UtilityArray";
 
 export default class DocumentUser
 {
@@ -14,6 +17,22 @@ export default class DocumentUser
         document.weekSchema = EntitySchemaWeek.fromJsonObject(document.weekSchema);
 
         return document;
+    }
+    
+    static getAllAsMap = async (story: ReduxStory): Promise<Map<string, DocumentUser>> =>
+    {   return DocumentUser.asMap(await DocumentUser.getAllAsArray(story));}
+
+    static getAllAsArray = async (story: ReduxStory): Promise<Array<DocumentUser>>  =>
+    {
+        const keys = Object.keys(story.interruptions);
+        const promises = keys.map(async key => 
+        {
+            const document = await FirebaseAdapter.getUsers().doc(key).get();
+            return DocumentUser.fromSnapshot(document);
+        });
+        const users = await Promise.all(promises);
+
+        return UtilityArray.asDefinedType(users);
     }
 
     static asMap = (users: Array<DocumentUser>) =>

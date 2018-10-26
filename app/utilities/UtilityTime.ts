@@ -74,6 +74,9 @@ export default class UtilityTime
      */
     public static millisecondsToLongDuration = (milliseconds: number) =>
     {
+        if(milliseconds == 0)
+        {   return "None";}
+
         const days: number = Math.floor(milliseconds / 86400000);
         milliseconds = milliseconds % 86400000;
 
