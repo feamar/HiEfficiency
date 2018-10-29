@@ -142,7 +142,7 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
                     <Dialog visible={this.state.visible} onDismiss={this.onDismiss}>
                         <Text style={styles.title}>{this.state.title}</Text>
                         <View  style={styles.content}>
-                            <ScrollView>
+                            <ScrollView keyboardShouldPersistTaps={"handled"}>
                                 {   this.state.content()}
                             </ScrollView> 
                         </View>
