@@ -27,6 +27,18 @@ const styles = StyleSheet.create({
     error:
     {
         color: Theme.colors.error
+    },
+    unstarted_wrapper:
+    {
+        padding:20, 
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+        width: "100%"
+    },
+    unstarted:
+    {
+        textAlign: "center"
     }
 });
 
@@ -149,6 +161,14 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
                     <TextGroup title="Process Efficiency">
                         <Text>{processEfficiencyString}</Text>
                     </TextGroup>
+                </View>
+            );
+        }
+        else if (this.state.lifecycle == "Unstarted")
+        {
+            return (
+                <View style={styles.unstarted_wrapper}>
+                    <Text style={styles.unstarted}>Analysis cannot be done until the story has been started.</Text>
                 </View>
             );
         }
