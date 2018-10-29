@@ -13,7 +13,10 @@ export default class DocumentTeam
         if(snapshot.exists == false)
         {   return undefined;}
 
-        return snapshot.data() as DocumentTeam;
+        
+        const json = snapshot.data() as any;
+        const document = new DocumentTeam(json.code, json.name, json.dateOfFirstSprint);
+        return document;
     }
 
     public code: string;

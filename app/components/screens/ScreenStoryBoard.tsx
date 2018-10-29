@@ -24,6 +24,7 @@ import WithEmptyListFiller from "../../hocs/WithEmptyListFiller";
 import ListFillerOption from "../../dtos/options/ListFillerOption";
 import { AbstractList_Props_Virtual } from "../list/abstractions/list/AbstractList";
 import equal from "deep-equal";
+import DocumentStory from "../../dtos/firebase/firestore/documents/DocumentStory";
 
 interface ReduxStateProps
 {
@@ -209,15 +210,8 @@ class ScreenStoryBoard extends Component<Props, State>
         break;
 
       case ActionType.SCAFFOLD:
-        const story = {
-          description: "Automatically scaffolded story for development purposes. This can be deleted in the production database if encounterd.",
-          finishedOn: undefined,
-          name: "Scaffolded Story " + Math.floor(Math.random() * 1000),
-          points:5,
-          type:1,
-          upvotes: 0,
-          createdOn: new Date()
-        }
+        const story = DocumentStory.create("Scaffolded Story " + Math.floor(Math.random() * 1000), 1, this.props.user.document.data);
+        story.description = "Automatically scaffolded story for development purposes. This can be deleted in the production database if encounterd.";
 
         if(this.team.id == undefined)
         {   return ToastAndroid.show("Could not retrieve team id, please try again later.", ToastAndroid.LONG);}  
@@ -266,7 +260,15 @@ class ScreenStoryBoard extends Component<Props, State>
     {
       case "Todo":
         result = allStories.filter(story => story.document.data.startedOn == undefined);
-        result = result.sort((a, b) => {  return b.document.data.upvotes - a.document.data.upvotes}); //Sort on "upvotes" in descending order.
+        
+        //Sort on "upvotes" in descending order, then on "createdOn".
+        result = result.sort((a, b) => 
+        { 
+          if(a.document.data.upvotes == b.document.data.upvotes)
+          {   return a.document.data.createdOn < b.document.data.createdOn ? -1 : 1}
+          else
+          {   return a.document.data.upvotes > b.document.data.upvotes ? -1 : 1;}
+        }); 
         break;
 
       case "Doing":

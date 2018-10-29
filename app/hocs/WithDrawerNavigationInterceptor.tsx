@@ -36,19 +36,15 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
         {
             const results: Array<boolean> = this.forEachWrappedComponent(componentOrHoc => 
             {
-                console.log("HERE 10");
                 if(componentOrHoc.onDrawerNavigation != undefined)
                 {   
-                    console.log("HERE 11");
                     const handled = componentOrHoc.onDrawerNavigation(navigationTarget);
-                    console.log("HERE 12: " + handled);
                     return handled;
 
                 }
                 return false;
             });
 
-            console.log("ALL: " + results);
             const wasHandled = results.some(e => e == true);
             return wasHandled;
         }

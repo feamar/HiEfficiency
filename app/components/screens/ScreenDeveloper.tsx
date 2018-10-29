@@ -38,9 +38,11 @@ export default class ScreenDeveloper extends Component<Props, State>
             {
                 team.ref.collection("stories").get().then(stories => 
                 {
-                    stories.docs.forEach((_story: RNFirebase.firestore.DocumentSnapshot) => 
+                    stories.docs.forEach((_snapshot: RNFirebase.firestore.DocumentSnapshot) => 
                     {
+                        //const document = DocumentStory.fromSnapshot(_snapshot)
                        
+                        
                     });
                 });
             });

@@ -2,6 +2,20 @@ import UtilityJson from "./UtilityJson";
 
 export default class UtilityObject 
 {
+    static deserialize = <T> (json: {[index: string]: any}, prototype: object) : T =>
+    {
+        const instance = Object.create(prototype);
+        const keys = Object.keys(instance);
+
+        console.log("KEYS");
+        keys.forEach(key => 
+        {
+           console.log("KEY: " + key); 
+           instance[key] = json[key];
+        });
+        return instance;
+    } 
+
     static stringify = (object: object) : string =>
     {   return JSON.stringify(UtilityJson.decycle(object));}
 

@@ -3,13 +3,14 @@ import DocumentStory from "../firebase/firestore/documents/DocumentStory";
 import ReduxInterruptions from "./ReduxInterruptions";
 import DocumentInterruptions from "../firebase/firestore/documents/DocumentInterruptions";
 import UtilityObject from "../../utilities/UtilityObject";
+import DocumentUser from "../firebase/firestore/documents/DocumentUser";
 
 export type StoryLifecycle = "Unstarted" | "Uninterrupted" | "Interrupted" | "Finished";
 
 export default class ReduxStory
 {
-    static default = () =>
-    {   return new ReduxStory(new AbstractFirestoreDocument<DocumentStory>(DocumentStory.default(), null), {}, true);}
+    static default = (reporter: DocumentUser) =>
+    {   return new ReduxStory(new AbstractFirestoreDocument<DocumentStory>(DocumentStory.default(reporter), null), {}, true);}
 
     public readonly document: AbstractFirestoreDocument<DocumentStory>;
     public readonly loaded: boolean;
@@ -30,7 +31,6 @@ export default class ReduxStory
         {   return "Finished";}
         else 
         {
-            console.log("GET LIFECYCLE: " + UtilityObject.stringify(this.interruptions));
             const document = DocumentInterruptions.fromReduxInterruptions(this.interruptions, uid);
             if(document.interruptions.length == 0)
             {   return "Uninterrupted";}

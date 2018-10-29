@@ -12,7 +12,8 @@ export default class DocumentUser
         if(snapshot.exists == false)
         {   return undefined;}
 
-        const document: DocumentUser = snapshot.data() as DocumentUser;
+        const json = snapshot.data() as any;
+        const document = new DocumentUser(json.uid, json.teams, json.name, json.initials, json.weekSchema);
         document.uid = snapshot.id as string;
         document.weekSchema = EntitySchemaWeek.fromJsonObject(document.weekSchema);
 
@@ -40,7 +41,6 @@ export default class DocumentUser
         const map = new Map<string, DocumentUser>();
         users.forEach(user => 
         {   
-            console.log("AS MAP: " + user.uid + " AND " + UtilityObject.stringify(user));
             map.set(user.uid, user);
         });
 

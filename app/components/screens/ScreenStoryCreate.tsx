@@ -22,6 +22,7 @@ import PreferenceSelectSpinner, { PreferenceSelectSpinner_StorageValue } from ".
 import SelectOption from "../../dtos/options/SelectOption";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 import ReduxStory from "../../dtos/redux/ReduxStory";
+import ReduxUser from "../../dtos/redux/ReduxUser";
 
 const styles = StyleSheet.create({
     scrollView:{
@@ -31,7 +32,8 @@ const styles = StyleSheet.create({
 
 interface ReduxStateProps
 {
-    inspecting: ReduxInspecting
+    inspecting: ReduxInspecting,
+    user: ReduxUser
 }
 
 type Props = ReduxStateProps & WithDatabaseProps & WithDialogContainerProps &  
@@ -42,7 +44,8 @@ type Props = ReduxStateProps & WithDatabaseProps & WithDialogContainerProps &
 type State =  
 {
     story: ReduxStory,
-    fabEnabled: boolean
+    fabEnabled: boolean,
+    reporterName: string
 }
 
 type Mode = "Create" | "Edit";
@@ -50,7 +53,8 @@ type Mode = "Create" | "Edit";
 const mapStateToProps = (state: ReduxState): ReduxStateProps  =>
 {
     return {
-        inspecting: state.inspecting
+        inspecting: state.inspecting,
+        user: state.user!
     }
 }
 
@@ -75,8 +79,7 @@ class ScreenStoryCreate extends Component<Props, State>
     {
         super(props);
   
-        var story: ReduxStory = ReduxStory.default();
-       
+        var story: ReduxStory = ReduxStory.default(this.props.user.document.data);
 
         const existingStory = props.navigation.getParam("story");
         this.mode = "Create";
@@ -99,8 +102,16 @@ class ScreenStoryCreate extends Component<Props, State>
         {
             story: story,
             fabEnabled: false,
+            reporterName: "Loading.."
         }
+
+        this.state.story.document.data.getReporterDocument().then(document => 
+        {   
+            console.log("Get Reporter Documnet: "+ document);
+            this.setState({reporterName:  document ? document.name : "Unknown"});
+        });
     }
+
 
     onHardwareBackPress = () =>
     {   return this.onSoftwareBackPress();}
@@ -259,7 +270,7 @@ class ScreenStoryCreate extends Component<Props, State>
         }
     }
 
-    render()
+    render = () =>
     { 
         const data = this.state.story.document.data;
         const storyType: StoryType = StoryType.fromId(data.type) || StoryType.Feature;
@@ -278,6 +289,7 @@ class ScreenStoryCreate extends Component<Props, State>
                     </PreferenceCategory>
                     {this.mode == "Edit" && 
                     <PreferenceCategory title="Additional Information">
+                        <PreferenceText disabled={true} label="Reporter" title="Reporter" storageValue={{text: this.state.reporterName}}></PreferenceText>
                         <PreferenceText disabled={true} label="Created On" title="Created On" storageValue={{text: this.state.story.document.data.createdOn.toDateString()}}></PreferenceText>
                     </PreferenceCategory>
                     }

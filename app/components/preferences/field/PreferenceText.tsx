@@ -28,6 +28,15 @@ export default class PreferenceText extends React.Component<Props, State> implem
         {   }
     }
 
+    componentWillReceiveProps = (nextProps: Props) =>
+    {
+        if(nextProps.storageValue != this.props.storageValue)
+        {   
+            if(this.base && this.base.base)
+            {   this.base.base.onValueChanged(nextProps.storageValue, false);}
+        }
+    }
+
     getDialogComponent = (props: AbstractPreferenceDialog_Props_Virtual<StorageValue>, onBaseReference: (ref: Baseable<AbstractPreferenceDialog<StorageValue>> | null) => void) =>
     {
         return (

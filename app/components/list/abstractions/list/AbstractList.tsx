@@ -43,7 +43,6 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
     constructor(props: Props<ModelType>) 
     {
         super(props);
-        console.log("CONSTRUCTOR");
 
         this.unsubscribers = [];
         this.state = 
@@ -75,11 +74,9 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
     scrollToSavedPosition = (animated: boolean = false) =>
     {
         const saved = ListManager.instance.getStoredOffset(this.props.listId);
-        console.log("scrollToSavedPosition - " + saved);
 
         if(saved)
         {
-            console.log("scrollToSavedPosition - if");
             this.scrollTo(saved, animated);
         }
     }
@@ -100,9 +97,7 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
 
     componentDidMount = () =>
     {
-        console.log("componentWillMount - start");
         this.onListReference(this.list || null);
-        console.log("componentWillMount - end");
     }
 
     onScroll = (event?: NativeSyntheticEvent<NativeScrollEvent>) =>
@@ -126,16 +121,12 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
     
     onListReference = (reference: FlatList<ModelType> | null) =>
     {
-        console.log("onListReference - start");
         if(reference == null)
         {
-            console.log("onListReference - if");
             this.list = undefined;
         }
         else
         {
-            console.log("onListReference - else");
-
             this.list = reference;
             this.scrollToSavedPosition();
         }
