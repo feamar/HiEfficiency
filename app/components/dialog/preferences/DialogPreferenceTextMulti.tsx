@@ -92,7 +92,7 @@ export default class DialogPreferenceTextMulti<Fields> extends React.Component<P
                 {
                     return (
                         <View key={element.field} style={styles.element}>
-                            <TextInput blurOnSubmit={false} onFocus={() =>{console.log("FOCUSSING: " + index)}} autoFocus={index == 0} label={element.label} value={storageValue[element.field]} onChangeText={this.onTextInputChanged(element.field)} multiline={element.multiline} numberOfLines={element.numberOfLines} />
+                            <TextInput blurOnSubmit={false} autoFocus={index == 0} label={element.label} value={storageValue[element.field]} onChangeText={this.onTextInputChanged(element.field)} multiline={element.multiline} numberOfLines={element.numberOfLines} />
                         </View>
                     );
                 })}

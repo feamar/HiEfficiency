@@ -56,12 +56,9 @@ export default class CustomDrawer extends Component<Props, State>
         var handled = false;
         
         const injection = navigation.getParam("onDrawerNavigation");
-        console.log("on Navigation Item Pressed: " + injection);
         if(injection)
         {
-            console.log("HERE 1!");
             handled = injection(route);
-            console.log("HERE 2!: " + handled);
         }
 
         if(handled == false)

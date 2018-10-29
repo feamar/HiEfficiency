@@ -51,7 +51,7 @@ const styles = StyleSheet.create(
 
 export default <B extends ConcreteComponent & RequiredFunctions, C extends ConcreteOrHigher<B, C, RequiredFunctions, P>, P>(WrappedComponent: ConcreteOrHigherConstructor<B, C, RequiredFunctions, P>, options: ListFillerOption) =>
 {
-    const hoc = class WithKeyboardListener extends AbstractHigherOrderComponent<B, C, RequiredFunctions, P, HocProps & P, HocState>
+    const hoc = class WithEmptyListFiller extends AbstractHigherOrderComponent<B, C, RequiredFunctions, P, HocProps & P, HocState>
     {
         constructor(props: P & HocProps)
         {

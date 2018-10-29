@@ -4,7 +4,6 @@ import Theme from '../../../styles/Theme';
 import AbstractDialog, { AbstractDialog_Props_Virtual } from '../AbstractDialog';
 import update, {Spec} from "immutability-helper";
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
-import UtilityObject from '../../../utilities/UtilityObject';
  
 interface AbstractPreferenceDialog_Props_Sealed<StorageValue> 
 {
@@ -36,13 +35,11 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
 {
     public base: AbstractDialog | undefined;
     private inputBackup?: StorageValue;
-    private hash: number;
 
     constructor(props: Props<StorageValue>) 
     {
         super(props);
 
-        this.hash = Math.floor(Math.random() * 100);
         this.state = 
         {
             storageValue: this.props.storageValue,
@@ -173,19 +170,16 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
 
     onDialogClosed = () =>
     {       
-        console.log(this.hash + " - onDialogClosed: " + UtilityObject.stringify(this.state.storageValue));
         setTimeout(() => this.setState({error: undefined, storageValue: this.getOriginalStorageValue() || {} as StorageValue}), 500);
     }
 
     onDialogDismissed = () =>
     {
-        console.log(this.hash + " - onDialogDismissed: " + UtilityObject.stringify(this.state.storageValue));
         this.inputBackup = this.state.storageValue;
     }
 
     setStorageValue = (storageValue: StorageValue) =>
     {
-        console.log(this.hash + " - setStorageValue: " + UtilityObject.stringify(storageValue));
         this.setState({storageValue: storageValue});
     }
 

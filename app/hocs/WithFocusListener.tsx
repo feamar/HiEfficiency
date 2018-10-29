@@ -4,12 +4,12 @@ import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstru
 import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
 import { NavigationEventSubscription } from "react-navigation";
 
-interface HocProps
+export interface WithFocusListener_RequiredProps
 {
     navigation: HiEfficiencyNavigator
 }
 
-export interface RequiredFunctions 
+export interface WithFocusListener_RequiredFunctions 
 {
     onScreenWillFocus?: (payload: any) => void,
     onScreenDidFocus?: (payload: any) => void,
@@ -17,13 +17,13 @@ export interface RequiredFunctions
     onScreenDidBlur?: (payload: any) => void
 }
 
-export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, RequiredFunctions, P>, P extends HocProps> (WrappedComponent: ConcreteOrHigherConstructor<B, C, RequiredFunctions, P>) =>
+export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, WithFocusListener_RequiredFunctions, P>, P extends WithFocusListener_RequiredProps> (WrappedComponent: ConcreteOrHigherConstructor<B, C, WithFocusListener_RequiredFunctions, P>) =>
 {
-    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, RequiredFunctions, P, HocProps & P>
+    const hoc = class HOC extends AbstractHigherOrderComponent<B, C, WithFocusListener_RequiredFunctions, P, WithFocusListener_RequiredProps & P>
     {
         private readonly unsubscribers: Array<NavigationEventSubscription>;
 
-        constructor(props: HocProps & P)
+        constructor(props: WithFocusListener_RequiredProps & P)
         {
             super(props);
 
@@ -81,7 +81,7 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Re
             });
         }
         
-        onComponentDidMount = () =>
+        onComponentWillUnmount = () =>
         {   this.unsubscribers.forEach(unsubscriber => unsubscriber.remove());}
 
         render()

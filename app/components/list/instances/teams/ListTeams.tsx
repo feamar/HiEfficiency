@@ -1,12 +1,12 @@
 import React, {Component} from "react";
-import AbstractList, { AbstractListPropsVirtual } from "../../abstractions/list/AbstractList";
+import AbstractList, { AbstractList_Props_Virtual } from "../../abstractions/list/AbstractList";
 import ListItemTeam from "./ListItemTeam";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ReduxTeam from "../../../../dtos/redux/ReduxTeam";
 import WithEmptyListFiller from "../../../../hocs/WithEmptyListFiller";
 import ListFillerOption from "../../../../dtos/options/ListFillerOption";
 
-type Props = AbstractListPropsVirtual<ReduxTeam> & 
+type Props = AbstractList_Props_Virtual<ReduxTeam> & 
 {
  
 }
@@ -49,5 +49,5 @@ class ListTeams extends Component<Props, State> implements Baseable<AbstractList
 } 
 
 
-const hoc1 = WithEmptyListFiller<ListTeams, ListTeams, Props>(ListTeams, ListFillerOption.Awkward);
+const hoc1 = WithEmptyListFiller<ListTeams, ListTeams, Props>(ListTeams, ListFillerOption.NoTeamsJoined);
 export default hoc1;

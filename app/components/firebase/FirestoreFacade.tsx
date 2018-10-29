@@ -157,7 +157,7 @@ export default class FirestoreFacade
                     warning={undefined} 
                     onTimeout={() => {}}
                     baseRef={ref}
-                    onClose={() => {console.log("ON CLOSE DIALOG!"); removeDialogCallback(id); resolve();}} />
+                    onClose={() => { removeDialogCallback(id); resolve();}} />
             }
 
             addDialogCallback(getDialog, id);

@@ -22,7 +22,8 @@ import ListStories from "../list/instances/stories/ListStories";
 import ActionOption from "../../dtos/options/ActionOption";
 import WithEmptyListFiller from "../../hocs/WithEmptyListFiller";
 import ListFillerOption from "../../dtos/options/ListFillerOption";
-import { AbstractListPropsVirtual } from "../list/abstractions/list/AbstractList";
+import { AbstractList_Props_Virtual } from "../list/abstractions/list/AbstractList";
+import equal from "deep-equal";
 
 interface ReduxStateProps
 {
@@ -71,6 +72,7 @@ class ScreenStoryBoard extends Component<Props, State>
   private team: AbstractFirestoreDocument<DocumentTeam>
   private dialogConfirmDelete?: ConcreteDialogConfirmation
   private itemToDelete?: ReduxStory;
+  private list: ListStories | undefined;
 
 
   constructor(props: Props)
@@ -86,6 +88,14 @@ class ScreenStoryBoard extends Component<Props, State>
       storyListItems: this.getStoryListItems(props),
     }
   }  
+
+  shouldComponentUpdate = (nextProps: Readonly<Props>, nextState: Readonly<State>, _nextContext: Readonly<any>) =>
+  {
+    if(equal(nextProps, this.props) && equal(this.state, nextState))
+    {   return false;}
+
+    return true;
+  }
 
   componentWillReceiveProps = (props: Props) =>
   {
@@ -109,7 +119,6 @@ class ScreenStoryBoard extends Component<Props, State>
       {   shouldBeLoading = true;}
     }
 
-    console.log("Should Load: " + shouldBeLoading);
     return this.props.setLoading(shouldBeLoading);
   }
 
@@ -273,23 +282,23 @@ class ScreenStoryBoard extends Component<Props, State>
     return result;
   }
 
+
   getListComponent = (mode: StoryboardMode) =>
   {
-    var Hoc = ListStories;
     switch(mode)
     { 
       case "Todo":
-        Hoc = WithEmptyListFiller<ListStories, ListStories, AbstractListPropsVirtual<ReduxStory>>(ListStories, ListFillerOption.Bored);
-        break;
+        const Hoc1 = WithEmptyListFiller<ListStories, ListStories, AbstractList_Props_Virtual<ReduxStory>>(ListStories, ListFillerOption.NoExistingStories);
+        return <Hoc1 navigation={this.props.navigation} listId={"stories-todo"}  concreteRef={(i: ListStories | undefined) => this.list = i} containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
 
       case "Doing":
-        Hoc = WithEmptyListFiller<ListStories, ListStories, AbstractListPropsVirtual<ReduxStory>>(ListStories, ListFillerOption.Happy);
-        break;
-      
-    }
+        const Hoc2 = WithEmptyListFiller<ListStories, ListStories, AbstractList_Props_Virtual<ReduxStory>>(ListStories, ListFillerOption.NoStoriesInProgress);
+        return <Hoc2 navigation={this.props.navigation} listId={"stories-doing"}  concreteRef={(i: ListStories | undefined) => this.list = i} containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
 
-    const component = <Hoc containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
-    return component;
+      default:
+        const Hoc3 = WithEmptyListFiller<ListStories, ListStories, AbstractList_Props_Virtual<ReduxStory>>(ListStories, ListFillerOption.NoWorkCompleted);
+        return <Hoc3 navigation={this.props.navigation} listId={"stories-done"}  concreteRef={(i: ListStories | undefined) => this.list = i} containerHasFab={true} items={this.state.storyListItems} onItemSelected={this.onItemSelected} onContextMenuItemSelected={this.onContextMenuItemSelected} />
+    }
   }
   
   render()   

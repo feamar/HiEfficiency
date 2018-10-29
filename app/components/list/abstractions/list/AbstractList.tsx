@@ -1,17 +1,22 @@
 import React, {Component} from "react";
-import {View, FlatList} from "react-native";
+import {View, FlatList, NativeSyntheticEvent, NativeScrollEvent} from "react-native";
 import ActionOption from "../../../../dtos/options/ActionOption";
 import equal from "deep-equal";
+import ListManager from "../../ListManager";
+import { HiEfficiencyNavigator } from "../../../routing/RoutingTypes";
+import { NavigationEventSubscription } from "react-navigation";
 
-export interface AbstractListPropsVirtual<ModelType>
+export interface AbstractList_Props_Virtual<ModelType>
 {
     items: Array<ModelType>,
     containerHasFab?: boolean,
     onItemSelected?: (item: ModelType, index: number) => void,
     onContextMenuItemSelected?: (item: ModelType, index: number, option: ActionOption) => void,
+    listId: string,
+    navigation: HiEfficiencyNavigator
 }
 
-interface AbstractListPropsSealed<ModelType>
+interface AbstractList_Props_Sealed<ModelType>
 {
     getItemLayout?: (data: ModelType[] | null, index: number) => {
         length: number,
@@ -22,27 +27,31 @@ interface AbstractListPropsSealed<ModelType>
     getItemKey: (item: ModelType) => string
 }
 
-type Props<ModelType> = AbstractListPropsVirtual<ModelType> & AbstractListPropsSealed<ModelType>
+type Props<ModelType> = AbstractList_Props_Virtual<ModelType> & AbstractList_Props_Sealed<ModelType>
 
 interface State<ModelType>
 {
     items: Array<ModelType>,
-    containerHasFab: boolean
+    containerHasFab: boolean,
 }
 
 export default class AbstractList<ModelType> extends Component<Props<ModelType>, State<ModelType>>
 {
+    private unsubscribers: Array<NavigationEventSubscription>;
+    private list?: FlatList<ModelType>; 
+
     constructor(props: Props<ModelType>) 
     {
         super(props);
+        console.log("CONSTRUCTOR");
 
+        this.unsubscribers = [];
         this.state = 
         {
             items: this.props.items,
-            containerHasFab: this.props.containerHasFab || false
+            containerHasFab: this.props.containerHasFab || false,
         }
     }
-
 
     shouldComponentUpdate = (nextProps: Readonly<Props<ModelType>>, nextState: Readonly<State<ModelType>>, _nextContext: Readonly<any>) =>
     {
@@ -51,7 +60,6 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
 
         return true;
     }
-
 
     componentWillReceiveProps(props: Props<ModelType>) 
     {   this.setState({items: props.items, containerHasFab: props.containerHasFab || false});}
@@ -64,13 +72,79 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
         return null;
     }
 
+    scrollToSavedPosition = (animated: boolean = false) =>
+    {
+        const saved = ListManager.instance.getStoredOffset(this.props.listId);
+        console.log("scrollToSavedPosition - " + saved);
 
+        if(saved)
+        {
+            console.log("scrollToSavedPosition - if");
+            this.scrollTo(saved, animated);
+        }
+    }
 
+    componentWillMount = () =>
+    {  
+        var unsubscriber = this.props.navigation.addListener('willFocus', (payload) => {this.onScreenWillFocus(payload)});
+        this.unsubscribers.push(unsubscriber);
+    }
+
+    componentWillUnmount = () =>
+    {   this.unsubscribers.forEach(unsubscriber => unsubscriber.remove());}
+
+    onScreenWillFocus = (_payload: any) =>
+    {
+        this.onListReference(this.list || null);
+    }
+
+    componentDidMount = () =>
+    {
+        console.log("componentWillMount - start");
+        this.onListReference(this.list || null);
+        console.log("componentWillMount - end");
+    }
+
+    onScroll = (event?: NativeSyntheticEvent<NativeScrollEvent>) =>
+    {
+        if(event)
+        {
+            ListManager.instance.onScrollOffsetChanged(this.props.listId, event.nativeEvent.contentOffset.y);
+        }
+    }
+
+    scrollTo = (offset: number, animated: boolean = false) =>
+    {
+        if(this.list)
+        {   
+            this.list.scrollToOffset({animated: animated, offset: offset});
+            return true;
+        }
+
+        return false;
+    }
     
+    onListReference = (reference: FlatList<ModelType> | null) =>
+    {
+        console.log("onListReference - start");
+        if(reference == null)
+        {
+            console.log("onListReference - if");
+            this.list = undefined;
+        }
+        else
+        {
+            console.log("onListReference - else");
+
+            this.list = reference;
+            this.scrollToSavedPosition();
+        }
+    }
+
     render() 
     {
         return(
-            <FlatList getItemLayout={this.props.getItemLayout} updateCellsBatchingPeriod={50} removeClippedSubviews={true} data={this.state.items} keyExtractor={this.props.getItemKey} renderItem={(data) => this.props.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
+            <FlatList ref={this.onListReference} onScroll={this.onScroll} getItemLayout={this.props.getItemLayout} updateCellsBatchingPeriod={50} removeClippedSubviews={true} data={this.state.items} keyExtractor={this.props.getItemKey} renderItem={(data) => this.props.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
         ); 
     }    
 }

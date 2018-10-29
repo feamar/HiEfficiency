@@ -9,7 +9,6 @@ import UtilityTime from '../../../utilities/UtilityTime';
 import UtilityNumber from '../../../utilities/UtilityNumber';
 import InputError from '../../inputs/InputError';
 import { Baseable, onBaseReference } from '../../../render_props/Baseable';
-import UtilityObject from '../../../utilities/UtilityObject';
 
 export const VALUE_SEPARATOR = "|";
 
@@ -74,16 +73,13 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
 
     onCheckboxPress = (index: number) => () => 
     {
-        console.log("onCheckboxPress!");
         if(this.base)
         {
 
             const field: keyof EntitySchemaWeek | undefined = EntitySchemaWeek.getPropertyByIndex(index);
-            console.log("onCheckboxPress 1: field");    
             if(field != undefined)
             {
                 const sv = this.base.getCurrentStorageValue();
-                console.log("onCheckboxPress 2: " + sv);    
 
                 if(sv == null)
                 {   return;}
@@ -122,15 +118,12 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
     onValueValidation = (storageValue: EntitySchemaWeek): string | undefined =>
     {
         var error: string | undefined;
-        console.log("ON VALUE VALIDATRION INTERNAL: " + UtilityObject.stringify(storageValue));
 
         storageValue.forEachDay((day, _index) => 
         {
-            console.log("START " + day.start + " AND END: " + day.end);
             if(this.isBefore(day.end, day.start))
             {   error = "Please make sure the end of your workday is after the start of your workday."}
         });
-        console.log("ON VALUE VALIDATRION INTERNAL: " + error);
 
         return error;
     }
@@ -202,16 +195,13 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
 
     onRangeChange = (index: number) => (component: "start" | "end", timestamp: Date) =>
     {
-        console.log("onRangeChange: " + this.base);
         if(this.base == undefined)
         {   return;}
 
-        console.log("onRangechange: " + component + ": " + timestamp.getHours() + ":" + timestamp.getMinutes());
 
         const display = this.toDisplayValue(timestamp);
         const field = EntitySchemaWeek.getPropertyByIndex(index);
 
-        console.log("INdex: " + index + " AND " + field);
         if(field)
         {   
             const sv = this.base.getCurrentStorageValue() || EntitySchemaWeek.default();

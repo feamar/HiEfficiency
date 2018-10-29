@@ -1,11 +1,11 @@
 import React, {Component} from "react";
-import AbstractList, { AbstractListPropsVirtual } from "../../abstractions/list/AbstractList";
+import AbstractList, { AbstractList_Props_Virtual } from "../../abstractions/list/AbstractList";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ListItemStory from "./ListItemStory";
 import ReduxStory from "../../../../dtos/redux/ReduxStory";
 import equal from "deep-equal";
 
-type Props = AbstractListPropsVirtual<ReduxStory> & 
+type Props = AbstractList_Props_Virtual<ReduxStory> & 
 {
  
 }

@@ -16,9 +16,10 @@ export default class ListFillerOption
         this.subtitle = subtitle;
     }
 
-    public static readonly  Awkward: ListFillerOption = new ListFillerOption(<FillerAwkward />, "You don't have to feel alone...", "Tap the action button below to create or join a team.");
-    public static readonly  Happy: ListFillerOption = new ListFillerOption(<FillerHappy />, "I see you've completed all your work!", "Swipe left to get even more done!");
-    public static readonly  Bored: ListFillerOption = new ListFillerOption(<FillerBored />, "It's a bit boring here, isn't it?", "Tap the action button below to create new stories.");
+    public static readonly NoWorkCompleted: ListFillerOption = new ListFillerOption(<FillerAwkward />, "You have not yet completed any work...", "Swipe left to get some work done!");
+    public static readonly  NoTeamsJoined: ListFillerOption = new ListFillerOption(<FillerAwkward />, "You don't have to feel alone...", "Tap the action button below to create or join a team.");
+    public static readonly  NoStoriesInProgress: ListFillerOption = new ListFillerOption(<FillerHappy />, "I see you've completed all your work!", "Swipe left to get even more done!");
+    public static readonly  NoExistingStories: ListFillerOption = new ListFillerOption(<FillerBored />, "It's a bit boring here, isn't it?", "Tap the action button below to create new stories.");
 
-    public static Values = [ListFillerOption.Awkward, ListFillerOption.Happy, ListFillerOption.Bored];
+    public static Values = [ListFillerOption.NoTeamsJoined, ListFillerOption.NoStoriesInProgress, ListFillerOption.NoExistingStories];
 }
