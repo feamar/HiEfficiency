@@ -235,7 +235,6 @@ class ScreenStoryCreate extends Component<Props, State>
                 break;
         }
 
-        this.unsavedChanges = false;
         this.setState({fabEnabled: true});
     }
 

@@ -18,7 +18,7 @@ import ScreenLogin from "../screens/ScreenLogin";
 import ScreenTeams from "../screens/ScreenTeams";
 import ScreenProfile from "../screens/ScreenProfile";
 import ScreenStoryBoard from '../screens/ScreenStoryBoard';
-import ScreenStoryDetailsInterruptions from '../screens/ScreenStoryDetailsInterruptions';
+import ScreenStoryDetailsTimeline from '../screens/ScreenStoryDetailsTimeline';
 import ScreenStoryCreate from '../screens/ScreenStoryCreate';
 import ScreenTeamEdit from '../screens/ScreenTeamEdit';
 import ScreenStoryAnalysis from '../screens/ScreenStoryAnalysis';
@@ -236,7 +236,7 @@ export default class Router
     return createMaterialTopTabNavigator ({
       [SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS]:
       {
-        screen: ScreenStoryDetailsInterruptions,
+        screen: ScreenStoryDetailsTimeline,
         navigationOptions: getNavigationOptions("Timeline", getBackIcon())
       },
       [SCREEN_NAME_STORY_DETAILS_INFO]:

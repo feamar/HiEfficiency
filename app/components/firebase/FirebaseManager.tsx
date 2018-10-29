@@ -217,6 +217,7 @@ export default class FirebaseManager
           } 
         } 
 
+        console.log("LONG TERM BUG LOG: onStoryDocumentsChanged: " + documents.length);
         this.store!.dispatch(new ActionStoriesOfTeamLoaded(teamId, documents));
     }
 

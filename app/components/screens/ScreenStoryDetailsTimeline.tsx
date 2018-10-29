@@ -141,7 +141,7 @@ const mapDispatchToProps = (dispatch: Dispatch): ReduxDispatchProps =>
     }
 } 
 
-class ScreenStoryDetailsInterruptions extends Component<Props, State> implements WithOverflowMenu_RequiredFunctions
+class ScreenStoryDetailsTimeline extends Component<Props, State> implements WithOverflowMenu_RequiredFunctions
 {
     static displayName = "Story Details Interruptions";
 
@@ -251,13 +251,10 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
         if(this.story == undefined)
         {   return;}
 
-        this.showConfirmationDialog("Start Issue", "Are you sure you want to start working on this issue?", "Start", async() => 
+        await this.props.database.inDialog("dialog-starting-story", this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
         {
-            await this.props.database.inDialog("dialog-starting-story", this.props.addDialog, this.props.removeDialog, "Starting Story", async (execute) => 
-            {
-                const update = this.props.database.updateStory(this.props.inspecting.team!, this.story.document.id!, this.story.document.data, {startedOn: {$set: new Date()}});
-                await execute(update, false);
-            });
+            const update = this.props.database.updateStory(this.props.inspecting.team!, this.story.document.id!, this.story.document.data, {startedOn: {$set: new Date()}});
+            await execute(update, false);
         });
     }
 
@@ -902,10 +899,10 @@ class ScreenStoryDetailsInterruptions extends Component<Props, State> implements
     }
 
     private log = (method:string,  message: string) =>
-    {   console.log(ScreenStoryDetailsInterruptions.displayName + " - " + method + " - " + message);}
+    {   console.log(ScreenStoryDetailsTimeline.displayName + " - " + method + " - " + message);}
 } 
 
-const hoc1 = WithReduxSubscription<ScreenStoryDetailsInterruptions, ScreenStoryDetailsInterruptions, Props, ReduxStateProps, ReduxDispatchProps>(mapStateToProps, mapDispatchToProps)(ScreenStoryDetailsInterruptions);
+const hoc1 = WithReduxSubscription<ScreenStoryDetailsTimeline, ScreenStoryDetailsTimeline, Props, ReduxStateProps, ReduxDispatchProps>(mapStateToProps, mapDispatchToProps)(ScreenStoryDetailsTimeline);
 const hoc2 = WithOverflowMenu(hoc1);
 const hoc3 = WithDatabase(hoc2);
 const hoc4 = WithDialogContainer(hoc3);
