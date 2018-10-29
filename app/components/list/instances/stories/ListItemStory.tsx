@@ -92,7 +92,8 @@ export default class ListItemStory extends React.Component<Props, State> impleme
         if(reference)
         {
             await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));
-            await reference.addContextMenuItem(new ActionOption(ActionType.UPVOTE, "Upvote"));
+            if(reference.state.item.document.data.finishedOn == undefined)
+            {   await reference.addContextMenuItem(new ActionOption(ActionType.UPVOTE, "Upvote"));}
             await reference.addContextMenuItem(new ActionOption(ActionType.DELETE, "Delete"));
         }
     }
