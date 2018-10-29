@@ -70,6 +70,8 @@ export default class AbstractHigherOrderComponent<B, C extends ConcreteOrHigher<
         if(this.wrapped == undefined)
         {   return [];}
 
+        console.log("forEachWrappedComponent: " + this.wrapped.constructor.name);
+
         var result: Array<ResultType> = [];
         if(this.wrapped instanceof AbstractHigherOrderComponent)
         {   

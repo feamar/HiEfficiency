@@ -19,6 +19,8 @@ import PreferenceWeekSchema from '../preferences/field/PreferenceWeekSchema';
 import DialogConfirmation, { ConcreteDialogConfirmation, DialogConfirmationActionUnion } from '../dialog/instances/DialogConfirmation';
 import { DialogPreferenceText_StorageValue } from '../dialog/preferences/DialogPreferenceText';
 import UserUpdate from '../firebase/crud/UserUpdate';
+import WithDrawerNavigationInterceptor, { WithDrawerInterceptorFunctions } from '../../hocs/WithDrawerNavigationInterceptor';
+import { NavigationRoute } from 'react-navigation';
 
 const styles = {
   content: {padding: 0, height: "100%"}
@@ -50,11 +52,11 @@ const mapStateToProps = (state: ReduxState): SP =>
   }
 }
 
-class ScreenProfile extends React.Component<Props, State>
+class ScreenProfile extends React.Component<Props, State> implements WithDrawerInterceptorFunctions
 {
   static displayName = "Screen Profile";
 
-  private dialogConfirmation?: ConcreteDialogConfirmation;
+  private concreteDialogConfirmation?: ConcreteDialogConfirmation;
   private unsavedChanges: boolean = false;
 
   constructor(props: Props, _?: any)
@@ -120,28 +122,62 @@ class ScreenProfile extends React.Component<Props, State>
 
   onSoftwareBackPress = () =>
   {
-      if(this.unsavedChanges == false || this.dialogConfirmation == undefined)
+      if(this.unsavedChanges == false || this.concreteDialogConfirmation == undefined)
       {
         this.props.navigation.navigate(STACK_NAME_TEAMS);
         return true;
       }
 
-      const base = this.dialogConfirmation.base;
+      const listener = (_: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
+      {
+          switch(action) 
+          {
+              case "Positive":
+                this.props.navigation.navigate(STACK_NAME_TEAMS);
+                break;
+          }
+
+          if(this.concreteDialogConfirmation)
+          {   this.concreteDialogConfirmation.removeOnActionClickedListener(listener);}
+      };
+
+      this.concreteDialogConfirmation.addOnActionClickedListener(listener);
+
+      const base = this.concreteDialogConfirmation.base;
       if(base)
       {   base.setVisible(true);}
 
       return true;
   }
 
-  onDialogConfirmed = (_: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
+  onDrawerNavigation = (navigationTarget: NavigationRoute) =>
   {
-      switch(action) 
+    if(this.unsavedChanges == false || this.concreteDialogConfirmation == undefined)
+    {   return false;}
+
+    const listener = (_: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
+    {
+      switch(action)
       {
-          case "Positive":
-            this.props.navigation.navigate(STACK_NAME_TEAMS);
-            break;
+        case "Positive":
+          this.props.navigation.navigate(navigationTarget.key);
+          break;
       }
+
+      if(this.concreteDialogConfirmation)
+      { this.concreteDialogConfirmation.removeOnActionClickedListener(listener)};
+    }
+
+    this.concreteDialogConfirmation.addOnActionClickedListener(listener);
+
+    const base = this.concreteDialogConfirmation.base;
+    if(base == undefined)
+    {   return false;}
+
+    base.setVisible(true);
+    return true;
   }
+
 
   render()
   {
@@ -160,7 +196,7 @@ class ScreenProfile extends React.Component<Props, State>
           </PreferenceCategory> 
         </View>
         <InputFloatingActionButton enabled={this.state.fabEnabled} icon="save" onPress={this.onFabPress}  />
-        <DialogConfirmation concreteRef={i => this.dialogConfirmation = i} title="Unsaved Changes" onActionClickListener={this.onDialogConfirmed} textPositive="Discard" message="There are unsaved changes to the profile. Are you sure you want to go back and discard your unsaved changes?"  />
+        <DialogConfirmation concreteRef={i => this.concreteDialogConfirmation = i} title="Unsaved Changes" textPositive="Discard" message="There are unsaved changes to the profile. Are you sure you want to go back and discard your unsaved changes?"  />
       </View>
     ); 
   }
@@ -170,6 +206,7 @@ const hoc1 = WithReduxSubscription<ScreenProfile, ScreenProfile, Props, SP, {}>(
 const hoc2 = WithDatabase(hoc1);
 const hoc3 = WithDialogContainer(hoc2);
 const hoc4 = WithBackButtonInterceptor(hoc3);
-const hoc5 = WithLoading(hoc4);
+const hoc5 = WithDrawerNavigationInterceptor(hoc4);
+const hoc6 = WithLoading(hoc5);
 
-export default hoc5;
+export default hoc6;

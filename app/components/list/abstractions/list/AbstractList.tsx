@@ -70,7 +70,7 @@ export default class AbstractList<ModelType> extends Component<Props<ModelType>,
     render() 
     {
         return(
-            <FlatList getItemLayout={this.props.getItemLayout} updateCellsBatchingPeriod={100} removeClippedSubviews={true} data={this.state.items} keyExtractor={this.props.getItemKey} renderItem={(data) => this.props.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
+            <FlatList getItemLayout={this.props.getItemLayout} updateCellsBatchingPeriod={50} removeClippedSubviews={true} data={this.state.items} keyExtractor={this.props.getItemKey} renderItem={(data) => this.props.getListItemFor(data.item, data.index)} ListFooterComponent={this.getListFooterComponent()} />
         ); 
     }    
 }

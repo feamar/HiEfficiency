@@ -5,7 +5,7 @@ import { View, ScrollView, Image, StyleSheet} from "react-native";
 import {Text, TouchableRipple, Divider} from "react-native-paper";
 import VersionNumber from 'react-native-version-number';
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
-import { CustomNavigationState, CustomNavigationParams } from "./RoutingTypes";
+import { CustomNavigationState, CustomNavigationParams, HiEfficiencyNavigator } from "./RoutingTypes";
 
 var styles = StyleSheet.create({
     root:{
@@ -51,8 +51,22 @@ interface State
 
 export default class CustomDrawer extends Component<Props, State>
 {
-    onNavigationItemPressed = (route: NavigationRoute) => () =>
-    {   this.props.navigation.navigate(route.key);  }
+    onNavigationItemPressed = (navigation: HiEfficiencyNavigator, route: NavigationRoute) => () =>
+    {
+        var handled = false;
+        
+        const injection = navigation.getParam("onDrawerNavigation");
+        console.log("on Navigation Item Pressed: " + injection);
+        if(injection)
+        {
+            console.log("HERE 1!");
+            handled = injection(route);
+            console.log("HERE 2!: " + handled);
+        }
+
+        if(handled == false)
+        {   this.props.navigation.navigate(route.key);}
+    }
 
     getItemStyle = (active: boolean) =>
     {
@@ -74,7 +88,7 @@ export default class CustomDrawer extends Component<Props, State>
         return styles;
     }
 
-    getNavigationItem = (route: NavigationRoute) =>
+    getNavigationItem = (navigation: HiEfficiencyNavigator, route: NavigationRoute) =>
     {
         const active = this.props.activeItemKey == route.key;
         
@@ -82,7 +96,7 @@ export default class CustomDrawer extends Component<Props, State>
 
         return (
             <View key={route.key}>
-                <TouchableRipple disabled={active} style={styles.touchable} onPress={this.onNavigationItemPressed(route)}>
+                <TouchableRipple disabled={active} style={styles.touchable} onPress={this.onNavigationItemPressed(navigation, route)}>
                     <Text style={styles.title}>{route.key}</Text>
                 </TouchableRipple>
             </View>
@@ -107,7 +121,7 @@ export default class CustomDrawer extends Component<Props, State>
                 <Image style={styles.header} source={require('../../../assets/drawer_header.png')}/>
                 <ScrollView style={styles.scrollView}>
                     <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
-                    {this.props.navigation.state.routes.map(route => {   return this.getNavigationItem(route);})}
+                    {this.props.navigation.state.routes.map(route => {   return this.getNavigationItem(this.props.navigation as HiEfficiencyNavigator, route);})}
                     <Divider />
                     {this.getEventItem("Logout", () => {FirebaseAdapter.logout()})}
                     </SafeAreaView> 

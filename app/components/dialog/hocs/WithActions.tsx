@@ -3,24 +3,28 @@ import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstru
 
 export type OnActionClickedListener<B extends ConcreteComponent, A> = (baseComponent: B | undefined, action: A) => void;
 
-interface InjectedProps<A> 
-{   onActionClicked: (action: A) => void;}
+interface InjectedProps<B extends ConcreteComponent, A> 
+{
+    onActionClicked: (action: A) => void,
+    addOnActionClickedListener: (listener: OnActionClickedListener<B, A>) => boolean
+    removeOnActionClickedListener: (listener: OnActionClickedListener<B, A>) => boolean
+}
 
 interface ExternalProps<B extends ConcreteComponent, A>
 {   onActionClickListener?: OnActionClickedListener<B, A>;}
 
-export type WithActionPropsInner<P, A> = P & InjectedProps<A>;
+export type WithActionPropsInner<B extends ConcreteComponent, P, A> = P & InjectedProps<B, A>;
 type WithActionPropsOuter<B extends ConcreteComponent, A, P> = P & ExternalProps<B, A>
 
 export default <B extends ConcreteComponent, 
-                C extends ConcreteOrHigher<B, C, {}, WithActionPropsInner<P, A>>, 
+                C extends ConcreteOrHigher<B, C, {}, WithActionPropsInner<B, P, A>>, 
                 A, 
                 P> 
-                (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, WithActionPropsInner<P, A>>) =>
+                (WrappedComponent: ConcreteOrHigherConstructor<B, C, {}, WithActionPropsInner<B, P, A>>) =>
 {
-    const hoc = class WithActions extends AbstractHigherOrderComponent<B, C, {}, WithActionPropsInner<P, A>, WithActionPropsOuter<B, A, P>> 
+    const hoc = class WithActions extends AbstractHigherOrderComponent<B, C, {}, WithActionPropsInner<B, P, A>, WithActionPropsOuter<B, A, P>> 
     {
-        public readonly onActionClickedListeners: Array<OnActionClickedListener<B, A>>;
+        private onActionClickedListeners: Array<OnActionClickedListener<B, A>>;
 
         constructor(props: WithActionPropsOuter<C, A, P>)
         {
@@ -45,10 +49,35 @@ export default <B extends ConcreteComponent,
             });
         }
 
+        addOnActionClickedListener = (listener: OnActionClickedListener<B, A>) =>
+        {
+            if(this.onActionClickedListeners.includes(listener))
+            {   return false;}
+
+            this.onActionClickedListeners.push(listener);
+            return true;
+        }
+
+        removeOnActionClickedListener = (listener: OnActionClickedListener<B, A>) =>
+        {
+            const index = this.onActionClickedListeners.indexOf(listener);
+            if(index < 0)
+            {   return false;}
+
+            this.onActionClickedListeners = this.onActionClickedListeners.splice(index, 1);
+
+            return true;
+        }
+
         render()
         {
             let passthroughProps: Readonly<P> = this.props;
-            let innerProps: Readonly<WithActionPropsInner<P, A>> = Object.assign({}, passthroughProps,{onActionClicked: this.onActionClicked});
+            let innerProps: Readonly<WithActionPropsInner<B, P, A>> = Object.assign({}, passthroughProps, 
+            {
+                onActionClicked: this.onActionClicked, 
+                addOnActionClickedListener: this.addOnActionClickedListener,
+                removeOnActionClickedListener: this.removeOnActionClickedListener
+            });
 
             return (
                 <WrappedComponent ref={this.onReference} {...innerProps} />

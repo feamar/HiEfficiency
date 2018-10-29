@@ -1,7 +1,7 @@
 import AbstractDialog, { AbstractDialog_Props_Virtual } from "../AbstractDialog";
 import React from "react";
 import {StyleSheet} from "react-native";
-import WithActions, { WithActionPropsInner } from "../hocs/WithActions";
+import WithActions, { WithActionPropsInner, OnActionClickedListener } from "../hocs/WithActions";
 import {Text, Button, Dialog } from 'react-native-paper';
 import Theme from "../../../styles/Theme";
 import { Baseable, onBaseReference } from "../../../render_props/Baseable";
@@ -32,7 +32,7 @@ interface State
 
 export type DialogConfirmationActionUnion = "Positive" | "Negative";
 
-type DialogConfirmationPropsAndInjected = WithActionPropsInner<DialogConfirmationProps, DialogConfirmationActionUnion>; 
+type DialogConfirmationPropsAndInjected = WithActionPropsInner<ConcreteDialogConfirmation, DialogConfirmationProps, DialogConfirmationActionUnion>; 
 
 
 export class ConcreteDialogConfirmation extends React.Component<DialogConfirmationPropsAndInjected, State> implements Baseable<AbstractDialog>
@@ -49,7 +49,7 @@ export class ConcreteDialogConfirmation extends React.Component<DialogConfirmati
         }
     }
 
-    getDialogContent =() =>
+    getDialogContent = () =>
     {
         return <Text style={styles.message}>{this.state.message}</Text>
     }
@@ -60,6 +60,12 @@ export class ConcreteDialogConfirmation extends React.Component<DialogConfirmati
         if(this.base)
         {   this.base.setVisible(false);}
     }
+
+    addOnActionClickedListener = (listener: OnActionClickedListener<ConcreteDialogConfirmation, DialogConfirmationActionUnion>) =>
+    {   return this.props.addOnActionClickedListener(listener);}
+    
+    removeOnActionClickedListener = (listener: OnActionClickedListener<ConcreteDialogConfirmation, DialogConfirmationActionUnion>) =>
+    {   return this.props.removeOnActionClickedListener(listener);}
 
     getDialogActions = () =>
     {

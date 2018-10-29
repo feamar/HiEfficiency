@@ -20,6 +20,7 @@ export interface CustomNavigationState
 export interface CustomNavigationParams
 {
   header_right_injection?: () => JSX.Element | undefined,
+  onDrawerNavigation?: (navigationTarget: NavigationRoute) => boolean,
   initial_route_name?: string,
   title: string,
   subtitle?: string,

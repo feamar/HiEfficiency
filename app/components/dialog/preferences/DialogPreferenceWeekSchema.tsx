@@ -253,7 +253,6 @@ export default class DialogPreferenceWeekSchema extends React.Component<Props, S
         //Check whether the current value array contains the current index.
         const enabled = this.isEnabled(index);
         const status = enabled ? "checked" : "unchecked";
-        console.log("STATUS: " + index + ": " + status);
         const dayName = this.days[index];
         return (
             <View style={styles.item} key={index}>
