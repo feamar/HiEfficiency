@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View} from "react-native";
-import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT, SCREEN_NAME_STORY_BOARD_DOING, PARAM_NAME_SUBTITLE} from "../routing/Router";
+import {STACK_NAME_STORY_BOARD, SCREEN_NAME_TEAM_EDIT, SCREEN_NAME_STORY_BOARD_DOING, PARAM_NAME_SUBTITLE, SCREEN_NAME_PROFILE} from "../routing/Router";
 import { FAB } from "react-native-paper";
 import ActionType from "../../enums/ActionType";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
@@ -19,6 +19,7 @@ import FabAction from "../../dtos/options/FabAction";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 import DialogPreferenceTextMulti, { TextElement, DialogPreferenceTextMulti_StorageValue } from "../dialog/preferences/DialogPreferenceTextMulti";
 import ActionOption from "../../dtos/options/ActionOption";
+import App from "../../../App";
 
 
 interface ReduxStateProps 
@@ -82,8 +83,13 @@ class ScreenTeams extends Component<Props, State>
       user: this.props.user,
       open: false,
       joinTeamInputBackup: {code: "", name: ""},
-      
     } 
+
+    if(App.userJustRegistered)
+    {   
+      App.userJustRegistered = false;
+      this.props.navigation.navigate(SCREEN_NAME_PROFILE);
+    }
 
     this.setLoading(this.props);
   }

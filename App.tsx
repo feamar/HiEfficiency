@@ -36,6 +36,9 @@ type State =
 
 export default class App extends React.Component<any, State>
 {
+  //Not very beautiful, but I don't currently know how to implement this better without spending an unordinate amount of time working it into Redux.
+  static userJustRegistered = false;
+
 
   private readonly store: Store<ReduxState>;
   private readonly unsubscribers: Array<() => void>;

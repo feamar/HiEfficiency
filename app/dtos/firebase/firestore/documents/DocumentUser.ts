@@ -1,6 +1,5 @@
 import { RNFirebase } from "react-native-firebase";
 import EntitySchemaWeek from "../entities/EntitySchemaWeek";
-import UtilityObject from "../../../../utilities/UtilityObject";
 import ReduxStory from "../../../redux/ReduxStory";
 import FirebaseAdapter from "../../../../components/firebase/FirebaseAdapter";
 import UtilityArray from "../../../../utilities/UtilityArray";

@@ -2,7 +2,6 @@ import AbstractFirestoreDocument from "../firebase/firestore/documents/AbstractF
 import DocumentStory from "../firebase/firestore/documents/DocumentStory";
 import ReduxInterruptions from "./ReduxInterruptions";
 import DocumentInterruptions from "../firebase/firestore/documents/DocumentInterruptions";
-import UtilityObject from "../../utilities/UtilityObject";
 import DocumentUser from "../firebase/firestore/documents/DocumentUser";
 
 export type StoryLifecycle = "Unstarted" | "Uninterrupted" | "Interrupted" | "Finished";

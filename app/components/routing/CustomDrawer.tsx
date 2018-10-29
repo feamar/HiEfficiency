@@ -6,6 +6,7 @@ import {Text, TouchableRipple, Divider} from "react-native-paper";
 import VersionNumber from 'react-native-version-number';
 import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import { CustomNavigationState, CustomNavigationParams, HiEfficiencyNavigator } from "./RoutingTypes";
+import App from "../../../App";
 
 var styles = StyleSheet.create({
     root:{
@@ -111,6 +112,12 @@ export default class CustomDrawer extends Component<Props, State>
         );        
     }
 
+    onLogout = () =>
+    {
+        App.userJustRegistered = false;
+        FirebaseAdapter.logout();
+    }
+
     render()
     {
         return (  
@@ -120,7 +127,7 @@ export default class CustomDrawer extends Component<Props, State>
                     <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
                     {this.props.navigation.state.routes.map(route => {   return this.getNavigationItem(this.props.navigation as HiEfficiencyNavigator, route);})}
                     <Divider />
-                    {this.getEventItem("Logout", () => {FirebaseAdapter.logout()})}
+                    {this.getEventItem("Logout", this.onLogout)}
                     </SafeAreaView> 
                 </ScrollView>
                 <Text style={styles.version}>Version {VersionNumber.appVersion}</Text>

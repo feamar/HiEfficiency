@@ -8,6 +8,7 @@ import WithDialogContainer, { WithDialogContainerProps } from "../../hocs/WithDi
 import ActionUserLoggedIn from "../../redux/actions/user/ActionUserLoggedIn";
 import { Dispatch } from "redux";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
+import App from "../../../App";
 
 const styles = StyleSheet.create({
   wrapper: 
@@ -116,14 +117,20 @@ class ScreenRegister extends React.Component<Props, State>
       //State change will automatically navigate to HOME route if successful.
       await this.props.database.inDialog("dialog-registering-account", this.props.addDialog, this.props.removeDialog, "Registering Account", async (execute) => 
       {   
+        App.userJustRegistered = true;
+
         const register = this.props.database.registerUser(this.state.email!, this.state.password!);
-        const result = await execute(register, true);
+        var result = await execute(register, true);
 
         if(result.successful == false)
-        {   return;}
+        {
+          return;
+        }
+
 
         const login = this.props.database.loginUser(this.state.email!, this.state.password!, this.props.onUserLoggedIn);
-        await execute(login, false);
+        result = await execute(login, false);
+
         
       }, 200);
     });
