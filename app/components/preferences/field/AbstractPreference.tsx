@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ViewStyle} from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import Theme from "../../../styles/Theme";
 
@@ -30,10 +30,11 @@ export interface AbstractPreference_Props_Virtual<StorageValue>
 {
     storageValue: StorageValue,
     title: string
-    onValueChanged: (value: StorageValue) => void,
+    onValueChanged?: (value: StorageValue) => void,
     onValueValidation?: (value: StorageValue) => string | undefined,
     onPreferencePress?: () => void,
-    required?: boolean
+    required?: boolean,
+    disabled?: boolean
 }
 
 interface AbstractPreference_Props_Sealed<StorageValue>
@@ -50,6 +51,7 @@ type Props<StorageValue> = AbstractPreference_Props_Sealed<StorageValue> & Abstr
 
 export interface AbstractPreferenceState<StorageValue>
 {
+    disabled: boolean, 
     required: boolean,
     title: string,
     storageValue: StorageValue,
@@ -65,6 +67,7 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
         super(props);
 
         this.state = { 
+            disabled: props.disabled || false,
             storageValue: props.storageValue || {} as StorageValue,
             title: props.title,
             required: props.required || false,
@@ -82,6 +85,9 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
 
         if(props.title != this.props.title)
         {   this.setState({title: props.title});}
+
+        if(props.disabled != this.props.disabled)
+        {   this.setState({disabled: props.disabled || this.state.disabled});}
     }
 
     componentWillMount = () =>
@@ -92,7 +98,7 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
         const display = this.props.toDisplayValue(storage);
         this.setState({storageValue: storage, displayValue: display});
         
-        if(notifyListeners)
+        if(notifyListeners && this.props.onValueChanged)
         {   this.props.onValueChanged(storage);}
     }
 
@@ -127,6 +133,9 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
 
     onPreferencePress = () => 
     {
+        if(this.state.disabled)
+        {   return;}
+
         if(this.props.onPreferencePressInternal)
         {   this.props.onPreferencePressInternal();}
 
@@ -134,10 +143,22 @@ export default class AbstractPreference<StorageValue extends {}> extends Compone
         {   this.props.onPreferencePress();}
     }
 
+    getViewStyle = (disabled: boolean): ViewStyle =>
+    {
+        if(disabled)
+        {
+            return {
+                opacity: 0.75
+            }
+        }
+        
+        return {}
+    }
+
     render(){
         return(
-            <View>
-                 <TouchableRipple disabled={false} onPress={this.onPreferencePress}>
+            <View style={this.getViewStyle(this.state.disabled)}>
+                 <TouchableRipple disabled={this.state.disabled} onPress={this.onPreferencePress}>
                     <View style={AbstractPreferenceStyles.root}>
                         {this.props.getDisplayContent(this.state)}
                         {this.state.error && this.getErrorComponent()}

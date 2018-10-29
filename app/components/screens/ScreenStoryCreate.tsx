@@ -277,6 +277,11 @@ class ScreenStoryCreate extends Component<Props, State>
                     <PreferenceCategory title="Optional">
                         <PreferenceText label="Story Points" ref={c => this.fields.points = c} plural={true} title="Story Points" storageValue={{text: storyPoints}} onValueChanged={this.onTextValueChanged("points")} onValueValidation={this.onValueValidation("points")} />
                     </PreferenceCategory>
+                    {this.mode == "Edit" && 
+                    <PreferenceCategory title="Additional Information">
+                        <PreferenceText disabled={true} label="Created On" title="Created On" storageValue={{text: this.state.story.document.data.createdOn.toDateString()}}></PreferenceText>
+                    </PreferenceCategory>
+                    }
                 </ScrollView>
                 <InputFloatingActionButton icon="save" onPress={this.onFabPress} enabled={this.state.fabEnabled}/>
                 <DialogConfirmation concreteRef={i => this.confirmationDialog = i} message="There are unsaved changes to the user story. Are you sure you want to go back and discard your unsaved changes?" title="Unsaved Changes" onActionClickListener={this.onDialogConfirmed} textPositive="Discard" textNegative="Cancel" />

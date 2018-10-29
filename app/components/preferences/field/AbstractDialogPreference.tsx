@@ -50,10 +50,16 @@ export default class AbstractDialogPreference<StorageValue extends {}> extends R
         }
     }
 
-    onDialogSubmit = (storageValue: StorageValue | null) =>
+    onDialogSubmit = (storageValue: StorageValue) =>
     {
         if(this.base)
-        {   this.base.onValueChanged(storageValue || {} as StorageValue);}
+        {   
+            this.base.onValueChanged(storageValue || {} as StorageValue);
+            return true;
+        }
+
+        return false;
+
     } 
 
     getEnterMessage = () =>
