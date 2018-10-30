@@ -1,4 +1,5 @@
 import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
+import { STACK_NAME_HOME } from "../components/routing/Router";
 
 export default class UtilityRouter
 {
@@ -30,5 +31,17 @@ export default class UtilityRouter
         {   return undefined;}
         else
         {   return UtilityRouter.getParentByName(parent, name);}
+    }
+
+    static forEachParentNavigator = (navigator: HiEfficiencyNavigator, closure: (navigator: HiEfficiencyNavigator, index: number) => void) =>
+    {
+        closure(navigator, navigator.state.index);
+
+        const parent = UtilityRouter.getParentNavigator(navigator);
+        if(parent == undefined)
+        {   return;}
+
+        if(parent.state.routeName != STACK_NAME_HOME)
+        {   UtilityRouter.forEachParentNavigator(parent, closure);}
     }
 }

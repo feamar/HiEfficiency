@@ -11,7 +11,6 @@ import
     NavigationState
 } from "react-navigation";
 
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import ScreenRegister from "../screens/ScreenRegister";
 import ScreenLogin from "../screens/ScreenLogin";
@@ -27,10 +26,11 @@ import ScreenStoryAnalysis from '../screens/ScreenStoryAnalysis';
 import Theme from '../../styles/Theme';
 import CustomDrawer from './CustomDrawer';
 import CustomHeader from './CustomHeader';
-import { TouchableRipple } from '../../../node_modules/react-native-paper';
-import {  CustomNavigationParams, HiEfficiencyNavigator } from './RoutingTypes';
+import {  CustomNavigationParams } from './RoutingTypes';
 import ScreenFeedback from '../screens/ScreenFeedback';
 import ScreenAbout from '../screens/ScreenAbout';
+import NavigationActionBack from './actions/NavigationActionBack';
+import NavigationActionHamburger from './actions/NavigationActionHamburger';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -139,7 +139,7 @@ export default class Router
       [SCREEN_NAME_FEEDBACK]:
       {
         screen: ScreenFeedback,
-        navigationOptions: getNavigationOptions("Feedback", getHamburgerIcon())
+        navigationOptions: getNavigationOptions("Feedback", <NavigationActionHamburger />)
       }
     }, {
       initialRouteName: SCREEN_NAME_FEEDBACK
@@ -152,7 +152,7 @@ export default class Router
       [SCREEN_NAME_ABOUT]:
       {
         screen: ScreenAbout,
-        navigationOptions: getNavigationOptions("About", getHamburgerIcon())
+        navigationOptions: getNavigationOptions("About", <NavigationActionHamburger />)
       }
     }, {
       initialRouteName: SCREEN_NAME_ABOUT
@@ -165,7 +165,7 @@ export default class Router
       [SCREEN_NAME_PROFILE]:
       {
         screen: ScreenProfile,
-        navigationOptions: getNavigationOptions("Profile", getHamburgerIcon())
+        navigationOptions: getNavigationOptions("Profile", <NavigationActionHamburger />)
       }
     }, {
       initialRouteName: SCREEN_NAME_PROFILE
@@ -178,27 +178,27 @@ export default class Router
       [SCREEN_NAME_TEAMS]:
       {
         screen: ScreenTeams,
-        navigationOptions: getNavigationOptions("Teams", getHamburgerIcon())
+        navigationOptions: getNavigationOptions("Teams", <NavigationActionHamburger />)
       },
       [SCREEN_NAME_TEAM_EDIT]:
       {
         screen: ScreenTeamEdit,
-        navigationOptions: getNavigationOptions("Edit Team", getBackIcon())
+        navigationOptions: getNavigationOptions("Edit Team", <NavigationActionBack />)
       },
       [STACK_NAME_STORY_BOARD]:
       {
         screen: Router.createStoryBoardStack(),
-        navigationOptions: getNavigationOptions("Storyboard", getBackIcon())
+        navigationOptions: getNavigationOptions("Storyboard", <NavigationActionBack />)
       },
       [STACK_NAME_STORY_DETAILS]:
       {
         screen: Router.createStoryDetailsStack(),
-        navigationOptions: getNavigationOptions("Story Details", getBackIcon())
+        navigationOptions: getNavigationOptions("Story Details", <NavigationActionBack />)
       },
       [SCREEN_NAME_STORY_CREATE]:
       {
         screen: ScreenStoryCreate,
-        navigationOptions: getNavigationOptions("Story Information", getBackIcon())
+        navigationOptions: getNavigationOptions("Story Information", <NavigationActionBack />)
       }
     }, {
       initialRouteName: SCREEN_NAME_TEAMS
@@ -212,17 +212,17 @@ export default class Router
       {
         //Props parameter is of type: NavigationContainerProps & NavigationNavigatorProps<any>,
         screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={"Todo"} />,
-        navigationOptions: getNavigationOptions("Todo", getBackIcon())
+        navigationOptions: getNavigationOptions("Todo", <NavigationActionBack />)
       },  
       [SCREEN_NAME_STORY_BOARD_DOING]:
       {
         screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={"Doing"} />,
-        navigationOptions: getNavigationOptions("Doing", getBackIcon())
+        navigationOptions: getNavigationOptions("Doing", <NavigationActionBack />)
       },
       [SCREEN_NAME_STORY_BOARD_DONE]:
       {
         screen: (props: NavigationContainer) => <ScreenStoryBoard {...props} mode={"Done"} />,
-        navigationOptions: getNavigationOptions("Done", getBackIcon())
+        navigationOptions: getNavigationOptions("Done", <NavigationActionBack />)
       }
     },
     {
@@ -237,17 +237,17 @@ export default class Router
       [SCREEN_NAME_STORY_DETAILS_INTERRUPTIONS]:
       {
         screen: ScreenStoryDetailsTimeline,
-        navigationOptions: getNavigationOptions("Timeline", getBackIcon())
+        navigationOptions: getNavigationOptions("Timeline", <NavigationActionBack />)
       },
       [SCREEN_NAME_STORY_DETAILS_INFO]:
       {
         screen: ScreenStoryCreate,
-        navigationOptions: getNavigationOptions("Information", getBackIcon())
+        navigationOptions: getNavigationOptions("Information", <NavigationActionBack />)
       } ,
       [SCREEN_NAME_STORY_ANALYSIS]:
       {
         screen: ScreenStoryAnalysis,
-        navigationOptions: getNavigationOptions("Analysis", getBackIcon())
+        navigationOptions: getNavigationOptions("Analysis", <NavigationActionBack />)
       }
     },
     {
@@ -259,31 +259,6 @@ export default class Router
 
   static getCurrentRoute = (navigationState: NavigationState): NavigationRoute =>
   {   return navigationState.routes[navigationState.index];}
-}
-
-export const getHamburgerIcon = () => (navigation: HiEfficiencyNavigator): JSX.Element =>
-{
-  return <TouchableRipple onPress={() => navigation.openDrawer()}><Icon size={26}   name= "menu" color="white" /></TouchableRipple>
-}
-
-export const getBackIcon = () => (navigation: HiEfficiencyNavigator): JSX.Element =>
-{
-  const internal = () =>
-  {
-    const onBackClicked = navigation.getParam("onBackClicked");
-
-    if(onBackClicked == undefined)
-    {
-        navigation.goBack();
-        return;
-    }
-
-    const handled = onBackClicked(); 
-    if(handled == false)
-    {   navigation.goBack();}
-  }
-
-  return <TouchableRipple onPress={internal}><Icon size={26} name= "arrow-back" color="white" /></TouchableRipple>
 }
 
 const getTabBarOptions = () =>
@@ -300,16 +275,12 @@ const getTabBarOptions = () =>
 }
 
 
-const getNavigationOptions = (title: string, actionLeft?: (navigation: HiEfficiencyNavigator) => JSX.Element) =>
+const getNavigationOptions = (title: string, headerLeft?: JSX.Element) =>
 {
     return  (props: NavigationScreenProps<CustomNavigationParams, CustomNavigationParams>) =>
     {
       //const subtitle = props.navigation.getParam(PARAM_NAME_SUBTITLE);
       const navigation = props.navigation;
-
-      var headerLeft: JSX.Element | undefined = undefined;
-      if (actionLeft)
-      {   headerLeft = actionLeft(navigation);}
 
       var headerRight: JSX.Element | undefined = undefined;
       const headerRightInjection = navigation.getParam(PARAM_NAME_HEADER_RIGHT_INJECTION);
