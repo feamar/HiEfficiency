@@ -55,7 +55,7 @@ export type DialogLoadingProps = AbstractDialog_Props_Virtual &
 export type DialogLoadingActionUnion = "Ok" | "Cancel";
 type Lifecycle = "Canceled" | "Running" | "Timed Out" | "Completed";
 
-type DialogLoadingPropsAndInjected = WithActionPropsInner<DialogLoadingProps, DialogLoadingActionUnion>
+type DialogLoadingPropsAndInjected = WithActionPropsInner<ConcreteDialogLoading, DialogLoadingProps, DialogLoadingActionUnion>
 
 interface State
 {
@@ -249,10 +249,7 @@ export class ConcreteDialogLoading extends React.Component<DialogLoadingPropsAnd
         
         if(reference)
         {
-            if(reference.onOpenListeners.includes(this.onDialogOpen) == false)
-            { 
-                reference.onOpenListeners.push(this.onDialogOpen);
-            }
+            reference.addOnOpenListener(this.onDialogOpen);
         }
     }
     

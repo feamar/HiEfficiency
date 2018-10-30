@@ -16,13 +16,15 @@ export interface WithDrawerInterceptorFunctions
 
 export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, WithDrawerInterceptorFunctions, P>, P> (WrappedComponent: ConcreteOrHigherConstructor<B, C, WithDrawerInterceptorFunctions, P>) =>
 {
-    const hoc = class withBackButtonInterceptor extends AbstractHigherOrderComponent<B, C, WithDrawerInterceptorFunctions, P, HocProps & P>
+    const hoc = class WithDrawerNavigationInterceptor extends AbstractHigherOrderComponent<B, C, WithDrawerInterceptorFunctions, P, HocProps & P>
     {
         onComponentDidMount = () =>
         {
             const base = UtilityRouter.getParentByName(this.props.navigation, STACK_NAME_HOME);
             if(base)
-            {   base.setParams({onDrawerNavigation: this.onDrawerNavigation});}
+            {
+                base.setParams({onDrawerNavigation: this.onDrawerNavigation});
+            }
         }
 
         onComponentWillUnmount = () =>
@@ -44,6 +46,8 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
                 }
                 return false;
             });
+
+            console.log("INTERCEPTOR RESULTS : " + results);
 
             const wasHandled = results.some(e => e == true);
             return wasHandled;

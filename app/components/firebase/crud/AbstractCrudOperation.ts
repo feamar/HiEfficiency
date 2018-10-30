@@ -54,7 +54,6 @@ export default abstract class AbstractCrudOperation
         this.state = "Executed";
         dialog.setMessage(this.initialMessage);
         dialog.onTimeoutListeners.push(this.onDialogTimeout);
-        //dialog.base!.onDismissListeners.push(this.onDialogDismiss);
 
         const isConnected = await NetInfo.isConnected.fetch();
         if(isConnected == false)

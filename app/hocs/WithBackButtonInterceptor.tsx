@@ -3,7 +3,6 @@ import {BackHandler} from "react-native";
 import withStaticFields from "./WithStaticFields"
 import AbstractHigherOrderComponent, { ConcreteOrHigher, ConcreteOrHigherConstructor, ConcreteComponent } from './AbstractHigherOrderComponent';
 import { HiEfficiencyNavigator } from "../components/routing/RoutingTypes";
-import { withNavigation } from "react-navigation";
 import UtilityRouter from "../utilities/UtilityRouter";
 
 interface HocProps
@@ -26,9 +25,8 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
         {
             BackHandler.addEventListener('hardwareBackPress', this.onHardwareBackPress);
 
-            UtilityRouter.forEachParentNavigator(this.props.navigation, (navigator, index) => 
+            UtilityRouter.forEachParentNavigator(this.props.navigation, (navigator, _index) => 
             {
-                console.log("onComponentDidMount: " + index + ": " + navigator.state.routeName);
                 navigator.setParams({onBackClicked: this.onSoftwareBackPress});
             });
         }
@@ -37,9 +35,8 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
         {
             BackHandler.removeEventListener('hardwareBackPress', this.onHardwareBackPress);
             
-            UtilityRouter.forEachParentNavigator(this.props.navigation, (navigator, index) => 
+            UtilityRouter.forEachParentNavigator(this.props.navigation, (navigator, _index) => 
             {
-                console.log("onComponentWillUnmount: " + index + ": " + navigator.state.routeName);
                 navigator.setParams({onBackClicked: undefined});
             });
         }
@@ -77,8 +74,5 @@ export default <B extends ConcreteComponent, C extends ConcreteOrHigher<B, C, Wi
         }
     }
 
-    const hoc1 = withNavigation(hoc);
-    const hoc2 = withStaticFields(WrappedComponent, hoc1);
-
-    return hoc2;
+    return withStaticFields(WrappedComponent, hoc);
 }

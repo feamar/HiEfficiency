@@ -111,11 +111,8 @@ export default class AbstractPreferenceDialog<StorageValue extends object> exten
     {
         if(reference)
         {
-            if(reference.onCloseListeners.includes(this.onDialogClosed) == false)
-            {   reference.onCloseListeners.push(this.onDialogClosed);}
-
-            if(reference.onDismissListeners.includes(this.onDialogClosed) == false)
-            {   reference.onDismissListeners.push(this.onDialogDismissed);}
+            reference.addOnCloseListener(this.onDialogClosed);
+            reference.addOnDismissListener(this.onDialogDismissed);
         }
     }
     

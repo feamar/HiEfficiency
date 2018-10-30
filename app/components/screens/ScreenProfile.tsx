@@ -152,28 +152,40 @@ class ScreenProfile extends React.Component<Props, State> implements WithDrawerI
 
   onDrawerNavigation = (navigationTarget: NavigationRoute) =>
   {
+    console.log("On Drawer Navigation for: " + navigationTarget.routeName);
     if(this.unsavedChanges == false || this.concreteDialogConfirmation == undefined)
     {   return false;}
 
-    const listener = (_: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
+    const onActionListener = (_: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) => 
     {
+      console.log("onActionListener for: " + navigationTarget.routeName);
       switch(action)
       {
         case "Positive":
-          this.props.navigation.navigate(navigationTarget.key);
+          this.props.navigation.navigate(navigationTarget.routeName);
           break;
       }
 
       if(this.concreteDialogConfirmation)
-      { this.concreteDialogConfirmation.removeOnActionClickedListener(listener)};
+      {   this.concreteDialogConfirmation.removeOnActionClickedListener(onActionListener)};
     }
-
-    this.concreteDialogConfirmation.addOnActionClickedListener(listener);
 
     const base = this.concreteDialogConfirmation.base;
     if(base == undefined)
     {   return false;}
 
+    this.concreteDialogConfirmation.addOnActionClickedListener(onActionListener);
+
+    const onCloseListener = () =>
+    {
+      if(this.concreteDialogConfirmation && this.concreteDialogConfirmation.base)
+      {
+          this.concreteDialogConfirmation.base.removeOnCloseListener(onCloseListener);
+          this.concreteDialogConfirmation.removeOnActionClickedListener(onActionListener);
+      }
+    }
+
+    base.addOnCloseListener(onCloseListener);
     base.setVisible(true);
     return true;
   }

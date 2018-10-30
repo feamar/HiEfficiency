@@ -43,7 +43,6 @@ export default <B extends ConcreteComponent,
             {   
                 if(this.wrapped != null)
                 {
-
                     listener(this.concrete, action);
                 }
             });
@@ -52,7 +51,7 @@ export default <B extends ConcreteComponent,
         addOnActionClickedListener = (listener: OnActionClickedListener<B, A>) =>
         {
             if(this.onActionClickedListeners.includes(listener))
-            {   return false;}
+            {   this.removeOnActionClickedListener(listener);}
 
             this.onActionClickedListeners.push(listener);
             return true;
@@ -65,7 +64,6 @@ export default <B extends ConcreteComponent,
             {   return false;}
 
             this.onActionClickedListeners = this.onActionClickedListeners.splice(index, 1);
-
             return true;
         }
 

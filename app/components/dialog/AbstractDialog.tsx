@@ -55,9 +55,9 @@ export interface AbstractDialogState
 
 export default class AbstractDialog extends Component<Props, AbstractDialogState>
 {
-    public readonly onCloseListeners: Array<OnDialogCloseListener>;
-    public readonly onOpenListeners: Array<OnDialogOpenListener>;
-    public readonly onDismissListeners: Array<OnDialogDismissListener>;
+    private onCloseListeners: Array<OnDialogCloseListener>;
+    private onOpenListeners: Array<OnDialogOpenListener>;
+    private onDismissListeners: Array<OnDialogDismissListener>;
 
     constructor(props: Props)
     {
@@ -138,6 +138,64 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
     {
         listeners.forEach(listener => 
         {   listener(this);});
+    }
+
+    addOnCloseListener(listener: OnDialogCloseListener): boolean
+    {
+        if(this.onCloseListeners.includes(listener))
+        {   return false;}
+
+        this.onCloseListeners.push(listener);
+        return true;
+    }
+
+    
+    removeOnCloseListener(listener: OnDialogCloseListener): boolean
+    {
+        const index = this.onCloseListeners.indexOf(listener);
+        if(index < 0)
+        {   return false;}
+
+        this.onCloseListeners = this.onCloseListeners.splice(index, 1);
+        return true;
+    }
+
+    addOnDismissListener(listener: OnDialogDismissListener): boolean
+    {
+        if(this.onDismissListeners.includes(listener))
+        {   return false;}
+
+        this.onDismissListeners.push(listener);
+        return true;
+    }
+
+    removeOnDismissListener(listener: OnDialogDismissListener): boolean
+    {
+        const index = this.onDismissListeners.indexOf(listener);
+        if(index < 0)
+        {   return false;}
+
+        this.onDismissListeners = this.onDismissListeners.splice(index, 1);
+        return true;
+    }
+
+    addOnOpenListener(listener: OnDialogOpenListener): boolean
+    {
+        if(this.onOpenListeners.includes(listener))
+        {   return false;}
+
+        this.onOpenListeners.push(listener);
+        return true;
+    }
+
+    removeOnOpenListener(listener: OnDialogOpenListener): boolean
+    {
+        const index = this.onOpenListeners.indexOf(listener);
+        if(index < 0)
+        {   return false;}
+
+        this.onOpenListeners = this.onOpenListeners.splice(index, 1);
+        return true;
     }
 
     render() 
