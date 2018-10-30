@@ -338,7 +338,7 @@ class ScreenStoryDetailsTimeline extends Component<Props, State> implements With
                     const interruptionsOfUser = this.story.interruptions[key];
                     interruptionsOfUser.document.data.interruptions.forEach(interruption => 
                     {
-                       if(interruption.timestamp > now)
+                       if(interruption.timestamp > now || (interruption.duration && new Date(interruption.timestamp.getTime() + interruption.duration) > now))
                        {    
                            const user = users.get(key);
                            if(user)

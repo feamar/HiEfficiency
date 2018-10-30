@@ -37,8 +37,7 @@ export default class ListItemInterruption extends Component<Props, State> implem
 
     onBaseReference = async (reference?: AbstractListItem<ModelInterruption>) =>
     {
-
-        if(reference && this.isInProgress(this.state.item) == false)
+        if(reference)
         {  
             await reference.addContextMenuItem(new ActionOption(ActionType.EDIT, "Edit"));
             await reference.addContextMenuItem(new ActionOption(ActionType.DELETE, "Delete"));

@@ -55,13 +55,14 @@ const styles = StyleSheet.create({
     },
 });
 
-type DialogInterruptionEditProps = AbstractPreferenceDialog_Props_Virtual<StorageValue> & 
+type DialogInterruptionEdit_Props = AbstractPreferenceDialog_Props_Virtual<StorageValue> & 
 {   
-
+    shouldShowEnd?: boolean
 }
 
 interface State
 {
+    shouldShowEnd: boolean
 }
 
 type StorageValue = DialogInterruptionEdit_StorageValue;
@@ -74,16 +75,17 @@ export interface DialogInterruptionEdit_StorageValue
     next?: EntityInterruption
 }
 
-export default class DialogInterruptionEdit extends React.Component<DialogInterruptionEditProps, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
+export default class DialogInterruptionEdit extends React.Component<DialogInterruptionEdit_Props, State> implements Baseable<AbstractPreferenceDialog<StorageValue>>
 {
     public base: AbstractPreferenceDialog<StorageValue> | undefined;
 
-    constructor(props: DialogInterruptionEditProps)
+    constructor(props: DialogInterruptionEdit_Props)
     {
         super(props);
 
         this.state = 
         {
+            shouldShowEnd: props.shouldShowEnd || true
         }
     }
 
@@ -101,6 +103,12 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
             const type = InterruptionType.fromDatabaseId(id)!;
             this.base.onValueChange({type: {$set: type}});
         }
+    }
+
+    componentWillReceiveProps = (nextProps: DialogInterruptionEdit_Props) =>
+    {
+        if(this.props.shouldShowEnd != nextProps.shouldShowEnd)
+        {   this.setState({shouldShowEnd: nextProps.shouldShowEnd || this.state.shouldShowEnd});}
     }
 
     onValueValidation = (storageValue: StorageValue) => 
@@ -131,6 +139,9 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
         return undefined;
     }
  
+    setShouldShowEnd(shouldShowEnd: boolean) 
+    {   this.setState({shouldShowEnd: shouldShowEnd});}
+
     getSpinnerOptions = (): Array<SelectOption> =>
     {   return InterruptionType.Values.map(type  => {return {value: type.title, id: type.dbId}});}
 
@@ -149,9 +160,13 @@ export default class DialogInterruptionEdit extends React.Component<DialogInterr
                 <Text style={styles.fieldTitle}>Timestamp Start</Text>
                 <InputDateTimeSeparate style={styles.field_start} onSelected={this.onDateTimeSelected("start")} timestamp={storageValue.start || new Date()} />
                 
-                <Text style={styles.fieldTitle2}>Timestamp End</Text>
-                <InputDateTimeSeparate style={styles.field_end} onSelected={this.onDateTimeSelected("end")} timestamp={storageValue.end || new Date()} />
-                <InputError error={error} />
+                {this.state.shouldShowEnd && 
+                <View>
+                    <Text style={styles.fieldTitle2}>Timestamp End</Text>
+                    <InputDateTimeSeparate style={styles.field_end} onSelected={this.onDateTimeSelected("end")} timestamp={storageValue.end || new Date()} />
+                    <InputError error={error} />
+                </View>
+                }
 
                 <Text style={styles.fieldTitle3}>Type</Text>
                 <Dropdown data={this.getSpinnerOptions()} onChangeText={this.onInterruptionTypeSelected} value={storageValue.type.title} />
