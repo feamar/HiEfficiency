@@ -11,7 +11,14 @@ const styles =
         fontSize: 19
     },
     content:
-    {   maxHeight: "75%"}
+    {
+        maxHeight: "75%",
+        flexShrink: 1
+    },
+    actions:
+    {
+        flexShrink: 0
+    }
 }
 
 export type OnDialogDismissListener = (dialog: AbstractDialog) => void;
@@ -146,7 +153,9 @@ export default class AbstractDialog extends Component<Props, AbstractDialogState
                                 {   this.state.content()}
                             </ScrollView> 
                         </View>
-                        {   this.state.actions && this.state.actions()}
+                        <View style={styles.actions}>
+                            {   this.state.actions && this.state.actions()}
+                        </View>
                     </Dialog>
                 </Portal>
             </View>
