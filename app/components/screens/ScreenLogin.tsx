@@ -1,5 +1,5 @@
 import React from "react";
-import { View, ToastAndroid, StyleSheet} from "react-native";
+import { View, ToastAndroid, StyleSheet, Keyboard} from "react-native";
 import {Button,  Card, TextInput, Text} from 'react-native-paper';
 
 import {SCREEN_NAME_AUTH_REGISTER} from '../routing/Router';
@@ -91,6 +91,8 @@ class ScreenLogin extends React.Component<Props, State>
 
   handleLogin = () => 
   {
+    Keyboard.dismiss();
+
     if(this.state.email == undefined || this.state.email == "")
     {   
       ToastAndroid.show("Please enter an e-mail address first.", ToastAndroid.LONG);

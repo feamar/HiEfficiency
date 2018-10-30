@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Keyboard } from "react-native";
 //import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 import Theme from "../../styles/Theme";
 import {Button,Card,TextInput,Text} from 'react-native-paper';
@@ -95,6 +95,8 @@ class ScreenRegister extends React.Component<Props, State>
 
   handleRegister = () => 
   {
+    Keyboard.dismiss();
+
     if(this.state.email == undefined || this.state.email == "")
     { 
       alert("Please enter an e-mail address.")
