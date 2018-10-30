@@ -55,6 +55,15 @@
     "preset": "react-native",
     "transformIgnorePatterns": [
       "/node_modules/(?!react-native-paper)/"
-    ]
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "babel-jest" 
+    },
+    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$"
   }
 }

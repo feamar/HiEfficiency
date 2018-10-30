@@ -7,7 +7,7 @@ import UtilityTest from "../../../utilities/UtilityTest";
 beforeAll(() => 
 {
     jest.mock('Platform', () => {
-        const Platform = jest.requireActual('Platform');
+        const Platform = require('Platform');
         Platform.OS = 'android';
         return Platform;
     });
@@ -15,10 +15,10 @@ beforeAll(() =>
 
 describe("An InputDateTime", () => 
 {
-    const timestamp = 1514761200000; //2018-01-01
+    const timestamp = new Date(1514761200000); //2018-01-01
     const onSelectedMock = jest.fn();
   
-    let component = renderer.create(<InputDateTime timestamp={timestamp} onSelected={onSelectedMock} />);
+    let component = renderer.create(<InputDateTime mode="date" timestamp={timestamp} onSelected={onSelectedMock} />);
     let tree = component.toJSON();
     let instance = component.getInstance();
 
