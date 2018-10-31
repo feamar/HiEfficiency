@@ -2,7 +2,7 @@
     "presets": ["react-native"],
     "env": {
       "development": {
-        "plugins": ["transform-react-jsx-source", "babel-plugin-transform-class-properties", "syntax-class-properties"]
+        "plugins": ["transform-react-jsx-source", "transform-class-properties", "syntax-class-properties"]
       }
     }
   }
