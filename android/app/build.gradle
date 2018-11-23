@@ -150,6 +150,12 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-version-number')
+    compile project(':react-native-vector-icons')
+    compile project(':react-native-svg')
+    compile project(':react-native-firebase')
+    compile project(':react-native-device-info')
+    compile project(':react-native-background-fetch')
     implementation project(':react-native-firebase')
 
     implementation 'com.google.firebase:firebase-core:16.0.4'
