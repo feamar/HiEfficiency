@@ -2,6 +2,7 @@ import React from "react";
 import {View, StyleSheet, ViewStyle} from "react-native";
 import {Text} from "react-native-paper";
 import Theme from "../../styles/Theme";
+import { SafeAreaView } from "react-navigation";
 
 const styles = StyleSheet.create({
     wrapper:{
@@ -85,26 +86,28 @@ export default class CustomHeader extends React.Component<Props, State>
     render() 
     {
         return (
-            <View style={styles.wrapper}>
+            <SafeAreaView>
+                <View style={styles.wrapper}>
 
-                {this.state.left && 
-                    <View style={styles.left}>
-                        {this.state.left}
+                    {this.state.left && 
+                        <View style={styles.left}>
+                            {this.state.left}
+                        </View>
+                    }
+
+                    <View style={this.getMidStyles()}>
+                        <Text numberOfLines={1} style={styles.title}>{this.state.title}</Text>
+                        {this.state.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.state.subtitle}</Text>}
                     </View>
-                }
 
-                <View style={this.getMidStyles()}>
-                    <Text numberOfLines={1} style={styles.title}>{this.state.title}</Text>
-                    {this.state.subtitle && <Text numberOfLines={1} style={styles.subtitle}>{this.state.subtitle}</Text>}
+                    {this.state.right && 
+                        <View style={styles.right}>
+                            {this.state.right}
+                        </View>
+                    }
+
                 </View>
-
-                {this.state.right && 
-                    <View style={styles.right}>
-                        {this.state.right}
-                    </View>
-                }
-
-            </View>
+            </SafeAreaView>
         );
     }
 }
