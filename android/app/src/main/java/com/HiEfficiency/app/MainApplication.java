@@ -4,9 +4,11 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import io.fullstack.oauth.OAuthManagerPackage;
-import com.horcrux.svg.SvgPackage;
-import com.apsl.versionnumber.RNVersionNumberPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.horcrux.svg.SvgPackage;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
+import com.apsl.versionnumber.RNVersionNumberPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
@@ -31,7 +33,8 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
             new OAuthManagerPackage(),
-            //new RNDeviceInfo(),
+            new RNDeviceInfo(),
+            new RNBackgroundFetchPackage(),
             new SvgPackage(),
             new RNVersionNumberPackage(),
             new VectorIconsPackage(),
