@@ -4,6 +4,8 @@ import FirebaseAdapter from "../firebase/FirebaseAdapter";
 import { TouchableRipple } from 'react-native-paper';
 import {Text} from "react-native-paper";
 import { RNFirebase } from 'react-native-firebase';
+import GitHubAuthenticor from '../../etl/github/load/GitHubAuthentication';
+import JiraAuthenticor from '../../etl/jira/oauth/JiraAuthenticator';
 
 const styles = StyleSheet.create({
     button: {
@@ -50,12 +52,31 @@ export default class ScreenDeveloper extends Component<Props, State>
     }
 
 
+    authorizeGithub = async () =>
+    {
+        await GitHubAuthenticor.instance.authorize();
+    }
+
+    getIssuesGithub = async () =>
+    {
+        await GitHubAuthenticor.instance.getIssues();
+    }
+
+    authorizeJira = async () =>
+    {
+        await JiraAuthenticor.instance.authorize();
+    }
+
 
     render()
     {
         return (
         <View style={{height: "100%", padding:20}}>
             <TouchableRipple style={styles.button} onPress={this.migrateInterruptions}><Text>Migrate Interruptions</Text></TouchableRipple>
+            <TouchableRipple style={styles.button} onPress={this.authorizeGithub}><Text>Authorize GitHub</Text></TouchableRipple>
+            <TouchableRipple style={styles.button} onPress={this.getIssuesGithub}><Text>Get Issues GitHub</Text></TouchableRipple>
+            <TouchableRipple style={styles.button} onPress={this.authorizeJira}><Text>Authorize Jira</Text></TouchableRipple>
+            <TouchableRipple style={styles.button} onPress={this.getIssuesGithub}><Text>Get Issues GitHub</Text></TouchableRipple>
         </View>
         ); 
     }

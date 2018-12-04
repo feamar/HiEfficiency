@@ -47,6 +47,11 @@ export default class DocumentStory
         this.upvotes = upvotes;
     }
 
+    public getCurrentFinishedOn = () => 
+    {
+        return this.finishedOn || new Date();
+    }
+
     public getReporterDocument = async () =>
     {
         if(this.reporter == undefined)

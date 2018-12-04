@@ -33,6 +33,7 @@ allprojects {
             name 'Google'
         }
         jcenter()
+        maven { url 'https://jitpack.io' } 
         
     }
 }

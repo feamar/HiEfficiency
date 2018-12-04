@@ -1,13 +1,14 @@
 import ReduxStory from "../dtos/redux/ReduxStory";
 import DocumentUser from "../dtos/firebase/firestore/documents/DocumentUser";
 import EntitySchemaWeek from "../dtos/firebase/firestore/entities/EntitySchemaWeek";
-import ProcessEfficiency from "./dtos/ProccessEfficiency";
+import ProcessEfficiency from "./dtos/ProcessEfficiency";
 import ReduxInterruptions from "../dtos/redux/ReduxInterruptions";
 import ProcessEfficiencyError from "./dtos/ProcessEfficiencyError";
 import { ProcessEfficiencyErrorType } from "./dtos/ProcessEfficiencyErrorType";
 import ProcessEfficiencyErrors from "./dtos/ProcessEfficiencyErrors";
 import UtilityDate from "../utilities/UtilityDate";
 import EntitySchemaDay from "../dtos/firebase/firestore/entities/EntitySchemaDay";
+import ProcessEfficiencyBuilder from "./dtos/ProcessEfficiencyBuilder";
 
 export default class EfficiencyEngine
 {
@@ -70,46 +71,25 @@ export default class EfficiencyEngine
     //User could be undefined if the user entered an interruption on the story, and then removed his account from the database.
     static calculateUserProcessEfficiency = (story: ReduxStory, interruptions: ReduxInterruptions, user: DocumentUser | undefined): ProcessEfficiency | ProcessEfficiencyErrors  =>
     {
-        if(user == undefined) return new ProcessEfficiency(0, 0, []);
+        if(user == undefined) 
+        {
+            return new ProcessEfficiency(0, 0, []);
+        }
+        
+        return EfficiencyEngine.calculateUserProcessEfficiencyInternal(story.document.data.startedOn!, story.document.data.getCurrentFinishedOn(), interruptions, user);    
+    }
 
-        const storyStarted = story.document.data.startedOn!;
-        const storyFinished = story.document.data.finishedOn || new Date();
-
-        var previousFrom: Date = storyStarted;
-        var userProductiveTime: number = 0;
-        var userInterruptionTime: number = 0;
-
-        var errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
-
+    private static calculateUserProcessEfficiencyInternal = (previousFrom: Date, storyFinished: Date, interruptions: ReduxInterruptions, user: DocumentUser) =>
+    {
+        var builder: ProcessEfficiencyBuilder = new ProcessEfficiencyBuilder(user);
         interruptions.document.data.interruptions.forEach(interruption => 
         {
-            const differenceOrError = EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, interruption.timestamp, user.name);
-            if(differenceOrError instanceof ProcessEfficiencyError)
-            {
-                errors.addNoDuplicate(differenceOrError);
-            }
-            else
-            {
-                userProductiveTime += differenceOrError;
-                userInterruptionTime += interruption.duration || 0;
-            }
-            
+            builder.processInterruptionInterval(EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, interruption.timestamp, user.name), interruption);
             previousFrom = interruption.duration ? new Date(interruption.timestamp.getTime() + interruption.duration) : storyFinished;
         });
 
-        const differenceOrError = EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, storyFinished, user.name);
-        if(differenceOrError instanceof ProcessEfficiencyError)
-        {
-            errors.addNoDuplicate(differenceOrError);
-        }
-        else
-        {   userProductiveTime += differenceOrError;}
-
-        if(errors.hasAny())
-        {   return errors;}
-        else
-        {   return new ProcessEfficiency(userProductiveTime, userInterruptionTime, [user.name]);}
-    }
+        return builder.processInterruptionInterval(EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, storyFinished, user.name)).build();
+    } 
 
     static dateDiff = (schema: EntitySchemaWeek, earlierDate: Date, laterDate: Date, username: string): number | ProcessEfficiencyError =>
     {
@@ -117,30 +97,43 @@ export default class EfficiencyEngine
         const later = laterDate.getTime();
         
         if(earlier > later)
-        {   return new ProcessEfficiencyError(ProcessEfficiencyErrorType.IncorrectOrder, [username]);}
+        {   
+            return new ProcessEfficiencyError(ProcessEfficiencyErrorType.IncorrectOrder, [username]);
+        }
 
         var result = 0;
         if(UtilityDate.areOnSameDay(earlierDate, laterDate))
-        {   return laterDate.getTime() - earlierDate.getTime();}
+        { 
+            return later - earlier; 
+        }
 
-        const first = schema.getDayOfDate(earlierDate);
-        const millisecondsOfDayStart = earlierDate.getTime() % 86400000;
-        if(millisecondsOfDayStart < first.getEndAsMilliseconds())
-        {   result += first.getEndAsMilliseconds() - millisecondsOfDayStart;}
+        // schema.getTimeWorkedOnFirstDayOfStory
+        const scheduledWorkEnd = schema.getDayOfDate(earlierDate).getEndAsMilliseconds();
+        const dayStart = earlier % 86400000;
+        result += EfficiencyEngine.howMuchBigger(scheduledWorkEnd, dayStart);
 
-        const last = schema.getDayOfDate(laterDate);
-        const millisecondsOfDayEnd = laterDate.getTime() % 86400000;
-        if(millisecondsOfDayEnd > last.getStartAsMilliseconds())
-        {   result += millisecondsOfDayEnd - last.getStartAsMilliseconds()}
+        // schema.getTimeWorkedOnLastDayOfStory
+        const scheduledWorkStart = schema.getDayOfDate(laterDate).getStartAsMilliseconds();
+        const dayEnd = later % 86400000;
+        result += EfficiencyEngine.howMuchBigger(dayEnd, scheduledWorkStart);
 
         EfficiencyEngine.forEachDayBetweenDates(schema, earlierDate, laterDate, (day, index, amountOfDays) => 
         {   
             if(index != 0 && index != amountOfDays - 1)
-            {   result += day.getHours() * 60 * 60 * 1000;}
+            // schema.getTotalTimeOnDay
+            {   
+                result += day.getHours() * 60 * 60 * 1000;
+            }
         });
     
         return result;
     }
+
+    static howMuchBigger = (isThis: number, thanThis: number) =>
+    {
+        // In our particular case, we want to return 0 if isThis is smaller than thanThis
+        return Math.abs(Math.max(isThis - thanThis, 0))
+    }    
 
 
     static forEachDayBetweenDates = (schema: EntitySchemaWeek, started: Date, finished: Date, closure: (day: EntitySchemaDay, index: number, amountOfDays: number) => void) =>

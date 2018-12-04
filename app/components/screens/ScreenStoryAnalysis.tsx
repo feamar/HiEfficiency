@@ -11,13 +11,13 @@ import WithEmptyListFiller from "../../hocs/WithEmptyListFiller";
 import ListFillerOption from "../../dtos/options/ListFillerOption";
 import FillerBored from "../svg/fillers/FillerBored";
 import EfficiencyEngine from "../../engine/EfficiencyEngine";
-import ProcessEfficiency from "../../engine/dtos/ProccessEfficiency";
 import { View, StyleSheet } from "react-native";
 import TextGroup from "../text/TextGroup";
 import UtilityTime from "../../utilities/UtilityTime";
 import ProcessEfficiencyErrors from "../../engine/dtos/ProcessEfficiencyErrors";
 import UtilityMap from "../../utilities/UtilityMap";
 import Theme from "../../styles/Theme";
+import ProcessEfficiency from "../../engine/dtos/ProcessEfficiency";
 
 const styles = StyleSheet.create({
     root: {

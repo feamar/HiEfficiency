@@ -15,6 +15,7 @@ export default class ProcessEfficiency
         //TODO: Prohibit incorrect input in user interface.
 
         this.productiveTime = productiveTime;
+        
         this.interruptionTime = interruptionTime;
         this.usernames = usernames;
     }

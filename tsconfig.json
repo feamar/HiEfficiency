@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es2015",
         "jsx": "react",
-        "noEmit": true,
+        "noEmit": false,
         "allowJs": true,
         "moduleResolution": "node",
         "strictNullChecks": true,

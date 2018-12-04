@@ -31,6 +31,7 @@ import ScreenFeedback from '../screens/ScreenFeedback';
 import ScreenAbout from '../screens/ScreenAbout';
 import NavigationActionBack from './actions/NavigationActionBack';
 import NavigationActionHamburger from './actions/NavigationActionHamburger';
+import ScreenDeveloper from '../screens/ScreenDeveloper';
 
 export const STACK_NAME_AUTH = 'Auth';
 export const STACK_NAME_HOME = 'Home';
@@ -120,11 +121,11 @@ export default class Router
         [STACK_NAME_ABOUT]:
         {
           screen: Router.createAboutRouter()
-        }
-        /*[SCREEN_NAME_DEVELOPER]:
+        },
+        [SCREEN_NAME_DEVELOPER]:
         {
           screen: ScreenDeveloper
-        }*/
+        }
       },
       {
         initialRouteName: STACK_NAME_TEAMS,
