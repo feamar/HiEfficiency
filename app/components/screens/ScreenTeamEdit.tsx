@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
-import {View, ToastAndroid} from 'react-native';
+import {View} from 'react-native';
 import withBackButtonInterceptor, { WithBackButtonInterceptorProps } from "../../hocs/WithBackButtonInterceptor";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import UtilityUpdate from '../../utilities/UtilityUpdate';
@@ -18,6 +18,7 @@ import { DialogPreferenceText_StorageValue } from '../dialog/preferences/DialogP
 import { DialogPreferenceDateTime_StorageValue } from '../dialog/preferences/DialogPreferenceDateTime';
 import update from 'immutability-helper';
 import InputFloatingActionButton from '../inputs/InputFloatingActionButton';
+import Toast from 'react-native-simple-toast';
 
 interface ReduxStateProps 
 {
@@ -117,13 +118,13 @@ class ScreenTeamEdit extends Component<Props, State>
     {
         if(this.state.team.data.name == undefined || this.state.team.data.name == "")
         {   
-            ToastAndroid.show("Please enter a team name first.", ToastAndroid.LONG);
+            Toast.show("Please enter a team name first.", Toast.LONG);
             return false;
         }
 
         if(this.state.team.data.code == undefined || this.state.team.data.code == "")
         {
-            ToastAndroid.show("Please enter a security code first.", ToastAndroid.LONG);
+            Toast.show("Please enter a security code first.", Toast.LONG);
             return false;
         }
 

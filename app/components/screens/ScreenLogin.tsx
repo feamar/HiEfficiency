@@ -1,5 +1,5 @@
 import React from "react";
-import { View, ToastAndroid, StyleSheet, Keyboard} from "react-native";
+import { View, StyleSheet, Keyboard} from "react-native";
 import {Button,  Card, TextInput, Text} from 'react-native-paper';
 
 import {SCREEN_NAME_AUTH_REGISTER} from '../routing/Router';
@@ -10,6 +10,7 @@ import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
 import ActionUserLoggedIn from "../../redux/actions/user/ActionUserLoggedIn";
 import { Dispatch } from "redux";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
+import Toast from 'react-native-simple-toast';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -95,13 +96,13 @@ class ScreenLogin extends React.Component<Props, State>
 
     if(this.state.email == undefined || this.state.email == "")
     {   
-      ToastAndroid.show("Please enter an e-mail address first.", ToastAndroid.LONG);
+      Toast.show("Please enter an e-mail address first.", Toast.LONG);
       return;
     }
     
     if(this.state.password == undefined || this.state.password == "")
     {
-      ToastAndroid.show("Please enter a password first.", ToastAndroid.LONG);
+      Toast.show("Please enter a password first.", Toast.LONG);
       return;
     }
 

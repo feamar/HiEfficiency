@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, ScrollView, StyleSheet, ToastAndroid} from "react-native";
+import {View, ScrollView, StyleSheet} from "react-native";
 import PreferenceCategory from "../preferences/PreferenceCategory";
 import StoryType from "../../enums/StoryType";
 import WithBackButtonInterceptor from "../../hocs/WithBackButtonInterceptor";
@@ -23,6 +23,7 @@ import SelectOption from "../../dtos/options/SelectOption";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
 import ReduxStory from "../../dtos/redux/ReduxStory";
 import ReduxUser from "../../dtos/redux/ReduxUser";
+import Toast from 'react-native-simple-toast';
 
 const styles = StyleSheet.create({
     scrollView:{
@@ -234,7 +235,7 @@ class ScreenStoryCreate extends Component<Props, State>
                     if(result.successful)
                     {   
                         if(result.dialogOpened == false)
-                        {   ToastAndroid.show("Story successfully updated!", ToastAndroid.LONG);}
+                        {   Toast.show("Story successfully updated!", Toast.LONG);}
 
                         //For some reason, the function .dangerouslyGetParent has not been included in the type definition, but the contributors do tell us that it is part of the public API and is only called "dangerously" because it should not be overused.
                         const parent = (this.props.navigation as any).dangerouslyGetParent();

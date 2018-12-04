@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, ToastAndroid} from "react-native";
+import {View} from "react-native";
 import {STACK_NAME_STORY_DETAILS, SCREEN_NAME_STORY_CREATE, SCREEN_NAME_STORY_DETAILS_INFO} from "../routing/Router";
 import {FAB} from "react-native-paper";
 import ActionType from "../../enums/ActionType";
@@ -25,6 +25,7 @@ import ListFillerOption from "../../dtos/options/ListFillerOption";
 import { AbstractList_Props_Virtual } from "../list/abstractions/list/AbstractList";
 import equal from "deep-equal";
 import DocumentStory from "../../dtos/firebase/firestore/documents/DocumentStory";
+import Toast from 'react-native-simple-toast';
 
 interface ReduxStateProps
 {
@@ -214,7 +215,7 @@ class ScreenStoryBoard extends Component<Props, State>
         story.description = "Automatically scaffolded story for development purposes. This can be deleted in the production database if encounterd.";
 
         if(this.team.id == undefined)
-        {   return ToastAndroid.show("Could not retrieve team id, please try again later.", ToastAndroid.LONG);}  
+        {   return Toast.show("Could not retrieve team id, please try again later.", Toast.LONG);}  
 
         await this.props.database.inDialog("dialog-creating-story", this.props.addDialog, this.props.removeDialog, "Creating Story", async (execute) => 
         {
@@ -231,7 +232,7 @@ class ScreenStoryBoard extends Component<Props, State>
       case "Positive":
         
         if(this.team.id == undefined)
-        {   return ToastAndroid.show("Could not retrieve team id, please try again later.", ToastAndroid.LONG);}  
+        {   return Toast.show("Could not retrieve team id, please try again later.", Toast.LONG);}  
 
         await this.props.database.inDialog("dialog-deleting-story", this.props.addDialog, this.props.removeDialog, "Deleting Story", async (execute) => 
         {

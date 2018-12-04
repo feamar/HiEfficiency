@@ -1,8 +1,9 @@
 import React from "react";
 import TextGroup from "../text/TextGroup";
-import { StyleSheet, ToastAndroid, ScrollView, View } from "react-native";
+import { StyleSheet,ScrollView, View } from "react-native";
 import { Text } from "react-native-paper";
 import UtilityUrl from "../../utilities/UtilityUrl";
+import Toast from 'react-native-simple-toast';
 
 const styles = StyleSheet.create({
     root: {
@@ -42,7 +43,7 @@ export default class ScreenAbout extends React.Component<Props, State>
     {
         const success = await UtilityUrl.goToUrl("https://smashicons.com");
         if(success == false)
-        {   ToastAndroid.show("Something went wrong while trying to open the URL 'https://smashicons.com'. Please try again later.", ToastAndroid.LONG);}
+        {   Toast.show("Something went wrong while trying to open the URL 'https://smashicons.com'. Please try again later.", Toast.LONG);}
     }
 
     render()

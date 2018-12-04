@@ -1,6 +1,6 @@
 import React from 'react';
 import PreferenceCategory from '../preferences/PreferenceCategory';
-import { ToastAndroid, View } from "react-native";
+import { View } from "react-native";
 import {STACK_NAME_TEAMS} from '../routing/Router';
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
 import WithDialogContainer, { WithDialogContainerProps } from '../../hocs/WithDialogContainer';
@@ -21,6 +21,7 @@ import { DialogPreferenceText_StorageValue } from '../dialog/preferences/DialogP
 import UserUpdate from '../firebase/crud/UserUpdate';
 import WithDrawerNavigationInterceptor, { WithDrawerInterceptorFunctions } from '../../hocs/WithDrawerNavigationInterceptor';
 import { NavigationRoute } from 'react-navigation';
+import Toast from 'react-native-simple-toast';
 
 const styles = {
   content: {padding: 0, height: "100%"}
@@ -111,7 +112,7 @@ class ScreenProfile extends React.Component<Props, State> implements WithDrawerI
         const result = await execute(update, false);
 
         if(result.successful && result.dialogOpened == false)
-        {   ToastAndroid.show("Successfully updated your profile.", ToastAndroid.SHORT);}
+        {   Toast.show("Successfully updated your profile.", Toast.SHORT);}
 
         this.unsavedChanges = false;
     });

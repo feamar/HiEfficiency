@@ -5,10 +5,11 @@ import SelectOption from "../../dtos/options/SelectOption";
 import {DialogPreferenceSelect_StorageValue as About} from "../dialog/preferences/DialogPreferenceSelect";
 import {DialogPreferenceText_StorageValue as Details} from "../dialog/preferences/DialogPreferenceText";
 import PreferenceText from "../preferences/field/PreferenceText";
-import  PreferenceCheckbox, { PreferenceCheckbox_StorageValue as Permission} from "../preferences/field/PreferenceCheckbox";
+import { PreferenceCheckbox_StorageValue as Permission} from "../preferences/field/PreferenceCheckbox";
 import InputFloatingActionButton from "../inputs/InputFloatingActionButton";
-import { ToastAndroid, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import email from 'react-native-email'
+import Toast from 'react-native-simple-toast';
 
 const styles = StyleSheet.create({
     screen: {
@@ -104,7 +105,7 @@ export default class ScreenFeedback extends React.Component<Props, State>
         const validationError = this.getInputValidationError(this.state);
         if(validationError)
         {
-            ToastAndroid.show(validationError, ToastAndroid.LONG);
+            Toast.show(validationError, Toast.LONG);
             this.setState({fabEnabled: true});
             return;
         }
@@ -122,7 +123,7 @@ export default class ScreenFeedback extends React.Component<Props, State>
         .catch((error: Error) => 
         {
             console.trace(error);
-            ToastAndroid.show("Something went wrong while trying to open the e-mail manager. Please try again later.", ToastAndroid.LONG);
+            Toast.show("Something went wrong while trying to open the e-mail manager. Please try again later.", Toast.LONG);
         });
     }
 
