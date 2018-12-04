@@ -94,7 +94,7 @@ export default class Router
       [SCREEN_NAME_AUTH_REGISTER]:
       {
           screen: ScreenRegister,
-          navigationOptions : getNavigationOptions("Register Account")
+          navigationOptions : getNavigationOptions("Register Account", <NavigationActionBack />)
       }
     },
     {
