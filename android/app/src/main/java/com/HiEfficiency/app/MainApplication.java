@@ -7,7 +7,7 @@ import io.fullstack.oauth.OAuthManagerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
-import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
+
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
@@ -34,7 +34,6 @@ public class MainApplication extends Application implements ReactApplication {
             new MainReactPackage(),
             new OAuthManagerPackage(),
             new RNDeviceInfo(),
-            new RNBackgroundFetchPackage(),
             new SvgPackage(),
             new RNVersionNumberPackage(),
             new VectorIconsPackage(),

@@ -2,53 +2,27 @@ import React from "react";
 import { ReduxState } from "../../redux/ReduxState";
 import ReduxUser from "../../dtos/redux/ReduxUser";
 import WithReduxSubscription from "../../hocs/WithReduxSubscription";
-import ReduxStory, { StoryLifecycle } from "../../dtos/redux/ReduxStory";
+import ReduxStory from "../../dtos/redux/ReduxStory";
 import ReduxInspecting from "../../dtos/redux/ReduxInspecting";
 import WithLoading, { WithLoadingProps } from "../../hocs/WithLoading";
 import WithDatabase, { WithDatabaseProps } from "../../hocs/WithDatabase";
-import { Text } from "react-native-paper";
 import WithEmptyListFiller from "../../hocs/WithEmptyListFiller";
 import ListFillerOption from "../../dtos/options/ListFillerOption";
 import FillerBored from "../svg/fillers/FillerBored";
-import EfficiencyEngine from "../../engine/EfficiencyEngine";
-import { View, StyleSheet } from "react-native";
-import TextGroup from "../text/TextGroup";
-import UtilityTime from "../../utilities/UtilityTime";
-import ProcessEfficiencyErrors from "../../engine/dtos/ProcessEfficiencyErrors";
-import UtilityMap from "../../utilities/UtilityMap";
-import Theme from "../../styles/Theme";
 import ProcessEfficiency from "../../engine/dtos/ProcessEfficiency";
-
-const styles = StyleSheet.create({
-    root: {
-        marginLeft: 20,
-        marginRight: 20,
-    },
-    error:
-    {
-        color: Theme.colors.error
-    },
-    unstarted_wrapper:
-    {
-        padding:20, 
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-        width: "100%"
-    },
-    unstarted:
-    {
-        textAlign: "center"
-    }
-});
+import { HiEfficiencyNavigator } from "../routing/RoutingTypes";
+import ProcessEfficiencyErrors from "../../engine/dtos/ProcessEfficiencyErrors";
+import ScreenVsm from "../../modules/vsm/screen/ScreenVsm";
+import VsmConstants from "../../modules/vsm/VsmConstants";
 
 type Props = ReduxStateProps & WithLoadingProps & WithDatabaseProps &
 {
+    navigation: HiEfficiencyNavigator
 }
 
 interface State
 {
-    lifecycle: StoryLifecycle | "Loading",
+    //lifecycle: StoryLifecycle | "Loading",
     efficiency?: ProcessEfficiency | ProcessEfficiencyErrors
 }
 
@@ -77,10 +51,20 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
         this.story = props.user.teams[props.inspecting.team!].stories[props.inspecting.story!];
 
         this.state = {
-            lifecycle: this.getLifecycleFromStory(this.story),
+            //lifecycle: this.getLifecycleFromStory(this.story),
             efficiency: undefined
         }
+
+        this.props.setLoading(false);  
     }
+
+    
+    setLoading = (_props: Props) =>
+    {  
+        const shouldLoad = this.story == undefined || this.story.interruptions == undefined || this.story.loaded == false || this.state.efficiency == undefined;
+        this.props.setLoading(shouldLoad);
+    }
+    /*
 
     componentWillReceiveProps = (props: Props) =>
     {
@@ -129,9 +113,84 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
     shouldShowEmptyListFiller = () =>
     {   return this.state.lifecycle == "Unstarted";}
 
+
+    /*
+    getTimelineFromStory = (story: ReduxStory | undefined): Array<AbstractTimelineModel> =>
+    {
+        if(story == undefined) return [];
+        if(story.document.data.startedOn == undefined) return [];
+
+        const interruptions = UtilityIndexable.toArray(story.interruptions);
+        const events: Array<{timestamp: Date, change: number}> = [];
+        const participants = interruptions.length;
+
+        for(var i = 0 ; i < interruptions.length ; i ++)
+        {
+            const current = interruptions[i];
+            current.document.data.interruptions.map(e => 
+            {
+                events.push({timestamp: e.timestamp, change: -1});
+                if(e.duration) events.push({timestamp: new Date(e.timestamp.getTime() + e.duration), change: 1});
+            });
+        }
+
+        const sorted = events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+        const ratio = 100 / participants;
+
+        const builder = new TimelineBuilder();
+        builder.addStart(story.document.data.startedOn, 100);
+        
+        var previousDate = story.document.data.startedOn;
+        var previousValue = 100;
+
+        sorted.forEach(e => 
+        {
+             if(UtilityDate.areOnSameDay(previousDate, e.timestamp) == false)
+             {
+                 builder.addSkip(e.timestamp);
+             }
+
+             const newValue = previousValue + e.change * ratio;
+             builder.addEvent(e.timestamp, newValue);
+
+             previousDate = e.timestamp;
+             previousValue = newValue;
+        });
+
+        if(story.document.data.finishedOn)
+        {
+            builder.addFinish(story.document.data.finishedOn, builder.previousValue);
+        }
+
+        return builder.build();
+
+        /*const builder = new TimelineBuilder();
+        builder.addStart(new Date(2018, 6, 13, 11, 45, 20, 33), 100);
+        builder.addSkip(new Date(2018, 6, 14, 11, 50, 0));
+        builder.addEvent(new Date(2018, 6, 14, 12, 0, 44, 23), 75);
+        builder.addEvent(new Date(2018, 6, 14, 13, 15, 23, 44), 10);
+        builder.addSkip(new Date(2018, 6, 15, 17, 0, 0));
+        builder.addEvent(new Date(2018, 6, 15, 9, 0, 0, 0), 25);
+        builder.addEvent(new Date(2018, 6, 15, 9, 15, 0, 0), 66);
+        builder.addSkip(new Date(2018, 6, 16, 17, 0, 0));
+        builder.addFinish(new Date(2018, 6, 16, 13, 20, 20, 20), 66);
+
+        return builder.build();
+    }*/
+
+    getArrayWindow = (start: number, amount: number, array: Array<number>) =>
+    {   return array.splice(start, amount);} 
+
     render()
     {
-        if(this.state.efficiency == undefined)
+        //VSM
+        return <ScreenVsm granularity={VsmConstants.GRANULARITIES[0]} story={this.story} />
+
+        //TIMELINE
+        //return <Timeline items={this.getTimelineFromStory(this.story)} listId="list-analysis" navigation={this.props.navigation} />
+
+        //OLD ANALYSIS
+        /*if(this.state.efficiency == undefined)
         {   return null;}
 
         if(this.state.efficiency instanceof ProcessEfficiency)
@@ -199,7 +258,7 @@ class ScreenStoryAnalysis extends React.Component<Props, State>
                     
                 </View>
             );
-        }
+        }*/
     }
 }
 

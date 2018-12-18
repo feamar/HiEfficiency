@@ -1,6 +1,6 @@
 import React from "react";
 import {Text} from "react-native-paper"
-import AbstractListItem, { AbstractListItemPropsVirtual } from "../../abstractions/list/AbstractListItem";
+import AbstractListItem, { AbstractListItem_Props_Virtual } from "../../abstractions/list/AbstractListItem";
 import Theme from "../../../../styles/Theme";
 import ActionType from "../../../../enums/ActionType";
 import { StyleSheet } from "react-native";
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     }
 });
  
-type Props = AbstractListItemPropsVirtual<ReduxTeam> & 
+type Props = AbstractListItem_Props_Virtual<ReduxTeam> & 
 {
 
 }

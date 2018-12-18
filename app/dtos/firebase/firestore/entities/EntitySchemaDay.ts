@@ -71,6 +71,26 @@ export default class EntitySchemaDay
     getEndAsMilliseconds = () =>
     {   return this.getAsMilliseconds(this.end);}
 
+    getStartHourComponent = () =>
+    {
+        return parseInt(this.start.split(":")[0]);
+    }
+
+    getStartMinuteComponent = () =>
+    {
+        return parseInt(this.start.split(":")[1]);
+    }
+    
+    getEndHourComponent = () =>
+    {
+        return parseInt(this.end.split(":")[0]);
+    }
+
+    getEndMinuteComponent = () =>
+    {
+        return parseInt(this.end.split(":")[1]);
+    }
+
     private getAsMilliseconds = (value: string) =>
     {
         const split = value.split(":");

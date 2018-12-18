@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import AbstractListItem, { AbstractListItemPropsVirtual } from "../../abstractions/list/AbstractListItem";
+import AbstractListItem, { AbstractListItem_Props_Virtual } from "../../abstractions/list/AbstractListItem";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ActionOption from "../../../../dtos/options/ActionOption";
 import ActionType from "../../../../enums/ActionType";
@@ -10,7 +10,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import ModelFinish from "./models/ModelFinish";
 import { InterruptionListStyles } from "./ListInterruptions";
 
-type Props = AbstractListItemPropsVirtual<ModelFinish> & 
+type Props = AbstractListItem_Props_Virtual<ModelFinish> & 
 {
 
 }

@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* HiEfficiencyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* HiEfficiencyTests.m */; };
 		04D07ADB64144A29900022DD /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E28ACDD7E7F64F1D8AE9A927 /* FontAwesome5_Regular.ttf */; };
@@ -47,8 +46,6 @@
 		76A9E2CD526946D88FEF5859 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C2E62EA1E04B49D29963DD12 /* libRNSVG.a */; };
 		77AE5F2B60A3495F987A69ED /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 24274500D8B34F378B00E658 /* Entypo.ttf */; };
 		81588B4765994B2D9CE4C5CC /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5593DF229B845508AD8F36D /* rubicon-icon-font.ttf */; };
-		8EEF7A16025F47F69F076094 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68AF3F4CA22047AFBBE07114 /* TSBackgroundFetch.framework */; };
-		9A71F4A50E6E413987676035 /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FE544DD2FD754A2C8A12A68B /* RNBackgroundFetch+AppDelegate.m */; };
 		C0DCB60492484F72B0213068 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E93AACD5AF5B4395B7CDF7E5 /* Zocial.ttf */; };
 		C1F66EAE4A42B5390C54EDB8 /* libPods-HiEfficiency-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B312E75800BB066CE12E5FAA /* libPods-HiEfficiency-tvOS.a */; };
 		C95FCCE9341E42E99D800354 /* libRNVersionNumber-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D998E3AB97A4D389315EEF6 /* libRNVersionNumber-tvOS.a */; };
@@ -464,7 +461,6 @@
 		641C57B6BE06467CA15EFE75 /* libLRDRCTSimpleToast.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libLRDRCTSimpleToast.a; sourceTree = "<group>"; };
 		667541D021394F12BD59B3C2 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		6869002E947141169645DD5F /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		68AF3F4CA22047AFBBE07114 /* TSBackgroundFetch.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = TSBackgroundFetch.framework; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/TSBackgroundFetch.framework"; sourceTree = SDKROOT; };
 		70E8302B3E2C41C2AF2B5F8D /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		7182A2C71B75927082F6C2B7 /* Pods-HiEfficiency-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HiEfficiency-tvOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HiEfficiency-tvOS/Pods-HiEfficiency-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		745AB8BD1AEB4D6B95CA76BE /* libRNVersionNumber.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVersionNumber.a; sourceTree = "<group>"; };
@@ -499,7 +495,6 @@
 		EF998315CC4B4291A1BFC178 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		F4FF17118A14446C844E8E97 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		F88EB69457F94243A76B0287 /* RNVersionNumber.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVersionNumber.xcodeproj; path = "../node_modules/react-native-version-number/ios/RNVersionNumber.xcodeproj"; sourceTree = "<group>"; };
-		FE544DD2FD754A2C8A12A68B /* RNBackgroundFetch+AppDelegate.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = "RNBackgroundFetch+AppDelegate.m"; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/RNBackgroundFetch+AppDelegate.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -522,7 +517,6 @@
 				E2CE917DAF7C4486965240B9 /* libRNVersionNumber.a in Frameworks */,
 				76A9E2CD526946D88FEF5859 /* libRNSVG.a in Frameworks */,
 				36A930B7C9B64DFB81A4DCCF /* libRNDeviceInfo.a in Frameworks */,
-				8EEF7A16025F47F69F076094 /* TSBackgroundFetch.framework in Frameworks */,
 				3FCA9A29B886A9463810A1CE /* libPods-HiEfficiency.a in Frameworks */,
 				CEB9055275A545D9AB819C89 /* libLRDRCTSimpleToast.a in Frameworks */,
 			);
@@ -649,7 +643,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				FE544DD2FD754A2C8A12A68B /* RNBackgroundFetch+AppDelegate.m */,
 			);
 			name = HiEfficiency;
 			sourceTree = "<group>";
@@ -696,7 +689,6 @@
 			isa = PBXGroup;
 			children = (
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				68AF3F4CA22047AFBBE07114 /* TSBackgroundFetch.framework */,
 				B312E75800BB066CE12E5FAA /* libPods-HiEfficiency-tvOS.a */,
 				9CD48372457ADFEDCE0DDE79 /* libPods-HiEfficiency.a */,
 				5C94EFD7808F049C13B7664F /* libPods-HiEfficiency-tvOSTests.a */,
@@ -999,11 +991,6 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						SystemCapabilities = {
-							com.apple.BackgroundModes = {
-								enabled = true;
-							};
-						};
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -1662,7 +1649,6 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				9A71F4A50E6E413987676035 /* RNBackgroundFetch+AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1716,7 +1702,9 @@
 			baseConfigurationReference = AB94D208996EC7F4269F138D /* Pods-HiEfficiencyTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1760,7 +1748,9 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..\node_modules\neact-native-firebaseiosRNFirebase/**",
@@ -1871,7 +1861,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1920,7 +1912,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1968,7 +1962,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2016,7 +2012,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import AbstractListItem, { AbstractListItemPropsVirtual } from "../../abstractions/list/AbstractListItem";
+import AbstractListItem, { AbstractListItem_Props_Virtual } from "../../abstractions/list/AbstractListItem";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import ActionOption from "../../../../dtos/options/ActionOption";
 import ActionType from "../../../../enums/ActionType";
@@ -10,7 +10,7 @@ import ModelInterruption from "./models/ModelInterruption";
 import { InterruptionListStyles } from "./ListInterruptions";
 import UtilityTime from "../../../../utilities/UtilityTime";
 
-type Props = AbstractListItemPropsVirtual<ModelInterruption> & 
+type Props = AbstractListItem_Props_Virtual<ModelInterruption> & 
 {
 
 }

@@ -657,7 +657,6 @@ class ScreenStoryDetailsTimeline extends Component<Props, State> implements With
         return (
             <ListInterruptions containerHasFab={true} sections={this.state.sections} onContextMenuItemSelected={this.onContextMenuItemSelected} />
         );
-
     }
 
 
@@ -784,11 +783,11 @@ class ScreenStoryDetailsTimeline extends Component<Props, State> implements With
         }
     }
 
+
     getSectionsFromStory = (story: ReduxStory | undefined): Array<AbstractListCollapsible_SectionType<InterruptionModelType>> =>
     {        
         if(story == undefined)
         {   return [];}
-
 
         const data = story.document.data;
         const document = DocumentInterruptions.fromReduxInterruptions(story.interruptions, this.props.user.document.id!);

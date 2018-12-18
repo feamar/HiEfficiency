@@ -69,4 +69,25 @@ export default class UtilityArray
 
         return array;
     };
+
+    static merge = <T> (first: T[], second: T[], allowDuplicates: boolean = false) =>
+    {
+        if(allowDuplicates)
+        {
+            return first.concat(second);
+        }
+        else
+        {
+            for(var i = 0 ; i < second.length ; i ++)
+            {
+                const current = second[i];
+                if(first.includes(current) == false)
+                {
+                    first.push(current);
+                }
+            }
+
+            return first;
+        }
+    }
 }

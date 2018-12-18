@@ -1,5 +1,5 @@
 import React from "react";
-import AbstractListItem, { AbstractListItemPropsVirtual } from "../../abstractions/list/AbstractListItem";
+import AbstractListItem, { AbstractListItem_Props_Virtual } from "../../abstractions/list/AbstractListItem";
 import {View} from "react-native";
 import {Text} from "react-native-paper";
 import Icon  from "react-native-vector-icons/MaterialIcons";
@@ -8,7 +8,7 @@ import ModelProductive from "./models/ModelProductive";
 import { Baseable, onBaseReference } from "../../../../render_props/Baseable";
 import { InterruptionListStyles } from "./ListInterruptions";
 
-type Props = AbstractListItemPropsVirtual<ModelProductive> & 
+type Props = AbstractListItem_Props_Virtual<ModelProductive> & 
 {
 
 }
