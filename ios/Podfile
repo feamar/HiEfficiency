@@ -24,14 +24,12 @@ target 'HiEfficiency' do
         pod 'Firebase/Firestore'
         pod 'Firebase/Auth'
         pod 'yoga', path: "./../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
-        pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
         pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
         pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
         pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/GLog.podspec'
    target 'HiEfficiency-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
-    pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
 
   end
 

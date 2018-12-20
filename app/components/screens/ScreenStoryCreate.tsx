@@ -131,6 +131,7 @@ class ScreenStoryCreate extends Component<Props, State>
     
     onSelectValueChanged = (field: keyof DocumentStory) => (value: PreferenceSelectSpinner_StorageValue) =>
     {
+        console.log("HERE");
         var story = this.state.story;
         if(story.document.data[field] == value.selected.id)
         {   return;}
