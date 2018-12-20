@@ -1,35 +1,67 @@
 import ProcessEfficiencyErrors from "./ProcessEfficiencyErrors";
 import ProcessEfficiencyError from "./ProcessEfficiencyError";
-import EntityInterruption from "../../dtos/firebase/firestore/entities/EntityInterruption";
 import ProcessEfficiency from "./ProcessEfficiency";
-import DocumentUser from "../../dtos/firebase/firestore/documents/DocumentUser";
+import UtilityArray from "../../utilities/UtilityArray";
 
 
 export default class ProcessEfficiencyBuilder
 {
-    private username: string;
+    private productiveTime: number = 0;
+    private interruptedTime: number = 0;
+    private potentialTime: number = 0;
 
-    private userProductiveTime: number = 0;
-    private userInterruptionTime: number = 0;
     private errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
+    private participants: Array<string>;
 
-    constructor(user: DocumentUser)
+    constructor(from: Date, to: Date)
     {
-        this.username = user.name;
+        this.participants = [];
+        this.potentialTime = to.getTime() - from.getTime();
     }
 
-    processInterruptionInterval = (differenceOrError: number | ProcessEfficiencyError, interruption?: EntityInterruption) => 
+    addProductiveTime = (productiveTimeOrError: number | ProcessEfficiencyError) =>
     {
-        if(differenceOrError instanceof ProcessEfficiencyError)
+        if(productiveTimeOrError instanceof ProcessEfficiencyError)
         {
-            this.errors.addNoDuplicate(differenceOrError);
+            this.errors.addNoDuplicate(productiveTimeOrError);
         }
         else
         {
-            this.userProductiveTime += differenceOrError;
-            this.userInterruptionTime += interruption ? interruption.duration || 0 : 0;
+            this.productiveTime += productiveTimeOrError;
         }
         return this;
+    }
+
+    addInterruptedTime = (interruptedTime: number | ProcessEfficiencyError) =>
+    {
+        if(interruptedTime instanceof ProcessEfficiencyError)
+        {
+            this.errors.addNoDuplicate(interruptedTime);
+        }
+        else
+        {
+            this.interruptedTime += interruptedTime;
+        }
+        return this;
+    }
+
+    addError = (error: ProcessEfficiencyError) =>
+    {
+        this.errors.addNoDuplicate(error);
+    }
+
+    addEfficiency = (efficiency: ProcessEfficiency | ProcessEfficiencyErrors) =>
+    {
+        if(efficiency instanceof ProcessEfficiency)
+        {
+            this.productiveTime += efficiency.productiveTime;
+            this.interruptedTime += efficiency.interruptionTime;
+            this.participants = UtilityArray.merge(this.participants, efficiency.usernames, false);
+        }
+        else
+        {
+            efficiency.all().forEach(e => this.errors.addNoDuplicate(e));
+        }
     }
 
     build = () =>
@@ -40,7 +72,7 @@ export default class ProcessEfficiencyBuilder
         }
         else
         {   
-            return new ProcessEfficiency(this.userProductiveTime, this.userInterruptionTime, [this.username]);
+            return new ProcessEfficiency(this.potentialTime, this.productiveTime, this.interruptedTime, this.participants);
         }
     }
 }

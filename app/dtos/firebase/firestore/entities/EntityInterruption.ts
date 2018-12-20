@@ -20,4 +20,5 @@ export default class EntityInterruption
         {   this.duration = undefined;}
     }
 
+    
 }

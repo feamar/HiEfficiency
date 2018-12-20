@@ -27,6 +27,10 @@ const Theme = {
     opacities: {
         text:{
             faded: 0.35
+        },
+        charts:
+        {
+            vsm: 0.40
         }
     }
 };

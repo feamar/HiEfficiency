@@ -12,7 +12,7 @@ import ProcessEfficiencyBuilder from "./dtos/ProcessEfficiencyBuilder";
 
 export default class EfficiencyEngine
 {
-    static getProcessEfficiency = async (story: ReduxStory): Promise<ProcessEfficiency | ProcessEfficiencyErrors>  =>
+    static getProcessEfficiency = async (story: ReduxStory, from: Date, to: Date): Promise<ProcessEfficiency | ProcessEfficiencyErrors>  =>
     {
         if(story.document.data.startedOn == undefined)
         {   return new ProcessEfficiencyErrors([new ProcessEfficiencyError(ProcessEfficiencyErrorType.StoryUnstarted)]);}
@@ -21,80 +21,238 @@ export default class EfficiencyEngine
         {   return new ProcessEfficiencyErrors([new ProcessEfficiencyError(ProcessEfficiencyErrorType.StoryStartInFuture)])}
 
         const users = await DocumentUser.getAllAsArray(story);
-        return EfficiencyEngine.calculateProcessEfficiency(story, users);
+        return EfficiencyEngine.calculateProcessEfficiency(story, users, from, to);
     }
 
-    static calculateProcessEfficiency = (story: ReduxStory, users: Array<DocumentUser>): ProcessEfficiency | ProcessEfficiencyErrors =>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    private static calculateProcessEfficiency = (story: ReduxStory, users: Array<DocumentUser>, from: Date, to: Date): ProcessEfficiency | ProcessEfficiencyErrors =>
     {
         const usersById = DocumentUser.asMap(users);
-        var totalProductiveTime: number = 0;
-        var totalInterruptionTime: number = 0;
+        const userIds = Object.keys(story.interruptions);
 
-        const keys = Object.keys(story.interruptions);
-        if(keys.length == 0)
+        if(userIds.length == 0 || userIds.some(e => story.interruptions[e].document.data.interruptions.length > 0) == false)
         {  
-            const end = story.document.data.finishedOn || new Date();
-            return new ProcessEfficiency(end.getTime() - story.document.data.startedOn!.getTime(), 0, []);
+            const duration = to.getTime() - from.getTime();
+            return new ProcessEfficiency(duration, duration, 0, []);
         }
 
-        var foundInterruptions = false;
-        var errors: ProcessEfficiencyErrors = new ProcessEfficiencyErrors();
-        keys.forEach(key => 
+        const builder: ProcessEfficiencyBuilder = new ProcessEfficiencyBuilder(from, to);
+        
+        userIds.forEach(key => 
         {
-            const value = story.interruptions[key];
-            if(value.document.data.interruptions.length > 0)
-            {   foundInterruptions = true;}
-
-            const processEfficiencyOrError = EfficiencyEngine.calculateUserProcessEfficiency(story, story.interruptions[key], usersById.get(key));
-
-            if(processEfficiencyOrError instanceof ProcessEfficiency)
-            {
-                totalProductiveTime += processEfficiencyOrError.productiveTime!;
-                totalInterruptionTime += processEfficiencyOrError.interruptionTime!;
-            }
-            else
-            {   errors = errors.merge(processEfficiencyOrError);}
+            const processEfficiencyOrError = EfficiencyEngine.calculateUserProcessEfficiency(story.interruptions[key], usersById.get(key), from, to);
+            builder.addEfficiency(processEfficiencyOrError);
         });
 
-        if(foundInterruptions == false)
-        {   
-            const end = story.document.data.finishedOn || new Date();
-            return new ProcessEfficiency(end.getTime() - story.document.data.startedOn!.getTime(), 0, []);
-        }
 
-        if(errors.hasAny())
-        {   return errors;}
-        else
-        {   return new ProcessEfficiency(totalProductiveTime, totalInterruptionTime, users.map(user => user.name));}
+        return builder.build()
     }
 
+    private static calculateUserProcessEfficiency= (participant: ReduxInterruptions, user: DocumentUser | undefined, from: Date, to: Date): ProcessEfficiency | ProcessEfficiencyErrors =>
+    {
+        if(user == undefined) 
+        {
+            return new ProcessEfficiency(0, 0, 0, []);
+        }
+    
+        const builder: ProcessEfficiencyBuilder = new ProcessEfficiencyBuilder(from, to);
+        const potentialTime = EfficiencyEngine.calculateUserPotentialTime(user.weekSchema, from, to, user.name);
+        const interruptedTime = EfficiencyEngine.calculateUserInterruptedTime(from, to, participant)
+        
+        builder.addInterruptedTime(interruptedTime);
+        if(potentialTime instanceof ProcessEfficiencyError)
+        {
+            builder.addError(potentialTime);
+        }
+        else
+        {
+            builder.addProductiveTime(potentialTime - interruptedTime);
+        }
+
+        return builder.build();
+    }
+
+    private static calculateUserInterruptedTime = (from: Date , to: Date, participant: ReduxInterruptions) =>
+    {
+        var cummulative = 0;
+        for(var i = 0 ; i < participant.document.data.interruptions.length ; i ++)
+        {
+            const interruption = participant.document.data.interruptions[i];
+            const start = interruption.timestamp;
+            const end = new Date(interruption.timestamp.getTime() + (interruption.duration || (new Date().getTime() - interruption.timestamp.getTime())));
+
+            if(start >= from && end <= to)
+            {
+                cummulative += interruption.duration || end.getTime() - start.getTime();
+            }   
+            else if(start < from && end >= from && end <= to)
+            {
+                cummulative += end.getTime() - from.getTime();
+            }
+            else if(start > from && start < to && end > to)
+            {
+                cummulative += to.getTime() - start.getTime();
+            }
+            else if(start < from && end > to)
+            {
+                cummulative += to.getTime() - from.getTime();
+            }
+        }
+
+        return cummulative;
+    }
+
+
+    /*
     //User could be undefined if the user entered an interruption on the story, and then removed his account from the database.
-    static calculateUserProcessEfficiency = (story: ReduxStory, interruptions: ReduxInterruptions, user: DocumentUser | undefined): ProcessEfficiency | ProcessEfficiencyErrors  =>
+    static calculateUserProcessEfficiency = (story: ReduxStory, participant: ReduxInterruptions, user: DocumentUser | undefined, from: Date, to: Date): ProcessEfficiency | ProcessEfficiencyErrors  =>
     {
         if(user == undefined) 
         {
             return new ProcessEfficiency(0, 0, []);
         }
         
-        return EfficiencyEngine.calculateUserProcessEfficiencyInternal(story.document.data.startedOn!, story.document.data.getCurrentFinishedOn(), interruptions, user);    
+        return EfficiencyEngine.calculateUserProcessEfficiencyInternal(story.document.data.startedOn!, story.document.data.getCurrentFinishedOn(), participant, user, from, to);    
     }
 
-    private static calculateUserProcessEfficiencyInternal = (previousFrom: Date, storyFinished: Date, interruptions: ReduxInterruptions, user: DocumentUser) =>
+    private static calculateUserProcessEfficiencyInternal = (previousFrom: Date, storyFinished: Date, participant: ReduxInterruptions, user: DocumentUser, from: Date, to: Date) =>
     {
-        var builder: ProcessEfficiencyBuilder = new ProcessEfficiencyBuilder(user);
-        interruptions.document.data.interruptions.forEach(interruption => 
+        var builder: ProcessEfficiencyBuilder = new ProcessEfficiencyBuilder();
+        participant.document.data.interruptions.forEach(interruption => 
         {
-            builder.processInterruptionInterval(EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, interruption.timestamp, user.name), interruption);
+            const interval = EfficiencyEngine.calculatePotentialTime(user.weekSchema, previousFrom, interruption.timestamp, user.name);
+            builder.addInterval(interval, interruption);
             previousFrom = interruption.duration ? new Date(interruption.timestamp.getTime() + interruption.duration) : storyFinished;
         });
 
-        return builder.processInterruptionInterval(EfficiencyEngine.dateDiff(user.weekSchema, previousFrom, storyFinished, user.name)).build();
-    } 
+        return builder.addInterval(EfficiencyEngine.calculatePotentialTime(user.weekSchema, previousFrom, storyFinished, user.name)).build();
+    } */
 
-    static dateDiff = (schema: EntitySchemaWeek, earlierDate: Date, laterDate: Date, username: string): number | ProcessEfficiencyError =>
+    private static calculateUserPotentialTime = (schema: EntitySchemaWeek, from: Date, to: Date, username: string): number | ProcessEfficiencyError =>
     {
-        const earlier = earlierDate.getTime();
-        const later = laterDate.getTime();
+        const earlier = from.getTime();
+        const later = to.getTime();
         
         if(earlier > later)
         {   
@@ -102,22 +260,22 @@ export default class EfficiencyEngine
         }
 
         var result = 0;
-        if(UtilityDate.areOnSameDay(earlierDate, laterDate))
+        if(UtilityDate.areOnSameDay(from, to))
         { 
             return later - earlier; 
         }
 
         // schema.getTimeWorkedOnFirstDayOfStory
-        const scheduledWorkEnd = schema.getDayOfDate(earlierDate).getEndAsMilliseconds();
+        const scheduledWorkEnd = schema.getDayOfDate(from).getEndAsMilliseconds();
         const dayStart = earlier % 86400000;
         result += EfficiencyEngine.howMuchBigger(scheduledWorkEnd, dayStart);
 
         // schema.getTimeWorkedOnLastDayOfStory
-        const scheduledWorkStart = schema.getDayOfDate(laterDate).getStartAsMilliseconds();
+        const scheduledWorkStart = schema.getDayOfDate(to).getStartAsMilliseconds();
         const dayEnd = later % 86400000;
         result += EfficiencyEngine.howMuchBigger(dayEnd, scheduledWorkStart);
 
-        EfficiencyEngine.forEachDayBetweenDates(schema, earlierDate, laterDate, (day, index, amountOfDays) => 
+        EfficiencyEngine.forEachDayBetweenDates(schema, from, to, (day, index, amountOfDays) => 
         {   
             if(index != 0 && index != amountOfDays - 1)
             // schema.getTotalTimeOnDay
@@ -129,17 +287,17 @@ export default class EfficiencyEngine
         return result;
     }
 
-    static howMuchBigger = (isThis: number, thanThis: number) =>
+    private static howMuchBigger = (isThis: number, thanThis: number) =>
     {
         // In our particular case, we want to return 0 if isThis is smaller than thanThis
         return Math.abs(Math.max(isThis - thanThis, 0))
     }    
 
 
-    static forEachDayBetweenDates = (schema: EntitySchemaWeek, started: Date, finished: Date, closure: (day: EntitySchemaDay, index: number, amountOfDays: number) => void) =>
+    private static forEachDayBetweenDates = (schema: EntitySchemaWeek, from: Date, to: Date, closure: (day: EntitySchemaDay, index: number, amountOfDays: number) => void) =>
     {
-        var index = (started.getDay() + 1 ) % 7;
-        const amountOfDays = EfficiencyEngine.getDaysBetweenDates(started, finished);
+        var index = (from.getDay() + 1 ) % 7;
+        const amountOfDays = EfficiencyEngine.getDaysBetweenDates(from, to);
         for(var i = 0 ; i < amountOfDays ; i ++)
         {
             const day = schema.getByIndex(index);
@@ -148,7 +306,8 @@ export default class EfficiencyEngine
         }
     }
 
-    static getDaysBetweenDates = (started: Date, finished: Date) =>
+    
+    private static getDaysBetweenDates = (started: Date, finished: Date) =>
     {
         const difference = Math.abs(finished.getTime() - started.getTime());
         const amount = Math.floor(difference / 86400000);

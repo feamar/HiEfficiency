@@ -7,6 +7,10 @@ import io.fullstack.oauth.OAuthManagerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0ad78ea74128534410d6386081a863bd1e85d621
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;

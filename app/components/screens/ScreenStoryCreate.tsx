@@ -119,8 +119,10 @@ class ScreenStoryCreate extends Component<Props, State>
 
     onSoftwareBackPress = () =>
     {
+        console.log("ON BACK PRESS: " + this.unsavedChanges);
         if(this.unsavedChanges == false || this.confirmationDialog == undefined)
         {   return false;}
+        console.log("ON BACK PRESS 2: " + this.unsavedChanges);
 
         if(this.confirmationDialog.base)
         {   this.confirmationDialog.base.setVisible(true);}
@@ -128,7 +130,6 @@ class ScreenStoryCreate extends Component<Props, State>
         return true;
     }
  
-    
     onSelectValueChanged = (field: keyof DocumentStory) => (value: PreferenceSelectSpinner_StorageValue) =>
     {
         console.log("HERE");
@@ -136,6 +137,7 @@ class ScreenStoryCreate extends Component<Props, State>
         if(story.document.data[field] == value.selected.id)
         {   return;}
 
+        console.log("UNSAVED CHANGES TO TRUE: 1");
         this.unsavedChanges = true ;
         story = update(story, {document: {data: {[field]: {$set: value.selected.id}}}});
         this.setState({story: story, fabEnabled: true});
@@ -144,9 +146,10 @@ class ScreenStoryCreate extends Component<Props, State>
     onTextValueChanged = (field: keyof DocumentStory) => (value: DialogPreferenceText_StorageValue) =>
     {
         var story = this.state.story;
-        if(story.document.data[field] == value.text)
+        if(story.document.data[field] === value.text)
         {   return;}
 
+        console.log("UNSAVED CHANGES TO TRUE: 2");
         this.unsavedChanges = true ;
         story = update(story, {document: {data: {[field]: {$set: value.text}}}});
         this.setState({story: story, fabEnabled: true});
@@ -216,12 +219,14 @@ class ScreenStoryCreate extends Component<Props, State>
                     crud.onCompleteListener = (successful: boolean) => 
                     {
                         if(successful)
-                        {   this.props.navigation.goBack();}
+                        {   
+                            console.log("UNSAVED CHANGES TO FALSE: 13");
+                            this.unsavedChanges = false;
+                            this.props.navigation.goBack();
+                        }
                     };
                     await execute(crud, false);
                 });
-
-                this.unsavedChanges = false;
                 break;
 
             case "Edit":
@@ -236,7 +241,11 @@ class ScreenStoryCreate extends Component<Props, State>
                     if(result.successful)
                     {   
                         if(result.dialogOpened == false)
-                        {   Toast.show("Story successfully updated!", Toast.LONG);}
+                        {
+                            console.log("UNSAVED CHANGES TO FALSE: 24");
+                            this.unsavedChanges = false;
+                            Toast.show("Story successfully updated!", Toast.LONG);
+                        }
 
                         //For some reason, the function .dangerouslyGetParent has not been included in the type definition, but the contributors do tell us that it is part of the public API and is only called "dangerously" because it should not be overused.
                         const parent = (this.props.navigation as any).dangerouslyGetParent();
@@ -244,7 +253,6 @@ class ScreenStoryCreate extends Component<Props, State>
                         {   parent.setParams({ subtitle: this.state.story.document.data.name });}
                     }
                 });
-                this.unsavedChanges = false;
                 break;
         }
 
@@ -252,12 +260,16 @@ class ScreenStoryCreate extends Component<Props, State>
     }
 
     getStoryTypeOptions = (): Array<SelectOption> =>
-    {   return StoryType.Values.map(type => new SelectOption(type.id, type.name));}
+    {   
+        const options = StoryType.Values.map(type => new SelectOption(type.id, type.name));
+        return options;
+    }
 
     onDialogConfirmed = (_baseComponent: ConcreteDialogConfirmation | undefined, action: DialogConfirmationActionUnion) =>
     {
         if(action == "Positive")
         {
+            console.log("UNSAVED CHANGES TO FALSE: 2");
             this.unsavedChanges = false; 
 
             //If the screen is encapsulated in a tab navigator, we'll need to perform the navigation event on the parent tab navigator.

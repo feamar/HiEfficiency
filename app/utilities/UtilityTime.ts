@@ -117,7 +117,7 @@ export default class UtilityTime
     public static dateToString = (date: Date, options?: Intl.DateTimeFormatOptions) =>
     {
         if(options == undefined)
-        {   options = {year: "numeric", month: "short", day: "numeric" };}
+        {   options = {year: "long", month: "short", day: "numeric" };}
 
         return date.toLocaleDateString("en-US",  options);
     }

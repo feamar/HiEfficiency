@@ -7,6 +7,7 @@ import { View } from "react-native";
 import { Dropdown } from 'react-native-material-dropdown';
 import { AbstractPreferenceState } from "./AbstractPreference";
 import update from "immutability-helper";
+import UtilityObject from "../../../utilities/UtilityObject";
 
 export type PreferenceSelectSpinner_StorageValue =
 {
@@ -39,14 +40,17 @@ export default class PreferenceSelectSpinner extends React.Component<Props, Stat
     toDisplayValue = (storage: StorageValue) =>
     {   return storage.selected.value;}
 
-    onValueSelected = (value: SelectOption) =>
+    onValueSelected = async (value: string) =>
     {
+        const selected = this.props.options.find(e => e.value == value);
+        if(selected == undefined) return;
+
         if(this.base)
         {
             const abstractPreference = this.base.base;
             if(abstractPreference)
             {
-                const updated = update(abstractPreference.state.storageValue, {selected: {$set: value}});
+                const updated = update(abstractPreference.state.storageValue, {selected: {$set: selected}});
                 abstractPreference.onValueChanged(updated);
             }
         }

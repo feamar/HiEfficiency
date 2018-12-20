@@ -33,20 +33,21 @@ const menuStyles =
     }
 }
  
-export interface AbstractListItemPropsVirtual<ModelType>
+export interface AbstractListItem_Props_Virtual<ModelType>
 {
     item: ModelType,
     index: number,
+    divider?: boolean,
     onItemSelected?: (item: ModelType, index: number) => void,
     onContextMenuItemSelected?: (item: ModelType, index: number, option: ActionOption) => void
 }
 
-interface AbstractListItemPropsSealed<ModelType>
+interface AbstractListItem_Props_Sealed<ModelType>
 {
     content: (item: ModelType) => JSX.Element,
 }
 
-type Props<ModelType> = AbstractListItemPropsVirtual<ModelType> & AbstractListItemPropsSealed<ModelType>
+type Props<ModelType> = AbstractListItem_Props_Virtual<ModelType> & AbstractListItem_Props_Sealed<ModelType>
 
 interface State<ModelType>
 {
@@ -156,7 +157,7 @@ export default class AbstractListItem<ModelType> extends Component<Props<ModelTy
                         }
                     </View>
                 </TouchableRipple>
-                <Divider />  
+                {this.props.divider && <Divider />}
             </View>
         );
     }
